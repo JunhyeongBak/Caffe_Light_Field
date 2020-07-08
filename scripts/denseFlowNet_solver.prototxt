@@ -1,0 +1,10 @@
+train_net: "/docker/etri/denseFlowNet_train.prototxt"
+base_lr: 10
+momentum: 0
+weight_decay: 0.0005
+lr_policy: "inv"gamma: 0.001
+power: 0.75
+display: 1
+max_iter: 50000
+snapshot: 10000
+snapshot_prefix: "/docker/etri"

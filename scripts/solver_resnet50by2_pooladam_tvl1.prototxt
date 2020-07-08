@@ -1,0 +1,23 @@
+train_net: "/docker/lf_depth/scripts/depthFlowTest_train.prototxt"
+test_interval: 40000000
+display: 20
+lr_policy: "step"
+gamma: 0.1        # drop the learning rate by a factor of 10
+                  # (i.e., multiply it by a factor of gamma = 0.1)
+
+stepsize: 60000  # drop the learning rate every 100K iterations
+# lr for unnormalized softmax
+base_lr: 5e-6
+# high momentum
+momentum: 0.9
+momentum2:0.999
+delta:1e-8
+# no gradient accumulation
+iter_size: 1
+max_iter: 60000
+weight_decay: 0.0001
+snapshot: 1000
+snapshot_prefix: "/docker/lf_depth/models"
+test_initialization: false
+type: "Adam"
+solver_mode: GPU
