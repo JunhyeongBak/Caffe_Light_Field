@@ -1,7 +1,0 @@
-train_net: "/docker/lf_depth/scripts/depthFlowTest_train.prototxt"
-base_lr: 0.000001
-momentum: 0.5
-lr_policy: "fixed"display: 1
-max_iter: 50000
-snapshot: 10000
-snapshot_prefix: "/docker/etri"
