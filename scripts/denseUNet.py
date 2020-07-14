@@ -54,26 +54,27 @@ if __name__ == "__main__":
         drop = L.Dropout(relu, dropout_ratio=0.5, in_place=True)
         return drop
         
-    def denseUNet_train(source_l, source_r, batch_size=1):
+    def denseFlowNet_train(batch_size=1):
         n = caffe.NetSpec()
 
-        n.left, n.trash = L.ImageData(batch_size=batch_size,
-                                source=source_l,
+        n.input = L.ImageData(batch_size=batch_size,
+                                source='/docker/lf_depth/datas/',
                                 transform_param=dict(scale=1./1.),
                                 shuffle=False,
-                                ntop=2,
+                                ntop=1,
                                 is_color=False)
-        n.right, n.trash = L.ImageData(batch_size=batch_size,
-                                source=source_r,
+
+        n.label = L.ImageData(batch_size=batch_size,
+                                source='/docker/lf_depth/datas/',
                                 transform_param=dict(scale=1./1.),
                                 shuffle=False,
-                                ntop=2,
+                                ntop=1,
                                 is_color=False)
 
-        mode_str = json.dumps({'id': 3})
-        n.left = L.Python(n.left, module = 'input_shifting_layer', layer = 'InputShiftingLayer', ntop = 1, param_str = mode_str)
+        mode_str = json.dumps({'id': 0})
+        n.shift0 = L.Python(n.input_center, module = 'input_shifting_layer', layer = 'InputShiftingLayer', ntop = 1, param_str = mode_str)
 
-        n.conv_relu1 = conv_relu(n.left, 3, 14, 1, 1) # init
+        n.conv_relu1 = conv_relu(n.input_center, 3, 14, 1, 1) # init
         n.block1_add1 = block(n.conv_relu1, 3, 12, 2, 1, 2)
         n.block1_add2 = block(n.block1_add1, 3, 12, 2, 1, 2)
         n.block1_add3 = block(n.block1_add2, 3, 12, 2, 1, 2)
@@ -90,15 +91,14 @@ if __name__ == "__main__":
         n.block4_add2 = block(n.block4_add1, 3, 12, 16, 1, 16)
         n.block4_add3 = block(n.block4_add2, 3, 12, 16, 1, 16)
         n.conv_relu5 = conv_relu(n.block4_add3, 3, 158, 1, 1) # trans4
-        n.flow1_conv1 = conv_relu(n.conv_relu5, 3, 158, 1, 1)
-        n.flow_h1 = conv_relu(n.flow1_conv1, 3, 18, 1, 1)
-        n.flow_h = L.ReLU(n.flow_h1, in_place=False)
+        n.flow = conv_relu(n.conv_relu5, 3, 158, 2, 1)
 
+        n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
         n.flow_h = L.Power(n.flow_h, power=1.0, scale=-1.0, shift=0.0, in_place=False)
-        n.flow_v = L.Power(n.flow_h, power=1.0, scale=0.0, shift=0.0, in_place=False)
+        n.flow_v = L.Power(n.flow_v, power=1.0, scale=-1.0, shift=0.0, in_place=False)
 
-        n.predict = L.Warping(n.left, n.flow_h, n.flow_v)
-        n.loss = L.AbsLoss(n.predict, n.right, loss_weight=1)
+        n.predict0 = L.Warping(n.shift0, n.flow_h, n.flow_v)
+        n.loss = L.AbsLoss(n.predict0, n.label0, loss_weight=1)
 
         bottom_layers = [n.flow_h, n.flow_v, n.left, n.predict, n.right]
         n.print = L.Python(*bottom_layers, module = 'lf_result_layer', layer = 'LfResultLayer', ntop = 1)
