@@ -177,16 +177,28 @@ if __name__ == "__main__":
                                 shuffle=False,
                                 ntop=2,
                                 is_color=False)
-        tx, ty = shift_value_5x5(TARGET_SAI, 0.8)
+        tx, ty = shift_value_5x5(0, 0.8)
         mode_str = json.dumps({'tx': tx, 'ty': ty})
-        n.shift = L.Python(n.input, module = 'input_shifting_layer', layer = 'InputShiftingLayer', ntop = 1, param_str = mode_str)
+        n.shift0 = L.Python(n.input, module = 'input_shifting_layer', layer = 'InputShiftingLayer', ntop = 1, param_str = mode_str)
+        tx, ty = shift_value_5x5(22, 0.8)
+        mode_str = json.dumps({'tx': tx, 'ty': ty})
+        n.shift22 = L.Python(n.input, module = 'input_shifting_layer', layer = 'InputShiftingLayer', ntop = 1, param_str = mode_str)
+        n.shift = L.Concat(*[n.shift0, n.shift22], concat_param={'axis': 1})
+
         
-        n.label, n.trash = L.ImageData(batch_size=batch_size,
-                                source='/docker/lf_depth/datas/FlowerLF/source'+str(TARGET_SAI)+'.txt',
+        n.label0, n.trash = L.ImageData(batch_size=batch_size,
+                                source='/docker/lf_depth/datas/FlowerLF/source'+str(0)+'.txt',
                                 transform_param=dict(scale=1./1.),
                                 shuffle=False,
                                 ntop=2,
                                 is_color=False)
+        n.label22, n.trash = L.ImageData(batch_size=batch_size,
+                                source='/docker/lf_depth/datas/FlowerLF/source'+str(22)+'.txt',
+                                transform_param=dict(scale=1./1.),
+                                shuffle=False,
+                                ntop=2,
+                                is_color=False)
+        n.label = L.Concat(*[n.label0, n.label22], concat_param={'axis': 1})
 
         n.conv_relu1 = conv_relu(n.input, 3, 14, 1, 1) # init
         n.block1_add1 = block(n.conv_relu1, 3, 12, 2, 1, 2)
@@ -205,18 +217,27 @@ if __name__ == "__main__":
         n.block4_add2 = block(n.block4_add1, 3, 12, 16, 1, 16)
         n.block4_add3 = block(n.block4_add2, 3, 12, 16, 1, 16)
         n.conv_relu5 = conv_relu(n.block4_add3, 3, 158, 1, 1) # trans4
-        #n.flow = conv_relu(n.conv_relu5, 3, 2, 1, 1)
         n.flow = L.Convolution(n.conv_relu5, kernel_size=3, stride=1,
-                                    num_output=2, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+                                    num_output=4, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
 
-        n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
-        #n.flow_h, n.flow_v = flow_translating(n.flow_h, n.flow_v, TARGET_SAI)
+        n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[2]))
 
         n.predict = L.Warping(n.shift, n.flow_h, n.flow_v)
         n.loss = L.AbsLoss(n.predict, n.label, loss_weight=1)
 
-        bottom_layers = [n.flow_h, n.flow_v, n.shift, n.predict, n.label]
-        n.print = L.Python(*bottom_layers, module = 'lf_result_layer', layer = 'LfResultLayer', ntop = 1)
+        n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                        param_str=str(dict(path='/docker/lf_depth/datas', name='flow_h', mult=30)))
+        n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                        param_str=str(dict(path='/docker/lf_depth/datas', name='flow_v', mult=30)))
+        n.trash3 = L.Python(n.shift, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                        param_str=str(dict(path='/docker/lf_depth/datas', name='shift', mult=1)))
+        n.trash4 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                        param_str=str(dict(path='/docker/lf_depth/datas', name='label', mult=1)))
+        n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                        param_str=str(dict(path='/docker/lf_depth/datas', name='predict', mult=1)))
+
+        #bottom_layers = [n.flow_h, n.flow_v, n.shift, n.predict, n.label]
+        #n.print = L.Python(*bottom_layers, module = 'lf_result_layer', layer = 'LfResultLayer', ntop = 1)
 
         return n.to_proto()
 
@@ -274,5 +295,5 @@ if __name__ == "__main__":
     generate_net()
     generate_solver()
     solver = caffe.get_solver(SOLVER_PATH)
-    solver.net.copy_from('/docker/lf_depth/models/majoong_ch2.caffemodel')
+    solver.net.copy_from('/docker/lf_depth/models/majoong_ch4.caffemodel')
     solver.solve()

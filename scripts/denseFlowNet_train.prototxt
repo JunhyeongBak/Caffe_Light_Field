@@ -14,9 +14,9 @@ layer {
   }
 }
 layer {
-  name: "label"
+  name: "label22"
   type: "ImageData"
-  top: "label"
+  top: "label22"
   top: "trash"
   transform_param {
     scale: 1.0
@@ -29,14 +29,60 @@ layer {
   }
 }
 layer {
-  name: "shift"
+  name: "shift0"
   type: "Python"
   bottom: "input"
-  top: "shift"
+  top: "shift0"
+  python_param {
+    module: "input_shifting_layer"
+    layer: "InputShiftingLayer"
+    param_str: "{\"tx\": -1.6, \"ty\": -1.6}"
+  }
+}
+layer {
+  name: "shift22"
+  type: "Python"
+  bottom: "input"
+  top: "shift22"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
     param_str: "{\"tx\": 1.6, \"ty\": 0}"
+  }
+}
+layer {
+  name: "shift"
+  type: "Concat"
+  bottom: "shift0"
+  bottom: "shift22"
+  top: "shift"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "label0"
+  type: "ImageData"
+  top: "label0"
+  top: "ImageData2"
+  transform_param {
+    scale: 1.0
+  }
+  image_data_param {
+    source: "/docker/lf_depth/datas/FlowerLF/source0.txt"
+    batch_size: 1
+    shuffle: false
+    is_color: false
+  }
+}
+layer {
+  name: "label"
+  type: "Concat"
+  bottom: "label0"
+  bottom: "label22"
+  top: "label"
+  concat_param {
+    axis: 1
   }
 }
 layer {
@@ -674,7 +720,7 @@ layer {
   bottom: "conv_relu5"
   top: "flow"
   convolution_param {
-    num_output: 2
+    num_output: 4
     bias_term: true
     pad: 1
     kernel_size: 3
@@ -695,7 +741,7 @@ layer {
   top: "flow_v"
   slice_param {
     slice_dim: 1
-    slice_point: 1
+    slice_point: 2
   }
 }
 layer {
@@ -715,16 +761,57 @@ layer {
   loss_weight: 1
 }
 layer {
-  name: "print"
+  name: "trash1"
   type: "Python"
   bottom: "flow_h"
-  bottom: "flow_v"
-  bottom: "shift"
-  bottom: "predict"
-  bottom: "label"
-  top: "print"
+  top: "trash1"
   python_param {
-    module: "lf_result_layer"
-    layer: "LfResultLayer"
+    module: "visualization_layer"
+    layer: "VisualizationLayer"
+    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'flow_h\', \'mult\': 30}"
+  }
+}
+layer {
+  name: "trash2"
+  type: "Python"
+  bottom: "flow_v"
+  top: "trash2"
+  python_param {
+    module: "visualization_layer"
+    layer: "VisualizationLayer"
+    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'flow_v\', \'mult\': 30}"
+  }
+}
+layer {
+  name: "trash3"
+  type: "Python"
+  bottom: "shift"
+  top: "trash3"
+  python_param {
+    module: "visualization_layer"
+    layer: "VisualizationLayer"
+    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'shift\', \'mult\': 1}"
+  }
+}
+layer {
+  name: "trash4"
+  type: "Python"
+  bottom: "label"
+  top: "trash4"
+  python_param {
+    module: "visualization_layer"
+    layer: "VisualizationLayer"
+    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'label\', \'mult\': 1}"
+  }
+}
+layer {
+  name: "trash5"
+  type: "Python"
+  bottom: "predict"
+  top: "trash5"
+  python_param {
+    module: "visualization_layer"
+    layer: "VisualizationLayer"
+    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'predict\', \'mult\': 1}"
   }
 }

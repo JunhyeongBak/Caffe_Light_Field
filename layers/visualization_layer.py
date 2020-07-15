@@ -20,39 +20,28 @@
 import caffe
 import numpy as np
 import cv2
-import imageio
+#import imageio
 
 class VisualizationLayer(caffe.Layer):
     def setup(self, bottom, top):
         # Read params
         params = eval(self.param_str)
-        self.mode = params['mode']
-        self.weight = params['weight']
         self.path = params['path']
+        self.name = params['name']
+        self.mult = params['mult']
     
     def reshape(self, bottom, top):
         # Assign top blob shape
-        top[0].reshape(*bottom[0].data.shape)            
+        top[0].reshape(1)            
 
     def forward(self, bottom, top):
-        # Transfer original value
-        top[0].data = bottom[0].data
-
-        # Visualize input image
-        if self.mode == 'img':
-            if bottom[0].data.shape[1] != 1
-                raise Exception("ERR - Image chennel should be 1ch")
-            cv2.imwrite(self.path, top[0].data[0, 0, :, :]*self.weight)
-        elif self.mode == 'gif':
-            imageio.mimsave(self.path, top[0].data[0, :, :, :]*self.weight, duration=0.5)
-        else:
-            raise Exception("ERR - Select the correct mode")
+        for b in range(bottom[0].data.shape[0]):
+            for c in range(bottom[0].data.shape[1]):
+                full_name = 'b'+str(b)+'_'+'c'+str(c)+'_'+self.name
+                full_path = self.path+'/'+full_name+'.png'
+                print('<'+full_name+'>')
+                print(np.mean(bottom[0].data[b, c, :, :]))
+                cv2.imwrite(full_path, abs(bottom[0].data[b, c, :, :]*self.mult))
 
     def backward(self, top, propagate_down, bottom):
-        # Transfer gradient
-        top[0].diff = bottom[0].diff
-
-"""
-if len(bottom) != 1:
-            raise Exception("Input size error.")
-"""
+        pass
