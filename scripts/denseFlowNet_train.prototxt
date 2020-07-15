@@ -22,7 +22,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source0.txt"
+    source: "/docker/lf_depth/datas/FlowerLF/source22.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -36,7 +36,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": -1.6}"
+    param_str: "{\"tx\": 1.6, \"ty\": 0}"
   }
 }
 layer {
@@ -669,10 +669,10 @@ layer {
   top: "conv_relu5"
 }
 layer {
-  name: "Convolution18"
+  name: "flow"
   type: "Convolution"
   bottom: "conv_relu5"
-  top: "Convolution18"
+  top: "flow"
   convolution_param {
     num_output: 2
     bias_term: true
@@ -688,42 +688,14 @@ layer {
   }
 }
 layer {
-  name: "flow"
-  type: "ReLU"
-  bottom: "Convolution18"
-  top: "flow"
-}
-layer {
-  name: "Slice1"
+  name: "flow_h"
   type: "Slice"
   bottom: "flow"
-  top: "Slice1"
-  top: "Slice2"
+  top: "flow_h"
+  top: "flow_v"
   slice_param {
     slice_dim: 1
     slice_point: 1
-  }
-}
-layer {
-  name: "flow_h"
-  type: "Power"
-  bottom: "Slice1"
-  top: "flow_h"
-  power_param {
-    power: 1.0
-    scale: -1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "flow_v"
-  type: "Power"
-  bottom: "Slice2"
-  top: "flow_v"
-  power_param {
-    power: 1.0
-    scale: -1.0
-    shift: 0.0
   }
 }
 layer {

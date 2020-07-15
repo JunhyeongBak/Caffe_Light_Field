@@ -11,7 +11,7 @@ from caffe import params as P
 np.set_printoptions(threshold=sys.maxsize)
 caffe.set_mode_gpu()
 
-TARGET_SAI = 0
+TARGET_SAI = 22
 CENTER_SAI = 12
 
 # +---+----+----+----+----+----+----+----+
@@ -120,6 +120,53 @@ if __name__ == "__main__":
             else:   
                 con = L.Concat([con, shift], concat_param={'axis': 1})
         return con
+
+    def flow_translating(bottom_h, bottom_v, i):
+        if i<=4:
+            flow_h = L.Power(bottom_h, power=1.0, scale=-1.0, shift=0.0, in_place=False)
+        elif i>4 and i<=9:
+            flow_h = L.Power(bottom_h, power=1.0, scale=-1.0, shift=0.0, in_place=False)
+        elif i>9 and i<=14:
+            flow_h = L.Power(bottom_h, power=1.0, scale=0.0, shift=0.0, in_place=False)
+        elif i>14 and i<=19:
+            flow_h = L.Power(bottom_h, power=1.0, scale=1.0, shift=0.0, in_place=False)
+        elif i>19 and i<=24:
+            flow_h = L.Power(bottom_h, power=1.0, scale=1.0, shift=0.0, in_place=False)
+        else:
+            flow_h = L.Power(bottom_h, power=1.0, scale=0.0, shift=0.0, in_place=False)
+        if i == 0 or (i)%5==0:
+            flow_v = L.Power(bottom_v, power=1.0, scale=-1.0, shift=0.0, in_place=False)
+        elif i == 1 or (i-1)%5==0:
+            flow_v = L.Power(bottom_v, power=1.0, scale=-1.0, shift=0.0, in_place=False)
+        elif i == 2 or (i-2)%5==0:
+            flow_v = L.Power(bottom_v, power=1.0, scale=0.0, shift=0.0, in_place=False)
+        elif i == 3 or (i-3)%5==0:
+            flow_v = L.Power(bottom_v, power=1.0, scale=1.0, shift=0.0, in_place=False)
+        elif i == 4 or (i-4)%5==0:
+            flow_v = L.Power(bottom_v, power=1.0, scale=1.0, shift=0.0, in_place=False)
+        else:
+            flow_v = L.Power(bottom_v, power=1.0, scale=0.0, shift=0.0, in_place=False)
+        return flow_h, flow_v
+
+    def flow_translating_5x5(bottom):
+        con = None
+        for i in range(25):
+            if i == 0:
+                flow_h, flow_v, flow_remain = L.Slice(bottom, ntop=3, slice_param=dict(slice_dim=1, slice_point=[1, 2]))
+            elif i > 0 and i <= 23:
+                flow_h, flow_v, flow_remain = L.Slice(flow_remain, ntop=3, slice_param=dict(slice_dim=1, slice_point=[1, 2]))
+            else:
+                flow_h, flow_v = L.Slice(flow_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+
+            flow_h, flow_v = flow_translating(flow_h, flow_v, i) 
+
+            if i == 0:
+                con = flow_h
+                con = L.Concat([con, flow_v], concat_param={'axis': 1})
+            else:
+                con = L.Concat([con, flow_h], concat_param={'axis': 1})
+                con = L.Concat([con, flow_v], concat_param={'axis': 1})
+        return con
         
     def denseFlowNet_train(batch_size=1):
         n = caffe.NetSpec()
@@ -158,11 +205,12 @@ if __name__ == "__main__":
         n.block4_add2 = block(n.block4_add1, 3, 12, 16, 1, 16)
         n.block4_add3 = block(n.block4_add2, 3, 12, 16, 1, 16)
         n.conv_relu5 = conv_relu(n.block4_add3, 3, 158, 1, 1) # trans4
-        n.flow = conv_relu(n.conv_relu5, 3, 2, 1, 1)
+        #n.flow = conv_relu(n.conv_relu5, 3, 2, 1, 1)
+        n.flow = L.Convolution(n.conv_relu5, kernel_size=3, stride=1,
+                                    num_output=2, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
 
         n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
-        n.flow_h = L.Power(n.flow_h, power=1.0, scale=-1.0, shift=0.0, in_place=False)
-        n.flow_v = L.Power(n.flow_v, power=1.0, scale=-1.0, shift=0.0, in_place=False)
+        #n.flow_h, n.flow_v = flow_translating(n.flow_h, n.flow_v, TARGET_SAI)
 
         n.predict = L.Warping(n.shift, n.flow_h, n.flow_v)
         n.loss = L.AbsLoss(n.predict, n.label, loss_weight=1)
@@ -187,7 +235,7 @@ if __name__ == "__main__":
         s.max_iter = 5000
 
         s.type = 'Adam'
-        s.base_lr = 0.00001
+        s.base_lr = 0.000005
 
         s.lr_policy = 'fixed'
         s.gamma = 0.75
@@ -226,4 +274,5 @@ if __name__ == "__main__":
     generate_net()
     generate_solver()
     solver = caffe.get_solver(SOLVER_PATH)
+    solver.net.copy_from('/docker/lf_depth/models/majoong_ch2.caffemodel')
     solver.solve()

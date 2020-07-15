@@ -1,5 +1,5 @@
 train_net: "/docker/lf_depth/scripts/denseFlowNet_train.prototxt"
-base_lr: 1e-05
+base_lr: 5e-06
 display: 100
 max_iter: 5000
 lr_policy: "fixed"
