@@ -18,8 +18,9 @@ class InputShiftingLayer(caffe.Layer):
         M = np.float32([[1, 0, self.tx], [0, 1, self.ty]])
 
         # Shift image
-        top[0].data[0, 0, :, :] = cv2.warpAffine(bottom[0].data[0, 0, :, :], M, (bottom[0].data.shape[3], bottom[0].data.shape[2]),
-                                                flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+        for b in range(bottom[0].data.shape[0]):
+            top[0].data[b, 0, :, :] = cv2.warpAffine(bottom[0].data[b, 0, :, :], M, (bottom[0].data.shape[3], bottom[0].data.shape[2]),
+                                                    flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
     def backward(self, top, propagate_down, bottom):
         # Transfer gradient

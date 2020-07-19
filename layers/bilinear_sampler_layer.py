@@ -290,15 +290,16 @@ class BilinearSamplerLayer(caffe.Layer):
 """
 
 def warp_flow(img, flow):
+    print(flow.shape)
     new_flow = np.zeros((flow.shape[1], flow.shape[2], flow.shape[0]), np.float32)
     new_flow[:, :, 0] = flow[1, :, :]
     new_flow[:, :, 1] = flow[0, :, :]
     h, w = new_flow.shape[:2]
-    print('img.shape', img.shape)
-    new_flow = -new_flow
+    #print('img.shape', img.shape)
+    new_flow = new_flow
     new_flow[:,:,0] += np.arange(w)
     new_flow[:,:,1] += np.arange(h)[:,np.newaxis]
-    res = cv2.remap(img[0, : :], new_flow, None, interpolation = cv2.INTER_LINEAR, borderMode = cv2.BORDER_WRAP)
+    res = cv2.remap(img[:, :], new_flow, None, interpolation = cv2.INTER_LINEAR, borderMode = cv2.BORDER_WRAP)
     
     return res
 
@@ -307,31 +308,34 @@ class BilinearSamplerLayer(caffe.Layer):
         pass
     
     def reshape(self, bottom, top):
-        self.src_shape = bottom[0].data[...].shape # lf center sai's shape
-        self.src = bottom[0].data[...]
-        self.vec_shape = bottom[1].data[...].shape # flow vector's shape
-        self.vec = bottom[1].data[...]
-        top[0].reshape(*self.src_shape) # caffe shape
-        top[1].reshape(*self.src_shape)
-        top[2].reshape(*self.src_shape)
+        self.src = bottom[0].data[...] # shifted SAIs
+        self.src_shape = bottom[0].data[...].shape 
+        self.vec = bottom[1].data[...] # concatenated flows
+        self.vec_shape = bottom[1].data[...].shape 
+        top[0].reshape(*self.src_shape)
 
     def forward(self, bottom, top):
-        self.dst = np.zeros((self.src_shape[0], self.src_shape[1], self.src_shape[2], self.src_shape[3]))
-        self.dst[0, :, :, :] = warp_flow(self.src[0, :, :, :], self.vec[0, :, :, :])
+        self.dst = np.zeros((self.src_shape))
+        for b in range(self.src_shape[0]):
+            for c in range(self.src_shape[1]):
+                vec_trans = np.zeros((2, self.src_shape[2], self.src_shape[3]))
+                vec_trans[0, :, :] = self.vec[b, c, :, :]
+                vec_trans[1, :, :] = self.vec[b, c+25, :, :]
+                self.dst[b, c, :, :] = warp_flow(self.src[b, c, :, :], vec_trans*1.)
         #self.dst[0, :, :, :] = warp_flow(self.src[0, :, :, :], np.concatenate([np.ones((1, 192, 256)) * 20., np.zeros((1, 192, 256)) * 20.], axis=0))
-        cv2.imwrite('/docker/etri/data/FlowerLF/test_input.png', self.src[0, 0, :, :])
-        cv2.imwrite('/docker/etri/data/FlowerLF/test_result.png', self.dst[0, 0, :, :])
-        cv2.imwrite('/docker/etri/data/FlowerLF/ver_flow.png', self.vec[0, 0, :, :] * 15.)
-        cv2.imwrite('/docker/etri/data/FlowerLF/hor_flow.png', self.vec[0, 1, :, :] * 15.)
-        print('Ver flow mean : ', np.mean(self.vec[0, 0, :, :]))
-        print('Hor flow mean : ', np.mean(self.vec[0, 1, :, :]))
+        cv2.imwrite('/docker/lf_depth/datas/FlowerLF/test_input.png', self.src[0, 0, :, :])
+        cv2.imwrite('/docker/lf_depth/datas/FlowerLF/test_result.png', self.dst[0, 0, :, :])
+        cv2.imwrite('/docker/lf_depth/datas/FlowerLF/ver_flow.png', self.vec[0, 0, :, :] * 15.)
+        cv2.imwrite('/docker/lf_depth/datas/FlowerLF/hor_flow.png', self.vec[0, 1, :, :] * 15.)
+        #print('Ver flow mean : ', np.mean(self.vec[0, 0, :, :]))
+        #print('Hor flow mean : ', np.mean(self.vec[0, 1, :, :]))
         top[0].data[...] = self.dst
-        top[1].data[...] = self.dst
-        top[2].data[...] = self.dst
 
     def backward(self, top, propagate_down, bottom):
-        bottom[1].diff[:, 0, :, :] = np.squeeze(top[1].diff, axis=1)
-        bottom[1].diff[:, 1, :, :] = np.squeeze(top[0].diff, axis=1)
-        print('Ver flow diff mean :', np.mean(top[1].diff))
-        print('Hor flow diff mean :', np.mean(top[0].diff))
+        # Transfer gradient
+        top[0].diff = bottom[0].diff
+        #bottom[1].diff[:, 0, :, :] = np.squeeze(top[1].diff, axis=1)
+        #bottom[1].diff[:, 1, :, :] = np.squeeze(top[0].diff, axis=1)
+        #print('Ver flow diff mean :', np.mean(top[1].diff))
+        #print('Hor flow diff mean :', np.mean(top[0].diff))
     

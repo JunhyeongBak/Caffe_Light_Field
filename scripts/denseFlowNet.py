@@ -87,15 +87,15 @@ if __name__ == "__main__":
     def conv_relu(bottom, ks, nout, stride=1, pad=0):
         conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
                                     num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-        relu = L.ReLU(conv, in_place=False)
+        relu = L.ReLU(conv, relu_param=dict(negative_slope=0.0), in_place=False)
         return relu
 
     def block(bottom, ks, nout, dilation=1, stride=1, pad=0):
         conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
                                     num_output=nout, pad=pad, dilation=dilation, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-        relu = L.ReLU(conv, in_place=False)
+        relu = L.ReLU(conv, relu_param=dict(negative_slope=0.1), in_place=False)
         ccat = L.Concat(relu, bottom, axis=1)
-        relu = L.ReLU(ccat, in_place=False)
+        relu = L.ReLU(ccat, relu_param=dict(negative_slope=0.0), in_place=False)
         return relu
 
     def fc_block(bottom, nout):
@@ -118,7 +118,7 @@ if __name__ == "__main__":
             if i == 0:
                 con = shift
             else:   
-                con = L.Concat([con, shift], concat_param={'axis': 1})
+                con = L.Concat(*[con, shift], concat_param={'axis': 1})
         return con
 
     def flow_translating(bottom_h, bottom_v, i):
@@ -147,27 +147,284 @@ if __name__ == "__main__":
         else:
             flow_v = L.Power(bottom_v, power=1.0, scale=0.0, shift=0.0, in_place=False)
         return flow_h, flow_v
+    
+    def flow_h_translating(bottom_h, i):
+        if i<=4:
+            flow_h = L.Power(bottom_h, power=1.0, scale=-1.0, shift=0.0, in_place=False)
+        elif i>4 and i<=9:
+            flow_h = L.Power(bottom_h, power=1.0, scale=-1.0, shift=0.0, in_place=False)
+        elif i>9 and i<=14:
+            flow_h = L.Power(bottom_h, power=1.0, scale=0.0, shift=0.0, in_place=False)
+        elif i>14 and i<=19:
+            flow_h = L.Power(bottom_h, power=1.0, scale=1.0, shift=0.0, in_place=False)
+        elif i>19 and i<=24:
+            flow_h = L.Power(bottom_h, power=1.0, scale=1.0, shift=0.0, in_place=False)
+        else:
+            flow_h = L.Power(bottom_h, power=1.0, scale=0.0, shift=0.0, in_place=False)
+        return flow_h
 
-    def flow_translating_5x5(bottom):
+    def flow_v_translating(bottom_v, i):
+        if i == 0 or (i)%5==0:
+            flow_v = L.Power(bottom_v, power=1.0, scale=-1.0, shift=0.0, in_place=False)
+        elif i == 1 or (i-1)%5==0:
+            flow_v = L.Power(bottom_v, power=1.0, scale=-1.0, shift=0.0, in_place=False)
+        elif i == 2 or (i-2)%5==0:
+            flow_v = L.Power(bottom_v, power=1.0, scale=0.0, shift=0.0, in_place=False)
+        elif i == 3 or (i-3)%5==0:
+            flow_v = L.Power(bottom_v, power=1.0, scale=1.0, shift=0.0, in_place=False)
+        elif i == 4 or (i-4)%5==0:
+            flow_v = L.Power(bottom_v, power=1.0, scale=1.0, shift=0.0, in_place=False)
+        else:
+            flow_v = L.Power(bottom_v, power=1.0, scale=0.0, shift=0.0, in_place=False)
+        return flow_v
+
+    def flow_h_translating_5x5(bottom_h):
+        flow_h = bottom_h
+        flow_h_con = None
+
+        for i in range(25):
+            if i < 24:
+                flow_h_slice, flow_h = L.Slice(flow_h, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+            else:
+                flow_h_slice = flow_h
+
+            flow_h_slice = flow_h_translating(flow_h_slice, i)
+
+            if i == 0:
+                flow_h_con = flow_h_slice
+            else:
+                flow_h_con = L.Concat(*[flow_h_con, flow_h_slice], concat_param={'axis': 1})
+        
+        return flow_h_con
+
+    def flow_v_translating_5x5(bottom_h):
+        flow_h = bottom_h
+        flow_h_con = None
+
+        for i in range(25):
+            if i < 24:
+                flow_h_slice, flow_h = L.Slice(flow_h, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+            else:
+                flow_h_slice = flow_h
+
+            flow_h_slice = flow_v_translating(flow_h_slice, i)
+
+            if i == 0:
+                flow_h_con = flow_h_slice
+            else:
+                flow_h_con = L.Concat(*[flow_h_con, flow_h_slice], concat_param={'axis': 1})
+        
+        return flow_h_con
+    
+    def image_data_5x5(batch_size=1):
         con = None
         for i in range(25):
+            label, trash = L.ImageData(batch_size=batch_size,
+                                    source='/docker/lf_depth/datas/FlowerLF/source'+str(i)+'.txt',
+                                    transform_param=dict(scale=1./1.),
+                                    shuffle=False,
+                                    ntop=2,
+                                    is_color=False)
             if i == 0:
-                flow_h, flow_v, flow_remain = L.Slice(bottom, ntop=3, slice_param=dict(slice_dim=1, slice_point=[1, 2]))
-            elif i > 0 and i <= 23:
-                flow_h, flow_v, flow_remain = L.Slice(flow_remain, ntop=3, slice_param=dict(slice_dim=1, slice_point=[1, 2]))
-            else:
-                flow_h, flow_v = L.Slice(flow_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+                con = label
+            else:   
+                con = L.Concat(*[con, label], concat_param={'axis': 1})
+        return con, trash
 
-            flow_h, flow_v = flow_translating(flow_h, flow_v, i) 
-
+    def abs_loss_5x5(predict_con, label_con):
+        tot = None
+        for i in range(25):
             if i == 0:
-                con = flow_h
-                con = L.Concat([con, flow_v], concat_param={'axis': 1})
+                predict, predict_remain = L.Slice(predict_con, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+                label, label_remain = L.Slice(label_con, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+                loss = L.AbsLoss(predict, label, loss_weight=1)
+                tot = loss
+            elif i < 24:
+                predict, predict_remain = L.Slice(predict_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+                label, label_remain = L.Slice(label_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+                loss = L.AbsLoss(predict, label, loss_weight=1)
+                tot = L.Eltwise(tot, loss, operation=P.Eltwise.SUM)
             else:
-                con = L.Concat([con, flow_h], concat_param={'axis': 1})
-                con = L.Concat([con, flow_v], concat_param={'axis': 1})
+                predict = predict_remain
+                label =  label_remain
+                loss = L.AbsLoss(predict, label, loss_weight=1)
+                tot = L.Eltwise(tot, loss, operation=P.Eltwise.SUM)
+        tot_div = L.Power(tot, power=1.0, scale=1./25., shift=0.0, in_place=False, loss_weight=1)
+        return tot_div
+        
+    def flow_layer(bottom):
+        conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
+                                    num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        relu = L.ReLU(conv, in_place=False)
+        conv = L.Convolution(relu, kernel_size=ks, stride=stride,
+                                    num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        relu = L.ReLU(conv, in_place=False)
+
+        return relu
+    
+    def ver_mean_block(bottom):
+        ver_remain = bottom
+
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean0 = ver_slice
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean0 = L.Eltwise(ver_mean0, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean0 = L.Eltwise(ver_mean0, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean0 = L.Eltwise(ver_mean0, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean0 = L.Eltwise(ver_mean0, ver_slice, operation=P.Eltwise.SUM)
+        ver_mean0 = L.Power(ver_mean0, power=1.0, scale=1., shift=0.0, in_place=False)
+
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean1 = ver_slice
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean1 = L.Eltwise(ver_mean1, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean1 = L.Eltwise(ver_mean1, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean1 = L.Eltwise(ver_mean1, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean1 = L.Eltwise(ver_mean1, ver_slice, operation=P.Eltwise.SUM)
+        ver_mean1 = L.Power(ver_mean1, power=1.0, scale=1., shift=0.0, in_place=False)
+
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean2 = ver_slice
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean2 = L.Eltwise(ver_mean2, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean2 = L.Eltwise(ver_mean2, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean2 = L.Eltwise(ver_mean2, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean2 = L.Eltwise(ver_mean2, ver_slice, operation=P.Eltwise.SUM)
+        ver_mean2 = L.Power(ver_mean2, power=1.0, scale=1., shift=0.0, in_place=False)
+
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean3 = ver_slice
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean3 = L.Eltwise(ver_mean3, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean3 = L.Eltwise(ver_mean3, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean3 = L.Eltwise(ver_mean3, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean3 = L.Eltwise(ver_mean3, ver_slice, operation=P.Eltwise.SUM)
+        ver_mean3 = L.Power(ver_mean3, power=1.0, scale=1., shift=0.0, in_place=False)
+
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean4 = ver_slice
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean4 = L.Eltwise(ver_mean4, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean4 = L.Eltwise(ver_mean4, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice, ver_remain = L.Slice(ver_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        ver_mean4 = L.Eltwise(ver_mean4, ver_slice, operation=P.Eltwise.SUM)
+        ver_slice = ver_remain
+        ver_mean4 = L.Eltwise(ver_mean4, ver_slice, operation=P.Eltwise.SUM)
+        ver_mean4 = L.Power(ver_mean4, power=1.0, scale=1., shift=0.0, in_place=False)
+
+        con = ver_mean0
+        con = L.Concat(*[con, ver_mean1], concat_param={'axis': 1})
+        con = L.Concat(*[con, ver_mean2], concat_param={'axis': 1})
+        con = L.Concat(*[con, ver_mean3], concat_param={'axis': 1})
+        con = L.Concat(*[con, ver_mean4], concat_param={'axis': 1})
+
+        return con
+
+    def hor_mean_block(bottom):
+        hor_remain = bottom
+
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean0 = hor_slice
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean1 = hor_slice
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean2 = hor_slice
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean3 = hor_slice
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean4 = hor_slice
+
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean0 = L.Eltwise(hor_mean0, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean1 = L.Eltwise(hor_mean1, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean2 = L.Eltwise(hor_mean2, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean3 = L.Eltwise(hor_mean3, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean4 = L.Eltwise(hor_mean4, hor_slice, operation=P.Eltwise.SUM)
+
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean0 = L.Eltwise(hor_mean0, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean1 = L.Eltwise(hor_mean1, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean2 = L.Eltwise(hor_mean2, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean3 = L.Eltwise(hor_mean3, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean4 = L.Eltwise(hor_mean4, hor_slice, operation=P.Eltwise.SUM)
+
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean0 = L.Eltwise(hor_mean0, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean1 = L.Eltwise(hor_mean1, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean2 = L.Eltwise(hor_mean2, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean3 = L.Eltwise(hor_mean3, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean4 = L.Eltwise(hor_mean4, hor_slice, operation=P.Eltwise.SUM)
+
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean0 = L.Eltwise(hor_mean0, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean1 = L.Eltwise(hor_mean1, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean2 = L.Eltwise(hor_mean2, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice, hor_remain = L.Slice(hor_remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+        hor_mean3 = L.Eltwise(hor_mean3, hor_slice, operation=P.Eltwise.SUM)
+        hor_slice = hor_remain
+        hor_mean4 = L.Eltwise(hor_mean4, hor_slice, operation=P.Eltwise.SUM)
+
+        hor_mean0 = L.Power(hor_mean0, power=1.0, scale=1., shift=0.0, in_place=False)
+        hor_mean1 = L.Power(hor_mean1, power=1.0, scale=1., shift=0.0, in_place=False)
+        hor_mean2 = L.Power(hor_mean2, power=1.0, scale=1., shift=0.0, in_place=False)
+        hor_mean3 = L.Power(hor_mean3, power=1.0, scale=1., shift=0.0, in_place=False)
+        hor_mean4 = L.Power(hor_mean4, power=1.0, scale=1., shift=0.0, in_place=False)
+
+        con = hor_mean0
+        con = L.Concat(*[con, hor_mean1], concat_param={'axis': 1})
+        con = L.Concat(*[con, hor_mean2], concat_param={'axis': 1})
+        con = L.Concat(*[con, hor_mean3], concat_param={'axis': 1})
+        con = L.Concat(*[con, hor_mean4], concat_param={'axis': 1})
+
         return con
         
+    def slice_warp(shift, flow_h, flow_v):
+        for i in range(25):
+            if i < 24:
+                shift_slice, shift = L.Slice(shift, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+                flow_h_slice, flow_h = L.Slice(flow_h, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+                flow_v_slice, flow_v = L.Slice(flow_v, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+                predict_slice = L.Warping(shift_slice, flow_h_slice, flow_v_slice)
+            else:
+                shift_slice = shift
+                flow_h_slice = flow_h
+                flow_v_slice = flow_v
+                predict_slice = L.Warping(shift_slice, flow_h_slice, flow_v_slice)
+
+            if i == 0:
+                con = predict_slice
+            else:
+                con = L.Concat(*[con, predict_slice], concat_param={'axis': 1})
+        
+        return con
+
     def denseFlowNet_train(batch_size=1):
         n = caffe.NetSpec()
 
@@ -177,28 +434,9 @@ if __name__ == "__main__":
                                 shuffle=False,
                                 ntop=2,
                                 is_color=False)
-        tx, ty = shift_value_5x5(0, 0.8)
-        mode_str = json.dumps({'tx': tx, 'ty': ty})
-        n.shift0 = L.Python(n.input, module = 'input_shifting_layer', layer = 'InputShiftingLayer', ntop = 1, param_str = mode_str)
-        tx, ty = shift_value_5x5(22, 0.8)
-        mode_str = json.dumps({'tx': tx, 'ty': ty})
-        n.shift22 = L.Python(n.input, module = 'input_shifting_layer', layer = 'InputShiftingLayer', ntop = 1, param_str = mode_str)
-        n.shift = L.Concat(*[n.shift0, n.shift22], concat_param={'axis': 1})
+        n.shift = input_shifting_5x5(n.input)
 
-        
-        n.label0, n.trash = L.ImageData(batch_size=batch_size,
-                                source='/docker/lf_depth/datas/FlowerLF/source'+str(0)+'.txt',
-                                transform_param=dict(scale=1./1.),
-                                shuffle=False,
-                                ntop=2,
-                                is_color=False)
-        n.label22, n.trash = L.ImageData(batch_size=batch_size,
-                                source='/docker/lf_depth/datas/FlowerLF/source'+str(22)+'.txt',
-                                transform_param=dict(scale=1./1.),
-                                shuffle=False,
-                                ntop=2,
-                                is_color=False)
-        n.label = L.Concat(*[n.label0, n.label22], concat_param={'axis': 1})
+        n.label, n.trash = image_data_5x5(batch_size)
 
         n.conv_relu1 = conv_relu(n.input, 3, 14, 1, 1) # init
         n.block1_add1 = block(n.conv_relu1, 3, 12, 2, 1, 2)
@@ -217,12 +455,51 @@ if __name__ == "__main__":
         n.block4_add2 = block(n.block4_add1, 3, 12, 16, 1, 16)
         n.block4_add3 = block(n.block4_add2, 3, 12, 16, 1, 16)
         n.conv_relu5 = conv_relu(n.block4_add3, 3, 158, 1, 1) # trans4
-        n.flow = L.Convolution(n.conv_relu5, kernel_size=3, stride=1,
-                                    num_output=4, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        n.flow = L.Convolution(n.conv_relu5, kernel_size=9, stride=1,
+                                    num_output=50, pad=4, bias_term=False, weight_filler=dict(type='xavier'))
+        n.flow2 = L.Convolution(n.flow, kernel_size=5, stride=1,
+                                    num_output=50, pad=2, bias_term=False, weight_filler=dict(type='xavier'))
+        n.flow3 = L.Convolution(n.flow2, kernel_size=1, stride=1,
+                                    num_output=50, pad=0, bias_term=False, weight_filler=dict(type='xavier'))
 
-        n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[2]))
+        n.flow_h, n.flow_v = L.Slice(n.flow3, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+        """
+        n.conv_relu1_2 = conv_relu(n.input, 3, 14, 1, 1) # init
+        n.block1_add1_2 = block(n.conv_relu1_2, 3, 12, 2, 1, 2)
+        n.block1_add2_2 = block(n.block1_add1_2, 3, 12, 2, 1, 2)
+        n.block1_add3_2 = block(n.block1_add2_2, 3, 12, 2, 1, 2)
+        n.conv_relu2_2 = conv_relu(n.block1_add3_2, 3, 50, 1, 1) # trans1
+        n.block2_add1_2 = block(n.conv_relu2_2, 3, 12, 1, 1, 1)
+        n.block2_add2_2 = block(n.block2_add1_2, 3, 12, 4, 1, 4)
+        n.block2_add3_2 = block(n.block2_add2_2, 3, 12, 4, 1, 4)
+        n.conv_relu3_2 = conv_relu(n.block2_add3_2, 3, 86, 1, 1) # trans2
+        n.block3_add1_2 = block(n.conv_relu3_2, 3, 12, 8, 1, 8)
+        n.block3_add2_2 = block(n.block3_add1_2, 3, 12, 8, 1, 8)
+        n.block3_add3_2 = block(n.block3_add2_2, 3, 12, 8, 1, 8)
+        n.conv_relu4_2 = conv_relu(n.block3_add3_2, 3, 122, 1, 1) # trans3
+        n.block4_add1_2 = block(n.conv_relu4_2, 3, 12, 16, 1, 16)
+        n.block4_add2_2 = block(n.block4_add1_2, 3, 12, 16, 1, 16)
+        n.block4_add3_2 = block(n.block4_add2_2, 3, 12, 16, 1, 16)
+        n.conv_relu5_2 = conv_relu(n.block4_add3_2, 3, 158, 1, 1) # trans4
+        #n.flow_v = conv_relu(n.conv_relu5_2, 3, 25, 1, 1) # trans4
+        n.flow_v = L.Convolution(n.conv_relu5_2, kernel_size=1, stride=1,
+                                    num_output=25, pad=0, bias_term=False, weight_filler=dict(type='xavier'))
+        """
+        #n.flow_h = flow_h_translating_5x5(n.flow_h)
+        #n.flow_v = flow_v_translating_5x5(n.flow_v)
 
-        n.predict = L.Warping(n.shift, n.flow_h, n.flow_v)
+        n.predict = slice_warp(n.shift, n.flow_h, n.flow_v)
+        #n.predict = L.Warping(n.shift, n.flow_h, n.flow_v)
+        n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
+        n.predict2 = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer', layer = 'BilinearSamplerLayer', ntop = 1)
+
+        n.predict_ver = ver_mean_block(n.predict)
+        n.label_ver = ver_mean_block(n.label)
+        n.predict_hor = hor_mean_block(n.predict)
+        n.label_hor = hor_mean_block(n.label)
+
+        n.loss_ver = L.AbsLoss(n.predict_ver, n.label_ver, loss_weight=1)
+        n.loss_hor = L.AbsLoss(n.predict_hor, n.label_hor, loss_weight=1)
         n.loss = L.AbsLoss(n.predict, n.label, loss_weight=1)
 
         n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
@@ -235,6 +512,8 @@ if __name__ == "__main__":
                         param_str=str(dict(path='/docker/lf_depth/datas', name='label', mult=1)))
         n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                         param_str=str(dict(path='/docker/lf_depth/datas', name='predict', mult=1)))
+        n.trash6 = L.Python(n.predict2, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                        param_str=str(dict(path='/docker/lf_depth/datas', name='predict2', mult=1)))
 
         #bottom_layers = [n.flow_h, n.flow_v, n.shift, n.predict, n.label]
         #n.print = L.Python(*bottom_layers, module = 'lf_result_layer', layer = 'LfResultLayer', ntop = 1)
@@ -253,23 +532,23 @@ if __name__ == "__main__":
             s.test_initialization = False
 
         s.iter_size = 1
-        s.max_iter = 5000
+        s.max_iter = 500000
 
         s.type = 'Adam'
-        s.base_lr = 0.000005
+        s.base_lr = 0.0000001 # 0.000005(basic), 
 
         s.lr_policy = 'fixed'
         s.gamma = 0.75
         s.power = 0.75
-        s.stepsize = 2000
+        s.stepsize = 1000
         s.momentum = 0.9
         s.momentum2 = 0.999
-        #s.weight_decay = 5e-4
+        #s.weight_decay = 0.0000005
         #s.clip_gradients = 10
 
-        s.display = 100
+        s.display = 1
 
-        s.snapshot = 1000
+        s.snapshot = 500
         if snapshot_path is not None:
             s.snapshot_prefix = snapshot_path
 
@@ -295,5 +574,5 @@ if __name__ == "__main__":
     generate_net()
     generate_solver()
     solver = caffe.get_solver(SOLVER_PATH)
-    solver.net.copy_from('/docker/lf_depth/models/majoong_ch4.caffemodel')
+    solver.net.copy_from('/docker/lf_depth/models/denseFlowNet_solver_iter_8000.caffemodel')
     solver.solve()
