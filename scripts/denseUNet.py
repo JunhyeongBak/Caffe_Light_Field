@@ -83,6 +83,76 @@ if __name__ == "__main__":
             ty = -3*shift_value
         return -tx, -ty
 
+    def flow_layer(bottom=None, nout=1):
+        conv = L.Convolution(bottom, kernel_size=3, stride=1,
+                                    num_output=nout, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+        conv = L.Convolution(conv, kernel_size=3, stride=1,
+                                    num_output=nout, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+        conv = L.Convolution(conv, kernel_size=1, stride=1,
+                                    num_output=nout, pad=0, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        return conv
+    
+    def conv_layer(bottom=None, ks=3, nout=1, stride=1, pad=1):
+        conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
+                                    num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+        return conv
+    
+    def conv_final_layer(bottom=None, ks=3, nout=1, stride=1, pad=1):
+        conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
+                                    num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        conv = L.TanH(conv, in_place=False)
+        return conv
+
+    def conv_conv_layer(bottom=None, ks=3, nout=1, stride=1, pad=1):
+        conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
+                                    num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+        conv = L.Convolution(conv, kernel_size=ks, stride=stride,
+                                    num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+        return conv
+    
+    def downsample_layer(bottom=None, ks=3, stride=2):
+        pool = L.Pooling(bottom, kernel_size=ks, stride=stride, pool=P.Pooling.MAX)
+        pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=False)
+        return pool
+
+    def upsample_layer(bottom=None, ks=2, nout=1, stride=2):
+        deconv = L.Deconvolution(bottom, convolution_param=dict(num_output=nout, kernel_size=ks, stride=stride, pad=0))
+        deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=False)
+        return deconv
+
+    def upsample_concat_layer(bottom1=None, bottom2=None, ks=2, nout=1, stride=2):
+        deconv = L.Deconvolution(bottom1, convolution_param=dict(num_output=nout, kernel_size=ks, stride=stride, pad=0))
+        deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=False)
+        conc = L.Concat(*[deconv, bottom2], concat_param={'axis': 1})
+        return conc
+
+    def upsample_conv_conv_layer(bottom=None, ks=3, nout=1, stride=2, pad=1):
+        deconv = L.Deconvolution(bottom, convolution_param=dict(num_output=nout, kernel_size=ks, stride=stride))
+        deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=False)
+        conv = L.Convolution(deconv, kernel_size=ks, stride=1,
+                                    num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+        conv = L.Convolution(conv, kernel_size=ks, stride=1,
+                                    num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        conv = L.TanH(conv, in_place=False)
+        return conv
+
+    def conv_conv_downsample_layer(bottom=None, ks=3, nout=1, stride=2, pad=1):
+        conv = L.Convolution(bottom, kernel_size=ks, stride=1,
+                                    num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+        conv = L.Convolution(conv, kernel_size=ks, stride=1,
+                                    num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+        pool = L.Pooling(conv, kernel_size=ks, stride=stride, pool=P.Pooling.MAX)
+        pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=False)
+        return conv, pool
+
     def conv_relu(bottom, ks, nout, stride=1, pad=0):
         conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
                                     num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
@@ -295,7 +365,7 @@ if __name__ == "__main__":
                 con = L.Concat(*[con, predict_slice], concat_param={'axis': 1})
         return con
 
-    def denseFlowNet_train(batch_size=1):
+    def denseUNet_train(batch_size=1):
         n = caffe.NetSpec()
 
         # Data loading
@@ -309,35 +379,29 @@ if __name__ == "__main__":
         n.label, n.trash = image_data_5x5(batch_size)
 
         # Network
-        n.conv_relu1 = conv_relu(n.input, 3, 14, 1, 1) # init
-        n.block1_add1 = block(n.conv_relu1, 3, 12, 2, 1, 2)
-        n.block1_add2 = block(n.block1_add1, 3, 12, 2, 1, 2)
-        n.block1_add3 = block(n.block1_add2, 3, 12, 2, 1, 2)
-        n.conv_relu2 = conv_relu(n.block1_add3, 3, 50, 1, 1) # trans1
-        n.block2_add1 = block(n.conv_relu2, 3, 12, 1, 1, 1)
-        n.block2_add2 = block(n.block2_add1, 3, 12, 4, 1, 4)
-        n.block2_add3 = block(n.block2_add2, 3, 12, 4, 1, 4)
-        n.conv_relu3 = conv_relu(n.block2_add3, 3, 86, 1, 1) # trans2
-        n.block3_add1 = block(n.conv_relu3, 3, 12, 8, 1, 8)
-        n.block3_add2 = block(n.block3_add1, 3, 12, 8, 1, 8)
-        n.block3_add3 = block(n.block3_add2, 3, 12, 8, 1, 8)
-        n.conv_relu4 = conv_relu(n.block3_add3, 3, 122, 1, 1) # trans3
-        n.block4_add1 = block(n.conv_relu4, 3, 12, 16, 1, 16)
-        n.block4_add2 = block(n.block4_add1, 3, 12, 16, 1, 16)
-        n.block4_add3 = block(n.block4_add2, 3, 12, 16, 1, 16)
-        n.conv_relu5 = conv_relu(n.block4_add3, 3, 158, 1, 1) # trans4
-        #n.flow = L.Convolution(n.conv_relu5, kernel_size=9, stride=1,
-        #                            num_output=50, pad=4, bias_term=False, weight_filler=dict(type='xavier'))
-        #n.flow2 = L.Convolution(n.flow, kernel_size=5, stride=1,
-        #                            num_output=50, pad=2, bias_term=False, weight_filler=dict(type='xavier'))
-        n.flow4 = L.Convolution(n.conv_relu5, kernel_size=1, stride=1,
-                                    num_output=50, pad=0, bias_term=False, weight_filler=dict(type='xavier'))
+        n.conv1, n.poo1 = conv_conv_downsample_layer(n.input, 3, 16, 2, 1)
+        n.conv2, n.poo2 = conv_conv_downsample_layer(n.poo1, 3, 32, 2, 1)
+        n.conv3, n.poo3 = conv_conv_downsample_layer(n.poo2, 3, 64, 2, 1)
+        n.conv4, n.poo4 = conv_conv_downsample_layer(n.poo3, 3, 128, 2, 1)
+        n.conv5, n.poo5 = conv_conv_downsample_layer(n.poo4, 3, 256, 2, 1)
 
-        # Estimation
+        n.feature = conv_conv_layer(n.poo5, 3, 512, 1, 1)
+
+        n.deconv5 = upsample_concat_layer(n.feature, n.conv5, 2, 256, 2)
+        n.conv6 = conv_conv_layer(n.deconv5, 3, 256, 1, 1)
+        n.deconv6 = upsample_concat_layer(n.conv6, n.conv4, 2, 128, 2)
+        n.conv7 = conv_conv_layer(n.deconv6, 3, 128, 1, 1)
+        n.deconv7 = upsample_concat_layer(n.conv7, n.conv3, 2, 64, 2)
+        n.conv8 = conv_conv_layer(n.deconv7, 3, 64, 1, 1)
+        n.deconv8 = upsample_concat_layer(n.conv8, n.conv2, 2, 64, 2)
+        n.conv9 = conv_conv_layer(n.deconv8, 3, 64, 1, 1)
+        n.deconv9 = upsample_concat_layer(n.conv9, n.conv1, 2, 64, 2)
+        n.conv10 = conv_conv_layer(n.deconv9, 3, 64, 1, 1)
+
+        n.flow4 = flow_layer(n.conv10, 25*2)
+
         n.flow_h, n.flow_v = L.Slice(n.flow4, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
         n.predict = slice_warp(n.shift, n.flow_h, n.flow_v)
-        n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
-        n.predict2 = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer', layer = 'BilinearSamplerLayer', ntop = 1)
 
         # Loss
         n.predict_ver = ver_mean_block(n.predict)
@@ -348,21 +412,20 @@ if __name__ == "__main__":
         n.loss_hor = L.AbsLoss(n.predict_hor, n.label_hor, loss_weight=1)
         n.loss = L.AbsLoss(n.predict, n.label, loss_weight=1)
 
+        # Visualization
         n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                         param_str=str(dict(path='/docker/lf_depth/datas', name='flow_h', mult=30)))
         n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                         param_str=str(dict(path='/docker/lf_depth/datas', name='flow_v', mult=30)))
-        n.trash3 = L.Python(n.shift, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                        param_str=str(dict(path='/docker/lf_depth/datas', name='shift', mult=1)))
-        n.trash4 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                        param_str=str(dict(path='/docker/lf_depth/datas', name='label', mult=1)))
-        n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                        param_str=str(dict(path='/docker/lf_depth/datas', name='predict', mult=1)))
-        n.trash6 = L.Python(n.predict2, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                        param_str=str(dict(path='/docker/lf_depth/datas', name='predict2', mult=1)))
+        #n.trash3 = L.Python(n.shift, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+        #                param_str=str(dict(path='/docker/lf_depth/datas', name='shift', mult=1)))
+        #n.trash4 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+        #                param_str=str(dict(path='/docker/lf_depth/datas', name='label', mult=1)))
+        #n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+        #                param_str=str(dict(path='/docker/lf_depth/datas', name='predict', mult=1)))
         return n.to_proto()
 
-    def denseFlowNet_solver(train_net_path, test_net_path=None, snapshot_path=None):
+    def denseUNet_solver(train_net_path, test_net_path=None, snapshot_path=None):
         s = caffe_pb2.SolverParameter()
 
         s.train_net = train_net_path
@@ -377,7 +440,7 @@ if __name__ == "__main__":
         s.max_iter = 500000
 
         s.type = 'Adam'
-        s.base_lr = 0.0000001 # 0.000005(basic), 
+        s.base_lr = 0.00001 # 0.000005(basic), 
 
         s.lr_policy = 'fixed'
         s.gamma = 0.75
@@ -390,7 +453,7 @@ if __name__ == "__main__":
 
         s.display = 1
 
-        s.snapshot = 10000
+        s.snapshot = 5000
         if snapshot_path is not None:
             s.snapshot_prefix = snapshot_path
 
@@ -398,22 +461,22 @@ if __name__ == "__main__":
         return s
 
     MODEL_PATH = '/docker/lf_depth/models'
-    TRAIN_PATH = '/docker/lf_depth/scripts/denseFlowNet_train.prototxt'
-    TEST_PATH = '/docker/lf_depth/scripts/denseFlowNet_test.prototxt'
-    SOLVER_PATH = '/docker/lf_depth/scripts/denseFlowNet_solver.prototxt'
+    TRAIN_PATH = '/docker/lf_depth/scripts/denseUNet_train.prototxt'
+    TEST_PATH = '/docker/lf_depth/scripts/denseUNet_test.prototxt'
+    SOLVER_PATH = '/docker/lf_depth/scripts/denseUNet_solver.prototxt'
 
     def generate_net():
         with open(TRAIN_PATH, 'w') as f:
-            f.write(str(denseFlowNet_train(1)))    
+            f.write(str(denseUNet_train(4)))    
         #with open(TEST_PATH, 'w') as f:
         #    f.write(str(denseFlowNet_test(1)))
     
     def generate_solver():
         with open(SOLVER_PATH, 'w') as f:
-            f.write(str(denseFlowNet_solver(TRAIN_PATH, None, MODEL_PATH)))
+            f.write(str(denseUNet_solver(TRAIN_PATH, None, MODEL_PATH)))
 
     generate_net()
     generate_solver()
     solver = caffe.get_solver(SOLVER_PATH)
-    solver.net.copy_from('/docker/lf_depth/models/denseFlowNet.caffemodel')
+    solver.net.copy_from('/docker/lf_depth/models/denseUNet.caffemodel')
     solver.solve()
