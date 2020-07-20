@@ -1,5 +1,8 @@
 train_net: "/docker/lf_depth/scripts/denseUNet_train.prototxt"
-base_lr: 1e-05
+test_net: "/docker/lf_depth/scripts/denseUNet_test.prototxt"
+test_iter: 1
+test_interval: 100
+base_lr: 5e-06
 display: 1
 max_iter: 500000
 lr_policy: "fixed"
@@ -7,10 +10,9 @@ gamma: 0.75
 power: 0.75
 momentum: 0.9
 stepsize: 1000
-snapshot: 5000
+snapshot: 1000
 snapshot_prefix: "/docker/lf_depth/models"
 solver_mode: GPU
-test_initialization: false
 iter_size: 1
 momentum2: 0.999
 type: "Adam"

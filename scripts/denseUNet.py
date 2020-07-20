@@ -413,10 +413,10 @@ if __name__ == "__main__":
         n.loss = L.AbsLoss(n.predict, n.label, loss_weight=1)
 
         # Visualization
-        n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                        param_str=str(dict(path='/docker/lf_depth/datas', name='flow_h', mult=30)))
-        n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                        param_str=str(dict(path='/docker/lf_depth/datas', name='flow_v', mult=30)))
+        #n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+        #                param_str=str(dict(path='/docker/lf_depth/datas', name='flow_h', mult=30)))
+        #n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+        #                param_str=str(dict(path='/docker/lf_depth/datas', name='flow_v', mult=30)))
         #n.trash3 = L.Python(n.shift, module='visualization_layer', layer='VisualizationLayer', ntop=1,
         #                param_str=str(dict(path='/docker/lf_depth/datas', name='shift', mult=1)))
         #n.trash4 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
@@ -425,22 +425,77 @@ if __name__ == "__main__":
         #                param_str=str(dict(path='/docker/lf_depth/datas', name='predict', mult=1)))
         return n.to_proto()
 
+    def denseUNet_test(batch_size=1):
+        n = caffe.NetSpec()
+
+        # Data loading
+        n.input, n.trash = L.ImageData(batch_size=batch_size,
+                                source='/docker/lf_depth/datas/FlowerLF/source'+str(CENTER_SAI)+'.txt',
+                                transform_param=dict(scale=1./1.),
+                                shuffle=False,
+                                ntop=2,
+                                is_color=False)
+        n.shift = input_shifting_5x5(n.input)
+        n.label, n.trash = image_data_5x5(batch_size)
+
+        # Network
+        n.conv1, n.poo1 = conv_conv_downsample_layer(n.input, 3, 16, 2, 1)
+        n.conv2, n.poo2 = conv_conv_downsample_layer(n.poo1, 3, 32, 2, 1)
+        n.conv3, n.poo3 = conv_conv_downsample_layer(n.poo2, 3, 64, 2, 1)
+        n.conv4, n.poo4 = conv_conv_downsample_layer(n.poo3, 3, 128, 2, 1)
+        n.conv5, n.poo5 = conv_conv_downsample_layer(n.poo4, 3, 256, 2, 1)
+
+        n.feature = conv_conv_layer(n.poo5, 3, 512, 1, 1)
+        
+        n.deconv5 = upsample_concat_layer(n.feature, n.conv5, 2, 256, 2)
+        n.conv6 = conv_conv_layer(n.deconv5, 3, 256, 1, 1)
+        n.deconv6 = upsample_concat_layer(n.conv6, n.conv4, 2, 128, 2)
+        n.conv7 = conv_conv_layer(n.deconv6, 3, 128, 1, 1)
+        n.deconv7 = upsample_concat_layer(n.conv7, n.conv3, 2, 64, 2)
+        n.conv8 = conv_conv_layer(n.deconv7, 3, 64, 1, 1)
+        n.deconv8 = upsample_concat_layer(n.conv8, n.conv2, 2, 64, 2)
+        n.conv9 = conv_conv_layer(n.deconv8, 3, 64, 1, 1)
+        n.deconv9 = upsample_concat_layer(n.conv9, n.conv1, 2, 64, 2)
+        n.conv10 = conv_conv_layer(n.deconv9, 3, 64, 1, 1)
+
+        n.flow4 = flow_layer(n.conv10, 25*2)
+
+        n.flow_h, n.flow_v = L.Slice(n.flow4, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+        n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
+        n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer', layer = 'BilinearSamplerLayer', ntop = 1)
+
+        # Visualization
+        n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                        param_str=str(dict(path='/docker/lf_depth/datas', name='demo_flow_h', mult=30)))
+        n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                        param_str=str(dict(path='/docker/lf_depth/datas', name='demo_flow_v', mult=30)))
+        n.trash3 = L.Python(n.shift, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                        param_str=str(dict(path='/docker/lf_depth/datas', name='demo_shift', mult=1)))
+        n.trash4 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                        param_str=str(dict(path='/docker/lf_depth/datas', name='demo_label', mult=1)))
+        n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                        param_str=str(dict(path='/docker/lf_depth/datas', name='demo_predict', mult=1)))
+        return n.to_proto()
+
     def denseUNet_solver(train_net_path, test_net_path=None, snapshot_path=None):
         s = caffe_pb2.SolverParameter()
 
         s.train_net = train_net_path
+
+
         if test_net_path is not None:
             s.test_net.append(test_net_path)
-            s.test_interval = 500
-            s.test_iter.append(1000)
+            s.test_interval = 100
+            s.test_iter.append(1)
         else:
             s.test_initialization = False
+        
 
         s.iter_size = 1
         s.max_iter = 500000
 
         s.type = 'Adam'
-        s.base_lr = 0.00001 # 0.000005(basic), 
+        s.base_lr = 0.000005 # 0.000005(basic), 
 
         s.lr_policy = 'fixed'
         s.gamma = 0.75
@@ -453,7 +508,7 @@ if __name__ == "__main__":
 
         s.display = 1
 
-        s.snapshot = 5000
+        s.snapshot = 1000
         if snapshot_path is not None:
             s.snapshot_prefix = snapshot_path
 
@@ -468,12 +523,12 @@ if __name__ == "__main__":
     def generate_net():
         with open(TRAIN_PATH, 'w') as f:
             f.write(str(denseUNet_train(4)))    
-        #with open(TEST_PATH, 'w') as f:
-        #    f.write(str(denseFlowNet_test(1)))
+        with open(TEST_PATH, 'w') as f:
+            f.write(str(denseUNet_test(1)))
     
     def generate_solver():
         with open(SOLVER_PATH, 'w') as f:
-            f.write(str(denseUNet_solver(TRAIN_PATH, None, MODEL_PATH)))
+            f.write(str(denseUNet_solver(TRAIN_PATH, TEST_PATH, MODEL_PATH)))
 
     generate_net()
     generate_solver()

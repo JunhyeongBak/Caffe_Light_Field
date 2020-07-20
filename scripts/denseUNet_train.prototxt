@@ -5592,25 +5592,3 @@ layer {
   top: "loss"
   loss_weight: 1
 }
-layer {
-  name: "trash1"
-  type: "Python"
-  bottom: "flow_h"
-  top: "trash1"
-  python_param {
-    module: "visualization_layer"
-    layer: "VisualizationLayer"
-    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'flow_h\', \'mult\': 30}"
-  }
-}
-layer {
-  name: "trash2"
-  type: "Python"
-  bottom: "flow_v"
-  top: "trash2"
-  python_param {
-    module: "visualization_layer"
-    layer: "VisualizationLayer"
-    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'flow_v\', \'mult\': 30}"
-  }
-}
