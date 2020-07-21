@@ -365,6 +365,15 @@ if __name__ == "__main__":
                 con = L.Concat(*[con, predict_slice], concat_param={'axis': 1})
         return con
 
+    def luma_layer(bottom):
+        r, g, b = L.Slice(bottom, ntop=3, slice_param=dict(slice_dim=2, slice_point=[1,2]))
+        y_r = L.Power(r, power=1.0, scale=0.299, shift=0.0, in_place=False)
+        y_g = L.Power(g, power=1.0, scale=0.587, shift=0.0, in_place=False)
+        y_b = L.Power(b, power=1.0, scale=0.114, shift=0.0, in_place=False)
+        y = L.Eltwise(y_r, y_g, operation=P.Eltwise.SUM)
+        y = L.Eltwise(y, y_b, operation=P.Eltwise.SUM)        
+        return y
+
     def denseUNet_train(batch_size=1):
         n = caffe.NetSpec()
 
@@ -400,6 +409,7 @@ if __name__ == "__main__":
 
         n.flow4 = flow_layer(n.conv10, 25*2)
 
+        # Translation
         n.flow_h, n.flow_v = L.Slice(n.flow4, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
         n.predict = slice_warp(n.shift, n.flow_h, n.flow_v)
 
@@ -411,18 +421,6 @@ if __name__ == "__main__":
         n.loss_ver = L.AbsLoss(n.predict_ver, n.label_ver, loss_weight=1)
         n.loss_hor = L.AbsLoss(n.predict_hor, n.label_hor, loss_weight=1)
         n.loss = L.AbsLoss(n.predict, n.label, loss_weight=1)
-
-        # Visualization
-        #n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-        #                param_str=str(dict(path='/docker/lf_depth/datas', name='flow_h', mult=30)))
-        #n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-        #                param_str=str(dict(path='/docker/lf_depth/datas', name='flow_v', mult=30)))
-        #n.trash3 = L.Python(n.shift, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-        #                param_str=str(dict(path='/docker/lf_depth/datas', name='shift', mult=1)))
-        #n.trash4 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-        #                param_str=str(dict(path='/docker/lf_depth/datas', name='label', mult=1)))
-        #n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-        #                param_str=str(dict(path='/docker/lf_depth/datas', name='predict', mult=1)))
         return n.to_proto()
 
     def denseUNet_test(batch_size=1):
@@ -460,6 +458,7 @@ if __name__ == "__main__":
 
         n.flow4 = flow_layer(n.conv10, 25*2)
 
+        # Translation
         n.flow_h, n.flow_v = L.Slice(n.flow4, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
         n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
         n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer', layer = 'BilinearSamplerLayer', ntop = 1)
@@ -485,7 +484,7 @@ if __name__ == "__main__":
 
         if test_net_path is not None:
             s.test_net.append(test_net_path)
-            s.test_interval = 100
+            s.test_interval = 200
             s.test_iter.append(1)
         else:
             s.test_initialization = False
@@ -495,7 +494,7 @@ if __name__ == "__main__":
         s.max_iter = 500000
 
         s.type = 'Adam'
-        s.base_lr = 0.000005 # 0.000005(basic), 
+        s.base_lr = 0.0000001 # 0.000005(basic), 
 
         s.lr_policy = 'fixed'
         s.gamma = 0.75
@@ -508,7 +507,7 @@ if __name__ == "__main__":
 
         s.display = 1
 
-        s.snapshot = 1000
+        s.snapshot = 2000
         if snapshot_path is not None:
             s.snapshot_prefix = snapshot_path
 
@@ -533,5 +532,5 @@ if __name__ == "__main__":
     generate_net()
     generate_solver()
     solver = caffe.get_solver(SOLVER_PATH)
-    solver.net.copy_from('/docker/lf_depth/models/denseUNet.caffemodel')
+    solver.net.copy_from('/docker/lf_depth/models/denseUNet_solver_iter_30000.caffemodel')
     solver.solve()
