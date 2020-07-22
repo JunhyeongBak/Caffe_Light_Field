@@ -1,15 +1,15 @@
 import os
-import sys
 import cv2
+import time
 import numpy as np
-import json
+import argparse
 import caffe
-from caffe.io import caffe_pb2
-from caffe import layers as L
-from caffe import params as P
+import json
+from caffe import layers as L, params as P
+from caffe.proto import caffe_pb2
 
-np.set_printoptions(threshold=sys.maxsize)
-caffe.set_mode_gpu()
+caffe.set_mode_cpu()
+caffe.set_device(0)
 
 def shift_value_5x5(i, shift_value):
     if i<=4:
@@ -108,30 +108,6 @@ def conv_conv_downsample_layer(bottom=None, ks=3, nout=1, stride=2, pad=1):
     pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=False)
     return conv, pool
 
-def conv_relu(bottom, ks, nout, stride=1, pad=0):
-    conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
-                                num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    relu = L.ReLU(conv, relu_param=dict(negative_slope=0.0), in_place=False)
-    return relu
-
-def block(bottom, ks, nout, dilation=1, stride=1, pad=0):
-    conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
-                                num_output=nout, pad=pad, dilation=dilation, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    relu = L.ReLU(conv, relu_param=dict(negative_slope=0.1), in_place=False)
-    ccat = L.Concat(relu, bottom, axis=1)
-    relu = L.ReLU(ccat, relu_param=dict(negative_slope=0.0), in_place=False)
-    return relu
-
-def fc_block(bottom, nout):
-    fc = L.InnerProduct(bottom,
-                        num_output=nout,
-                        param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)],
-                        weight_filler=dict(type="gaussian", std=0.005),
-                        bias_filler=dict(type="constant", value=1))
-    relu = L.ReLU(fc, in_place=True)
-    drop = L.Dropout(relu, dropout_ratio=0.5, in_place=True)
-    return drop
-
 def input_shifting_5x5(bottom):
     con = None
     for i in range(25):
@@ -145,21 +121,6 @@ def input_shifting_5x5(bottom):
             con = L.Concat(*[con, shift], concat_param={'axis': 1})
     return con
 
-def image_data_5x5(batch_size=1):
-    con = None
-    for i in range(25):
-        label, trash = L.ImageData(batch_size=batch_size,
-                                source='/docker/lf_depth/datas/FlowerLF/source'+str(i)+'.txt',
-                                transform_param=dict(scale=1./1.),
-                                shuffle=False,
-                                ntop=2,
-                                is_color=False)
-        if i == 0:
-            con = label
-        else:   
-            con = L.Concat(*[con, label], concat_param={'axis': 1})
-    return con, trash
-    
 def slice_warp(shift, flow_h, flow_v):
     for i in range(25):
         if i < 24:
@@ -188,20 +149,13 @@ def luma_layer(bottom):
     y = L.Eltwise(y, y_b, operation=P.Eltwise.SUM)        
     return y
 
-def denseUNet_demo(batch_size=1):
+def denseUNet_deploy():
     n = caffe.NetSpec()
 
-    # Data loading
-    n.input, n.trash = L.ImageData(batch_size=batch_size,
-                            source='/docker/lf_depth/datas/FlowerLF/input_image.txt',
-                            transform_param=dict(scale=1./1.),
-                            shuffle=False,
-                            ntop=2,
-                            is_color=True)
+    # Input data
+    n.input = L.Input(input_param=dict(shape=dict(dim=[1, 3, 192, 256])))
     n.luma = luma_layer(n.input)
     n.shift = input_shifting_5x5(n.input)
-
-    #n.shape1 = L.Python(n.luma, module='print_shape_layer', layer='PrintShapeLayer', ntop=1, param_str=str(dict(comment='n.luma')))
 
     # Network
     n.conv1, n.poo1 = conv_conv_downsample_layer(n.luma, 3, 16, 2, 1)
@@ -230,62 +184,71 @@ def denseUNet_demo(batch_size=1):
     n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
     n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1)
 
-    # Visualization
-    
-    n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='/docker/lf_depth/datas', name='demo_flow_h', mult=30)))
-    n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='/docker/lf_depth/datas', name='demo_flow_v', mult=30)))
-    """
-    n.trash3 = L.Python(n.shift, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='/docker/lf_depth/datas', name='demo_shift', mult=1)))
-    n.trash4 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='/docker/lf_depth/datas', name='demo_label', mult=1)))
-    """
-    n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='/docker/lf_depth/datas', name='demo_predict', mult=1)))
-    
+    n.predict0, n.remain = L.Slice(n.predict, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict1, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict2, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict3, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict4, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict5, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict6, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict7, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict8, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict9, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict10, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict11, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict12, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict13, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict14, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict15, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict16, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict17, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict18, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict19, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict20, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict21, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict22, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict23, n.remain = L.Slice(n.remain, ntop=2, slice_param=dict(slice_dim=1, slice_point=[3]))
+    n.predict24 = n.remain
     return n.to_proto()
 
-def denseUNet_demo_solver(demo_net_path):
-    s = caffe_pb2.SolverParameter()
-
-    s.train_net = demo_net_path
-
-    s.iter_size = 1
-    s.max_iter = 500000
-
-    s.type = 'Adam'
-    s.base_lr = 0.
-
-    s.lr_policy = 'fixed'
-    s.gamma = 0.75
-    s.power = 0.75
-    s.stepsize = 1000
-    s.momentum = 0.9
-    s.momentum2 = 0.999
-    #s.weight_decay = 0.0000005
-    #s.clip_gradients = 10
-
-    s.display = 1
-    s.solver_mode = caffe_pb2.SolverParameter.GPU
-    return s
-
 if __name__ == "__main__":
-    MODEL_PATH = '/docker/lf_depth/models/denseUNet.caffemodel'
-    DEMO_PATH = '/docker/lf_depth/scripts/denseUNet_demo.prototxt'
-    SOLVER_PATH = '/docker/lf_depth/scripts/denseUNet_demo_solver.prototxt'
-
-    def generate_net():
-        with open(DEMO_PATH, 'w') as f:
-            f.write(str(denseUNet_demo(1)))
+    start = time.time()
     
-    def generate_solver():
-        with open(SOLVER_PATH, 'w') as f:
-            f.write(str(denseUNet_demo_solver(DEMO_PATH)))
+    parser = argparse.ArgumentParser(description='Configuration')
+    parser.add_argument('-m', '--mode', type=str, required=False, help='Select mode')
+    parser.add_argument('-p', '--path', type=str, required=False, help='Write path')
+    args = parser.parse_args()
+    MODEL_PATH = args.path + '/denseUNet_deploy.prototxt'
+    WEIGHTS_PATH = args.path + '/denseUNet_deploy.caffemodel'
+    SRC_PATH = args.path + '/input_image.jpg'
+    DST_PATH =  args.path
+    # Ex) python3 denseUNet_deploy.py -m run -p /docker/lf_depth/deploy
 
-    generate_net()
-    generate_solver()
-    solver = caffe.get_solver(SOLVER_PATH)
-    solver.net.copy_from(MODEL_PATH)
-    solver.solve()
+    if args.mode == 'run':
+        net = caffe.Net(MODEL_PATH, WEIGHTS_PATH, caffe.TEST)
+        src = cv2.imread(SRC_PATH, cv2.IMREAD_COLOR)
+        src_blob = np.zeros((1, 3, 192, 256))
+        for i in range(3):
+            src_blob[0, i, :, :] = src[:, :, i]
+        net.blobs['input'].data[...] = src_blob
+        
+        res = net.forward()
+
+        dst = np.zeros((192, 256, 3))
+        for i in range(25):
+            dst_blob = net.blobs['predict'+str(i)].data[...]
+            for c in range(3):
+                dst[:, :, c] = dst_blob[0, c, :, :]
+            cv2.imwrite(DST_PATH+'/result_image'+str(i)+'.png', dst)
+    elif args.mode == 'gen':
+        def generate_net():
+            with open(MODEL_PATH, 'w') as f:
+                f.write(str(denseUNet_deploy()))
+        generate_net()
+    elif args.mode == 'gt':
+        pass
+    else:
+        pass
+
+    end = time.time()
+    print('time labs : ', str(end-start))
