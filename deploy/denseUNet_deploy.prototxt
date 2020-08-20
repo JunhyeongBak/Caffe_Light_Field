@@ -1,102 +1,49 @@
 layer {
-  name: "input"
+  name: "input_org"
   type: "Input"
-  top: "input"
+  top: "input_org"
   input_param {
     shape {
       dim: 1
       dim: 3
       dim: 192
-      dim: 256
+      dim: 192
     }
   }
 }
 layer {
-  name: "Slice1"
-  type: "Slice"
-  bottom: "input"
-  top: "Slice1"
-  top: "Slice2"
-  top: "Slice3"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-    slice_point: 2
-  }
-}
-layer {
-  name: "Power1"
-  type: "Power"
-  bottom: "Slice3"
-  top: "Power1"
-  power_param {
-    power: 1.0
-    scale: 0.299
-    shift: 0.0
-  }
-}
-layer {
-  name: "Power2"
-  type: "Power"
-  bottom: "Slice2"
-  top: "Power2"
-  power_param {
-    power: 1.0
-    scale: 0.587
-    shift: 0.0
-  }
-}
-layer {
-  name: "Eltwise1"
-  type: "Eltwise"
-  bottom: "Power1"
-  bottom: "Power2"
-  top: "Eltwise1"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power3"
-  type: "Power"
-  bottom: "Slice1"
-  top: "Power3"
-  power_param {
-    power: 1.0
-    scale: 0.114
-    shift: 0.0
-  }
-}
-layer {
-  name: "luma"
-  type: "Eltwise"
-  bottom: "Eltwise1"
-  bottom: "Power3"
-  top: "luma"
-  eltwise_param {
-    operation: SUM
+  name: "input_luma_org"
+  type: "Input"
+  top: "input_luma_org"
+  input_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 192
+      dim: 192
+    }
   }
 }
 layer {
   name: "Python1"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python1"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": -1.6}"
+    param_str: "{\"tx\": -0.8, \"ty\": -0.8}"
   }
 }
 layer {
   name: "Python2"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python2"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": -0.8}"
+    param_str: "{\"tx\": -0.8, \"ty\": -0.4}"
   }
 }
 layer {
@@ -112,12 +59,12 @@ layer {
 layer {
   name: "Python3"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python3"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": 0}"
+    param_str: "{\"tx\": -0.8, \"ty\": 0}"
   }
 }
 layer {
@@ -133,12 +80,12 @@ layer {
 layer {
   name: "Python4"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python4"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": 0.8}"
+    param_str: "{\"tx\": -0.8, \"ty\": 0.4}"
   }
 }
 layer {
@@ -154,12 +101,12 @@ layer {
 layer {
   name: "Python5"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python5"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": 1.6}"
+    param_str: "{\"tx\": -0.8, \"ty\": 0.8}"
   }
 }
 layer {
@@ -175,12 +122,12 @@ layer {
 layer {
   name: "Python6"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python6"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": -1.6}"
+    param_str: "{\"tx\": -0.4, \"ty\": -0.8}"
   }
 }
 layer {
@@ -196,12 +143,12 @@ layer {
 layer {
   name: "Python7"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python7"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": -0.8}"
+    param_str: "{\"tx\": -0.4, \"ty\": -0.4}"
   }
 }
 layer {
@@ -217,12 +164,12 @@ layer {
 layer {
   name: "Python8"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python8"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": 0}"
+    param_str: "{\"tx\": -0.4, \"ty\": 0}"
   }
 }
 layer {
@@ -238,12 +185,12 @@ layer {
 layer {
   name: "Python9"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python9"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": 0.8}"
+    param_str: "{\"tx\": -0.4, \"ty\": 0.4}"
   }
 }
 layer {
@@ -259,12 +206,12 @@ layer {
 layer {
   name: "Python10"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python10"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": 1.6}"
+    param_str: "{\"tx\": -0.4, \"ty\": 0.8}"
   }
 }
 layer {
@@ -280,12 +227,12 @@ layer {
 layer {
   name: "Python11"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python11"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -1.6}"
+    param_str: "{\"tx\": 0, \"ty\": -0.8}"
   }
 }
 layer {
@@ -301,12 +248,12 @@ layer {
 layer {
   name: "Python12"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python12"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -0.8}"
+    param_str: "{\"tx\": 0, \"ty\": -0.4}"
   }
 }
 layer {
@@ -322,7 +269,7 @@ layer {
 layer {
   name: "Python13"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python13"
   python_param {
     module: "input_shifting_layer"
@@ -343,12 +290,12 @@ layer {
 layer {
   name: "Python14"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python14"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 0.8}"
+    param_str: "{\"tx\": 0, \"ty\": 0.4}"
   }
 }
 layer {
@@ -364,12 +311,12 @@ layer {
 layer {
   name: "Python15"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python15"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 1.6}"
+    param_str: "{\"tx\": 0, \"ty\": 0.8}"
   }
 }
 layer {
@@ -385,12 +332,12 @@ layer {
 layer {
   name: "Python16"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python16"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": -1.6}"
+    param_str: "{\"tx\": 0.4, \"ty\": -0.8}"
   }
 }
 layer {
@@ -406,12 +353,12 @@ layer {
 layer {
   name: "Python17"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python17"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": -0.8}"
+    param_str: "{\"tx\": 0.4, \"ty\": -0.4}"
   }
 }
 layer {
@@ -427,12 +374,12 @@ layer {
 layer {
   name: "Python18"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python18"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": 0}"
+    param_str: "{\"tx\": 0.4, \"ty\": 0}"
   }
 }
 layer {
@@ -448,12 +395,12 @@ layer {
 layer {
   name: "Python19"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python19"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": 0.8}"
+    param_str: "{\"tx\": 0.4, \"ty\": 0.4}"
   }
 }
 layer {
@@ -469,12 +416,12 @@ layer {
 layer {
   name: "Python20"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python20"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": 1.6}"
+    param_str: "{\"tx\": 0.4, \"ty\": 0.8}"
   }
 }
 layer {
@@ -490,12 +437,12 @@ layer {
 layer {
   name: "Python21"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python21"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": -1.6}"
+    param_str: "{\"tx\": 0.8, \"ty\": -0.8}"
   }
 }
 layer {
@@ -511,12 +458,12 @@ layer {
 layer {
   name: "Python22"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python22"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": -0.8}"
+    param_str: "{\"tx\": 0.8, \"ty\": -0.4}"
   }
 }
 layer {
@@ -532,12 +479,12 @@ layer {
 layer {
   name: "Python23"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python23"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": 0}"
+    param_str: "{\"tx\": 0.8, \"ty\": 0}"
   }
 }
 layer {
@@ -553,12 +500,12 @@ layer {
 layer {
   name: "Python24"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python24"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": 0.8}"
+    param_str: "{\"tx\": 0.8, \"ty\": 0.4}"
   }
 }
 layer {
@@ -574,28 +521,76 @@ layer {
 layer {
   name: "Python25"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python25"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": 1.6}"
+    param_str: "{\"tx\": 0.8, \"ty\": 0.8}"
   }
 }
 layer {
-  name: "shift"
+  name: "shift_org"
   type: "Concat"
   bottom: "Concat23"
   bottom: "Python25"
-  top: "shift"
+  top: "shift_org"
   concat_param {
     axis: 1
   }
 }
 layer {
+  name: "dum1"
+  type: "DummyData"
+  top: "dum1"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 3
+      dim: 190
+      dim: 190
+    }
+  }
+}
+layer {
+  name: "dum2"
+  type: "DummyData"
+  top: "dum2"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 3
+      dim: 190
+      dim: 190
+    }
+  }
+}
+layer {
+  name: "input_luma"
+  type: "Crop"
+  bottom: "input_luma_org"
+  bottom: "dum1"
+  top: "input_luma"
+  crop_param {
+    axis: 2
+    offset: 1
+  }
+}
+layer {
+  name: "shift"
+  type: "Crop"
+  bottom: "shift_org"
+  bottom: "dum1"
+  top: "shift"
+  crop_param {
+    axis: 2
+    offset: 1
+  }
+}
+layer {
   name: "Convolution1"
   type: "Convolution"
-  bottom: "luma"
+  bottom: "input_luma"
   top: "Convolution1"
   convolution_param {
     num_output: 16
@@ -1036,7 +1031,7 @@ layer {
   convolution_param {
     num_output: 256
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1123,7 +1118,7 @@ layer {
   convolution_param {
     num_output: 128
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1210,7 +1205,7 @@ layer {
   convolution_param {
     num_output: 64
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1297,7 +1292,7 @@ layer {
   convolution_param {
     num_output: 64
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1384,7 +1379,7 @@ layer {
   convolution_param {
     num_output: 64
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1398,9 +1393,33 @@ layer {
   }
 }
 layer {
+  name: "DummyData1"
+  type: "DummyData"
+  top: "DummyData1"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 64
+      dim: 190
+      dim: 190
+    }
+  }
+}
+layer {
+  name: "Crop1"
+  type: "Crop"
+  bottom: "ReLU15"
+  bottom: "DummyData1"
+  top: "Crop1"
+  crop_param {
+    axis: 2
+    offset: 0
+  }
+}
+layer {
   name: "deconv9"
   type: "Concat"
-  bottom: "ReLU15"
+  bottom: "Crop1"
   bottom: "conv1"
   top: "deconv9"
   concat_param {
@@ -1568,269 +1587,5 @@ layer {
   python_param {
     module: "bilinear_sampler_layer_3ch"
     layer: "BilinearSamplerLayer3ch"
-  }
-}
-layer {
-  name: "predict0"
-  type: "Slice"
-  bottom: "predict"
-  top: "predict0"
-  top: "Slice4"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict1"
-  type: "Slice"
-  bottom: "Slice4"
-  top: "predict1"
-  top: "Slice5"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict2"
-  type: "Slice"
-  bottom: "Slice5"
-  top: "predict2"
-  top: "Slice6"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict3"
-  type: "Slice"
-  bottom: "Slice6"
-  top: "predict3"
-  top: "Slice7"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict4"
-  type: "Slice"
-  bottom: "Slice7"
-  top: "predict4"
-  top: "Slice8"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict5"
-  type: "Slice"
-  bottom: "Slice8"
-  top: "predict5"
-  top: "Slice9"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict6"
-  type: "Slice"
-  bottom: "Slice9"
-  top: "predict6"
-  top: "Slice10"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict7"
-  type: "Slice"
-  bottom: "Slice10"
-  top: "predict7"
-  top: "Slice11"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict8"
-  type: "Slice"
-  bottom: "Slice11"
-  top: "predict8"
-  top: "Slice12"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict9"
-  type: "Slice"
-  bottom: "Slice12"
-  top: "predict9"
-  top: "Slice13"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict10"
-  type: "Slice"
-  bottom: "Slice13"
-  top: "predict10"
-  top: "Slice14"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict11"
-  type: "Slice"
-  bottom: "Slice14"
-  top: "predict11"
-  top: "Slice15"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict12"
-  type: "Slice"
-  bottom: "Slice15"
-  top: "predict12"
-  top: "Slice16"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict13"
-  type: "Slice"
-  bottom: "Slice16"
-  top: "predict13"
-  top: "Slice17"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict14"
-  type: "Slice"
-  bottom: "Slice17"
-  top: "predict14"
-  top: "Slice18"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict15"
-  type: "Slice"
-  bottom: "Slice18"
-  top: "predict15"
-  top: "Slice19"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict16"
-  type: "Slice"
-  bottom: "Slice19"
-  top: "predict16"
-  top: "Slice20"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict17"
-  type: "Slice"
-  bottom: "Slice20"
-  top: "predict17"
-  top: "Slice21"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict18"
-  type: "Slice"
-  bottom: "Slice21"
-  top: "predict18"
-  top: "Slice22"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict19"
-  type: "Slice"
-  bottom: "Slice22"
-  top: "predict19"
-  top: "Slice23"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict20"
-  type: "Slice"
-  bottom: "Slice23"
-  top: "predict20"
-  top: "Slice24"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict21"
-  type: "Slice"
-  bottom: "Slice24"
-  top: "predict21"
-  top: "Slice25"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict22"
-  type: "Slice"
-  bottom: "Slice25"
-  top: "predict22"
-  top: "Slice26"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
-  }
-}
-layer {
-  name: "predict23"
-  type: "Slice"
-  bottom: "Slice26"
-  top: "predict23"
-  top: "predict24"
-  slice_param {
-    slice_dim: 1
-    slice_point: 3
   }
 }

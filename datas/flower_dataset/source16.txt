@@ -1,0 +1,4 @@
+/docker/lf_depth/datas/FaceLF/val_face_dataset/sai0_16.png 0
+/docker/lf_depth/datas/FaceLF/val_face_dataset/sai1_16.png 0
+/docker/lf_depth/datas/FaceLF/val_face_dataset/sai2_16.png 0
+/docker/lf_depth/datas/FaceLF/val_face_dataset/sai3_16.png 0

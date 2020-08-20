@@ -1,14 +1,14 @@
 layer {
-  name: "input"
+  name: "input_org"
   type: "ImageData"
-  top: "input"
+  top: "input_org"
   top: "ImageData1"
   transform_param {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source12.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source12.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -22,8 +22,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source24.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source24.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -31,23 +31,23 @@ layer {
 layer {
   name: "Python1"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python1"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": -1.6}"
+    param_str: "{\"tx\": -0.8, \"ty\": -0.8}"
   }
 }
 layer {
   name: "Python2"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python2"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": -0.8}"
+    param_str: "{\"tx\": -0.8, \"ty\": -0.4}"
   }
 }
 layer {
@@ -63,12 +63,12 @@ layer {
 layer {
   name: "Python3"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python3"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": 0}"
+    param_str: "{\"tx\": -0.8, \"ty\": 0}"
   }
 }
 layer {
@@ -84,12 +84,12 @@ layer {
 layer {
   name: "Python4"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python4"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": 0.8}"
+    param_str: "{\"tx\": -0.8, \"ty\": 0.4}"
   }
 }
 layer {
@@ -105,12 +105,12 @@ layer {
 layer {
   name: "Python5"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python5"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": 1.6}"
+    param_str: "{\"tx\": -0.8, \"ty\": 0.8}"
   }
 }
 layer {
@@ -126,12 +126,12 @@ layer {
 layer {
   name: "Python6"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python6"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": -1.6}"
+    param_str: "{\"tx\": -0.4, \"ty\": -0.8}"
   }
 }
 layer {
@@ -147,12 +147,12 @@ layer {
 layer {
   name: "Python7"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python7"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": -0.8}"
+    param_str: "{\"tx\": -0.4, \"ty\": -0.4}"
   }
 }
 layer {
@@ -168,12 +168,12 @@ layer {
 layer {
   name: "Python8"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python8"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": 0}"
+    param_str: "{\"tx\": -0.4, \"ty\": 0}"
   }
 }
 layer {
@@ -189,12 +189,12 @@ layer {
 layer {
   name: "Python9"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python9"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": 0.8}"
+    param_str: "{\"tx\": -0.4, \"ty\": 0.4}"
   }
 }
 layer {
@@ -210,12 +210,12 @@ layer {
 layer {
   name: "Python10"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python10"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": 1.6}"
+    param_str: "{\"tx\": -0.4, \"ty\": 0.8}"
   }
 }
 layer {
@@ -231,12 +231,12 @@ layer {
 layer {
   name: "Python11"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python11"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -1.6}"
+    param_str: "{\"tx\": 0, \"ty\": -0.8}"
   }
 }
 layer {
@@ -252,12 +252,12 @@ layer {
 layer {
   name: "Python12"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python12"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -0.8}"
+    param_str: "{\"tx\": 0, \"ty\": -0.4}"
   }
 }
 layer {
@@ -273,7 +273,7 @@ layer {
 layer {
   name: "Python13"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python13"
   python_param {
     module: "input_shifting_layer"
@@ -294,12 +294,12 @@ layer {
 layer {
   name: "Python14"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python14"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 0.8}"
+    param_str: "{\"tx\": 0, \"ty\": 0.4}"
   }
 }
 layer {
@@ -315,12 +315,12 @@ layer {
 layer {
   name: "Python15"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python15"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 1.6}"
+    param_str: "{\"tx\": 0, \"ty\": 0.8}"
   }
 }
 layer {
@@ -336,12 +336,12 @@ layer {
 layer {
   name: "Python16"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python16"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": -1.6}"
+    param_str: "{\"tx\": 0.4, \"ty\": -0.8}"
   }
 }
 layer {
@@ -357,12 +357,12 @@ layer {
 layer {
   name: "Python17"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python17"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": -0.8}"
+    param_str: "{\"tx\": 0.4, \"ty\": -0.4}"
   }
 }
 layer {
@@ -378,12 +378,12 @@ layer {
 layer {
   name: "Python18"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python18"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": 0}"
+    param_str: "{\"tx\": 0.4, \"ty\": 0}"
   }
 }
 layer {
@@ -399,12 +399,12 @@ layer {
 layer {
   name: "Python19"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python19"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": 0.8}"
+    param_str: "{\"tx\": 0.4, \"ty\": 0.4}"
   }
 }
 layer {
@@ -420,12 +420,12 @@ layer {
 layer {
   name: "Python20"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python20"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": 1.6}"
+    param_str: "{\"tx\": 0.4, \"ty\": 0.8}"
   }
 }
 layer {
@@ -441,12 +441,12 @@ layer {
 layer {
   name: "Python21"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python21"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": -1.6}"
+    param_str: "{\"tx\": 0.8, \"ty\": -0.8}"
   }
 }
 layer {
@@ -462,12 +462,12 @@ layer {
 layer {
   name: "Python22"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python22"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": -0.8}"
+    param_str: "{\"tx\": 0.8, \"ty\": -0.4}"
   }
 }
 layer {
@@ -483,12 +483,12 @@ layer {
 layer {
   name: "Python23"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python23"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": 0}"
+    param_str: "{\"tx\": 0.8, \"ty\": 0}"
   }
 }
 layer {
@@ -504,12 +504,12 @@ layer {
 layer {
   name: "Python24"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python24"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": 0.8}"
+    param_str: "{\"tx\": 0.8, \"ty\": 0.4}"
   }
 }
 layer {
@@ -525,20 +525,20 @@ layer {
 layer {
   name: "Python25"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python25"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": 1.6}"
+    param_str: "{\"tx\": 0.8, \"ty\": 0.8}"
   }
 }
 layer {
-  name: "shift"
+  name: "shift_org"
   type: "Concat"
   bottom: "Concat23"
   bottom: "Python25"
-  top: "shift"
+  top: "shift_org"
   concat_param {
     axis: 1
   }
@@ -552,8 +552,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source0.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source0.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -567,8 +567,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source1.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source1.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -592,8 +592,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source2.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source2.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -617,8 +617,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source3.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source3.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -642,8 +642,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source4.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source4.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -667,8 +667,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source5.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source5.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -692,8 +692,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source6.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source6.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -717,8 +717,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source7.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source7.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -742,8 +742,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source8.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source8.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -767,8 +767,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source9.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source9.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -792,8 +792,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source10.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source10.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -817,8 +817,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source11.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source11.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -842,8 +842,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source12.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source12.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -867,8 +867,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source13.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source13.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -892,8 +892,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source14.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source14.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -917,8 +917,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source15.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source15.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -942,8 +942,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source16.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source16.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -967,8 +967,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source17.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source17.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -992,8 +992,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source18.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source18.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -1017,8 +1017,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source19.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source19.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -1042,8 +1042,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source20.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source20.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -1067,8 +1067,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source21.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source21.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -1092,8 +1092,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source22.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source22.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -1117,8 +1117,8 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source23.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/source23.txt"
+    batch_size: 8
     shuffle: false
     is_color: false
   }
@@ -1134,13 +1134,85 @@ layer {
   }
 }
 layer {
-  name: "label"
+  name: "label_org"
   type: "Concat"
   bottom: "Concat46"
   bottom: "ImageData2"
-  top: "label"
+  top: "label_org"
   concat_param {
     axis: 1
+  }
+}
+layer {
+  name: "dum1"
+  type: "DummyData"
+  top: "dum1"
+  dummy_data_param {
+    shape {
+      dim: 8
+      dim: 3
+      dim: 190
+      dim: 190
+    }
+  }
+}
+layer {
+  name: "dum2"
+  type: "DummyData"
+  top: "dum2"
+  dummy_data_param {
+    shape {
+      dim: 8
+      dim: 3
+      dim: 190
+      dim: 190
+    }
+  }
+}
+layer {
+  name: "dum3"
+  type: "DummyData"
+  top: "dum3"
+  dummy_data_param {
+    shape {
+      dim: 8
+      dim: 3
+      dim: 190
+      dim: 190
+    }
+  }
+}
+layer {
+  name: "input"
+  type: "Crop"
+  bottom: "input_org"
+  bottom: "dum1"
+  top: "input"
+  crop_param {
+    axis: 2
+    offset: 1
+  }
+}
+layer {
+  name: "shift"
+  type: "Crop"
+  bottom: "shift_org"
+  bottom: "dum2"
+  top: "shift"
+  crop_param {
+    axis: 2
+    offset: 1
+  }
+}
+layer {
+  name: "label"
+  type: "Crop"
+  bottom: "label_org"
+  bottom: "dum3"
+  top: "label"
+  crop_param {
+    axis: 2
+    offset: 1
   }
 }
 layer {
@@ -1587,7 +1659,7 @@ layer {
   convolution_param {
     num_output: 256
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1674,7 +1746,7 @@ layer {
   convolution_param {
     num_output: 128
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1761,7 +1833,7 @@ layer {
   convolution_param {
     num_output: 64
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1848,7 +1920,7 @@ layer {
   convolution_param {
     num_output: 64
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1935,7 +2007,7 @@ layer {
   convolution_param {
     num_output: 64
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1949,9 +2021,33 @@ layer {
   }
 }
 layer {
+  name: "DummyData1"
+  type: "DummyData"
+  top: "DummyData1"
+  dummy_data_param {
+    shape {
+      dim: 8
+      dim: 64
+      dim: 190
+      dim: 190
+    }
+  }
+}
+layer {
+  name: "Crop1"
+  type: "Crop"
+  bottom: "ReLU15"
+  bottom: "DummyData1"
+  top: "Crop1"
+  crop_param {
+    axis: 2
+    offset: 0
+  }
+}
+layer {
   name: "deconv9"
   type: "Concat"
-  bottom: "ReLU15"
+  bottom: "Crop1"
   bottom: "conv1"
   top: "deconv9"
   concat_param {
@@ -3333,2262 +3429,58 @@ layer {
   }
 }
 layer {
-  name: "Slice145"
-  type: "Slice"
+  name: "dum4"
+  type: "DummyData"
+  top: "dum4"
+  dummy_data_param {
+    shape {
+      dim: 8
+      dim: 3
+      dim: 180
+      dim: 180
+    }
+  }
+}
+layer {
+  name: "dum5"
+  type: "DummyData"
+  top: "dum5"
+  dummy_data_param {
+    shape {
+      dim: 8
+      dim: 3
+      dim: 180
+      dim: 180
+    }
+  }
+}
+layer {
+  name: "predict_crop"
+  type: "Crop"
   bottom: "predict"
-  top: "Slice145"
-  top: "Slice146"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
+  bottom: "dum4"
+  top: "predict_crop"
+  crop_param {
+    axis: 2
+    offset: 5
   }
 }
 layer {
-  name: "Slice147"
-  type: "Slice"
-  bottom: "Slice146"
-  top: "Slice147"
-  top: "Slice148"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise1"
-  type: "Eltwise"
-  bottom: "Slice145"
-  bottom: "Slice147"
-  top: "Eltwise1"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice149"
-  type: "Slice"
-  bottom: "Slice148"
-  top: "Slice149"
-  top: "Slice150"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise2"
-  type: "Eltwise"
-  bottom: "Eltwise1"
-  bottom: "Slice149"
-  top: "Eltwise2"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice151"
-  type: "Slice"
-  bottom: "Slice150"
-  top: "Slice151"
-  top: "Slice152"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise3"
-  type: "Eltwise"
-  bottom: "Eltwise2"
-  bottom: "Slice151"
-  top: "Eltwise3"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice153"
-  type: "Slice"
-  bottom: "Slice152"
-  top: "Slice153"
-  top: "Slice154"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise4"
-  type: "Eltwise"
-  bottom: "Eltwise3"
-  bottom: "Slice153"
-  top: "Eltwise4"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power1"
-  type: "Power"
-  bottom: "Eltwise4"
-  top: "Power1"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Slice155"
-  type: "Slice"
-  bottom: "Slice154"
-  top: "Slice155"
-  top: "Slice156"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice157"
-  type: "Slice"
-  bottom: "Slice156"
-  top: "Slice157"
-  top: "Slice158"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise5"
-  type: "Eltwise"
-  bottom: "Slice155"
-  bottom: "Slice157"
-  top: "Eltwise5"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice159"
-  type: "Slice"
-  bottom: "Slice158"
-  top: "Slice159"
-  top: "Slice160"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise6"
-  type: "Eltwise"
-  bottom: "Eltwise5"
-  bottom: "Slice159"
-  top: "Eltwise6"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice161"
-  type: "Slice"
-  bottom: "Slice160"
-  top: "Slice161"
-  top: "Slice162"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise7"
-  type: "Eltwise"
-  bottom: "Eltwise6"
-  bottom: "Slice161"
-  top: "Eltwise7"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice163"
-  type: "Slice"
-  bottom: "Slice162"
-  top: "Slice163"
-  top: "Slice164"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise8"
-  type: "Eltwise"
-  bottom: "Eltwise7"
-  bottom: "Slice163"
-  top: "Eltwise8"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power2"
-  type: "Power"
-  bottom: "Eltwise8"
-  top: "Power2"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat70"
-  type: "Concat"
-  bottom: "Power1"
-  bottom: "Power2"
-  top: "Concat70"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Slice165"
-  type: "Slice"
-  bottom: "Slice164"
-  top: "Slice165"
-  top: "Slice166"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice167"
-  type: "Slice"
-  bottom: "Slice166"
-  top: "Slice167"
-  top: "Slice168"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise9"
-  type: "Eltwise"
-  bottom: "Slice165"
-  bottom: "Slice167"
-  top: "Eltwise9"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice169"
-  type: "Slice"
-  bottom: "Slice168"
-  top: "Slice169"
-  top: "Slice170"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise10"
-  type: "Eltwise"
-  bottom: "Eltwise9"
-  bottom: "Slice169"
-  top: "Eltwise10"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice171"
-  type: "Slice"
-  bottom: "Slice170"
-  top: "Slice171"
-  top: "Slice172"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise11"
-  type: "Eltwise"
-  bottom: "Eltwise10"
-  bottom: "Slice171"
-  top: "Eltwise11"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice173"
-  type: "Slice"
-  bottom: "Slice172"
-  top: "Slice173"
-  top: "Slice174"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise12"
-  type: "Eltwise"
-  bottom: "Eltwise11"
-  bottom: "Slice173"
-  top: "Eltwise12"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power3"
-  type: "Power"
-  bottom: "Eltwise12"
-  top: "Power3"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat71"
-  type: "Concat"
-  bottom: "Concat70"
-  bottom: "Power3"
-  top: "Concat71"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Slice175"
-  type: "Slice"
-  bottom: "Slice174"
-  top: "Slice175"
-  top: "Slice176"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice177"
-  type: "Slice"
-  bottom: "Slice176"
-  top: "Slice177"
-  top: "Slice178"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise13"
-  type: "Eltwise"
-  bottom: "Slice175"
-  bottom: "Slice177"
-  top: "Eltwise13"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice179"
-  type: "Slice"
-  bottom: "Slice178"
-  top: "Slice179"
-  top: "Slice180"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise14"
-  type: "Eltwise"
-  bottom: "Eltwise13"
-  bottom: "Slice179"
-  top: "Eltwise14"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice181"
-  type: "Slice"
-  bottom: "Slice180"
-  top: "Slice181"
-  top: "Slice182"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise15"
-  type: "Eltwise"
-  bottom: "Eltwise14"
-  bottom: "Slice181"
-  top: "Eltwise15"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice183"
-  type: "Slice"
-  bottom: "Slice182"
-  top: "Slice183"
-  top: "Slice184"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise16"
-  type: "Eltwise"
-  bottom: "Eltwise15"
-  bottom: "Slice183"
-  top: "Eltwise16"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power4"
-  type: "Power"
-  bottom: "Eltwise16"
-  top: "Power4"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat72"
-  type: "Concat"
-  bottom: "Concat71"
-  bottom: "Power4"
-  top: "Concat72"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Slice185"
-  type: "Slice"
-  bottom: "Slice184"
-  top: "Slice185"
-  top: "Slice186"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice187"
-  type: "Slice"
-  bottom: "Slice186"
-  top: "Slice187"
-  top: "Slice188"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise17"
-  type: "Eltwise"
-  bottom: "Slice185"
-  bottom: "Slice187"
-  top: "Eltwise17"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice189"
-  type: "Slice"
-  bottom: "Slice188"
-  top: "Slice189"
-  top: "Slice190"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise18"
-  type: "Eltwise"
-  bottom: "Eltwise17"
-  bottom: "Slice189"
-  top: "Eltwise18"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice191"
-  type: "Slice"
-  bottom: "Slice190"
-  top: "Slice191"
-  top: "Slice192"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise19"
-  type: "Eltwise"
-  bottom: "Eltwise18"
-  bottom: "Slice191"
-  top: "Eltwise19"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise20"
-  type: "Eltwise"
-  bottom: "Eltwise19"
-  bottom: "Slice192"
-  top: "Eltwise20"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power5"
-  type: "Power"
-  bottom: "Eltwise20"
-  top: "Power5"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "predict_ver"
-  type: "Concat"
-  bottom: "Concat72"
-  bottom: "Power5"
-  top: "predict_ver"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Slice193"
-  type: "Slice"
+  name: "label_crop"
+  type: "Crop"
   bottom: "label"
-  top: "Slice193"
-  top: "Slice194"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
+  bottom: "dum5"
+  top: "label_crop"
+  crop_param {
+    axis: 2
+    offset: 5
   }
-}
-layer {
-  name: "Slice195"
-  type: "Slice"
-  bottom: "Slice194"
-  top: "Slice195"
-  top: "Slice196"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise21"
-  type: "Eltwise"
-  bottom: "Slice193"
-  bottom: "Slice195"
-  top: "Eltwise21"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice197"
-  type: "Slice"
-  bottom: "Slice196"
-  top: "Slice197"
-  top: "Slice198"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise22"
-  type: "Eltwise"
-  bottom: "Eltwise21"
-  bottom: "Slice197"
-  top: "Eltwise22"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice199"
-  type: "Slice"
-  bottom: "Slice198"
-  top: "Slice199"
-  top: "Slice200"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise23"
-  type: "Eltwise"
-  bottom: "Eltwise22"
-  bottom: "Slice199"
-  top: "Eltwise23"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice201"
-  type: "Slice"
-  bottom: "Slice200"
-  top: "Slice201"
-  top: "Slice202"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise24"
-  type: "Eltwise"
-  bottom: "Eltwise23"
-  bottom: "Slice201"
-  top: "Eltwise24"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power6"
-  type: "Power"
-  bottom: "Eltwise24"
-  top: "Power6"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Slice203"
-  type: "Slice"
-  bottom: "Slice202"
-  top: "Slice203"
-  top: "Slice204"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice205"
-  type: "Slice"
-  bottom: "Slice204"
-  top: "Slice205"
-  top: "Slice206"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise25"
-  type: "Eltwise"
-  bottom: "Slice203"
-  bottom: "Slice205"
-  top: "Eltwise25"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice207"
-  type: "Slice"
-  bottom: "Slice206"
-  top: "Slice207"
-  top: "Slice208"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise26"
-  type: "Eltwise"
-  bottom: "Eltwise25"
-  bottom: "Slice207"
-  top: "Eltwise26"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice209"
-  type: "Slice"
-  bottom: "Slice208"
-  top: "Slice209"
-  top: "Slice210"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise27"
-  type: "Eltwise"
-  bottom: "Eltwise26"
-  bottom: "Slice209"
-  top: "Eltwise27"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice211"
-  type: "Slice"
-  bottom: "Slice210"
-  top: "Slice211"
-  top: "Slice212"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise28"
-  type: "Eltwise"
-  bottom: "Eltwise27"
-  bottom: "Slice211"
-  top: "Eltwise28"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power7"
-  type: "Power"
-  bottom: "Eltwise28"
-  top: "Power7"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat73"
-  type: "Concat"
-  bottom: "Power6"
-  bottom: "Power7"
-  top: "Concat73"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Slice213"
-  type: "Slice"
-  bottom: "Slice212"
-  top: "Slice213"
-  top: "Slice214"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice215"
-  type: "Slice"
-  bottom: "Slice214"
-  top: "Slice215"
-  top: "Slice216"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise29"
-  type: "Eltwise"
-  bottom: "Slice213"
-  bottom: "Slice215"
-  top: "Eltwise29"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice217"
-  type: "Slice"
-  bottom: "Slice216"
-  top: "Slice217"
-  top: "Slice218"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise30"
-  type: "Eltwise"
-  bottom: "Eltwise29"
-  bottom: "Slice217"
-  top: "Eltwise30"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice219"
-  type: "Slice"
-  bottom: "Slice218"
-  top: "Slice219"
-  top: "Slice220"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise31"
-  type: "Eltwise"
-  bottom: "Eltwise30"
-  bottom: "Slice219"
-  top: "Eltwise31"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice221"
-  type: "Slice"
-  bottom: "Slice220"
-  top: "Slice221"
-  top: "Slice222"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise32"
-  type: "Eltwise"
-  bottom: "Eltwise31"
-  bottom: "Slice221"
-  top: "Eltwise32"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power8"
-  type: "Power"
-  bottom: "Eltwise32"
-  top: "Power8"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat74"
-  type: "Concat"
-  bottom: "Concat73"
-  bottom: "Power8"
-  top: "Concat74"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Slice223"
-  type: "Slice"
-  bottom: "Slice222"
-  top: "Slice223"
-  top: "Slice224"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice225"
-  type: "Slice"
-  bottom: "Slice224"
-  top: "Slice225"
-  top: "Slice226"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise33"
-  type: "Eltwise"
-  bottom: "Slice223"
-  bottom: "Slice225"
-  top: "Eltwise33"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice227"
-  type: "Slice"
-  bottom: "Slice226"
-  top: "Slice227"
-  top: "Slice228"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise34"
-  type: "Eltwise"
-  bottom: "Eltwise33"
-  bottom: "Slice227"
-  top: "Eltwise34"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice229"
-  type: "Slice"
-  bottom: "Slice228"
-  top: "Slice229"
-  top: "Slice230"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise35"
-  type: "Eltwise"
-  bottom: "Eltwise34"
-  bottom: "Slice229"
-  top: "Eltwise35"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice231"
-  type: "Slice"
-  bottom: "Slice230"
-  top: "Slice231"
-  top: "Slice232"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise36"
-  type: "Eltwise"
-  bottom: "Eltwise35"
-  bottom: "Slice231"
-  top: "Eltwise36"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power9"
-  type: "Power"
-  bottom: "Eltwise36"
-  top: "Power9"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat75"
-  type: "Concat"
-  bottom: "Concat74"
-  bottom: "Power9"
-  top: "Concat75"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Slice233"
-  type: "Slice"
-  bottom: "Slice232"
-  top: "Slice233"
-  top: "Slice234"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice235"
-  type: "Slice"
-  bottom: "Slice234"
-  top: "Slice235"
-  top: "Slice236"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise37"
-  type: "Eltwise"
-  bottom: "Slice233"
-  bottom: "Slice235"
-  top: "Eltwise37"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice237"
-  type: "Slice"
-  bottom: "Slice236"
-  top: "Slice237"
-  top: "Slice238"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise38"
-  type: "Eltwise"
-  bottom: "Eltwise37"
-  bottom: "Slice237"
-  top: "Eltwise38"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice239"
-  type: "Slice"
-  bottom: "Slice238"
-  top: "Slice239"
-  top: "Slice240"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise39"
-  type: "Eltwise"
-  bottom: "Eltwise38"
-  bottom: "Slice239"
-  top: "Eltwise39"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise40"
-  type: "Eltwise"
-  bottom: "Eltwise39"
-  bottom: "Slice240"
-  top: "Eltwise40"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power10"
-  type: "Power"
-  bottom: "Eltwise40"
-  top: "Power10"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "label_ver"
-  type: "Concat"
-  bottom: "Concat75"
-  bottom: "Power10"
-  top: "label_ver"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Slice241"
-  type: "Slice"
-  bottom: "predict"
-  top: "Slice241"
-  top: "Slice242"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice243"
-  type: "Slice"
-  bottom: "Slice242"
-  top: "Slice243"
-  top: "Slice244"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice245"
-  type: "Slice"
-  bottom: "Slice244"
-  top: "Slice245"
-  top: "Slice246"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice247"
-  type: "Slice"
-  bottom: "Slice246"
-  top: "Slice247"
-  top: "Slice248"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice249"
-  type: "Slice"
-  bottom: "Slice248"
-  top: "Slice249"
-  top: "Slice250"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice251"
-  type: "Slice"
-  bottom: "Slice250"
-  top: "Slice251"
-  top: "Slice252"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise41"
-  type: "Eltwise"
-  bottom: "Slice241"
-  bottom: "Slice251"
-  top: "Eltwise41"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice253"
-  type: "Slice"
-  bottom: "Slice252"
-  top: "Slice253"
-  top: "Slice254"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice255"
-  type: "Slice"
-  bottom: "Slice254"
-  top: "Slice255"
-  top: "Slice256"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice257"
-  type: "Slice"
-  bottom: "Slice256"
-  top: "Slice257"
-  top: "Slice258"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice259"
-  type: "Slice"
-  bottom: "Slice258"
-  top: "Slice259"
-  top: "Slice260"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice261"
-  type: "Slice"
-  bottom: "Slice260"
-  top: "Slice261"
-  top: "Slice262"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise42"
-  type: "Eltwise"
-  bottom: "Eltwise41"
-  bottom: "Slice261"
-  top: "Eltwise42"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice263"
-  type: "Slice"
-  bottom: "Slice262"
-  top: "Slice263"
-  top: "Slice264"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice265"
-  type: "Slice"
-  bottom: "Slice264"
-  top: "Slice265"
-  top: "Slice266"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice267"
-  type: "Slice"
-  bottom: "Slice266"
-  top: "Slice267"
-  top: "Slice268"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice269"
-  type: "Slice"
-  bottom: "Slice268"
-  top: "Slice269"
-  top: "Slice270"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice271"
-  type: "Slice"
-  bottom: "Slice270"
-  top: "Slice271"
-  top: "Slice272"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise43"
-  type: "Eltwise"
-  bottom: "Eltwise42"
-  bottom: "Slice271"
-  top: "Eltwise43"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice273"
-  type: "Slice"
-  bottom: "Slice272"
-  top: "Slice273"
-  top: "Slice274"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice275"
-  type: "Slice"
-  bottom: "Slice274"
-  top: "Slice275"
-  top: "Slice276"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice277"
-  type: "Slice"
-  bottom: "Slice276"
-  top: "Slice277"
-  top: "Slice278"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice279"
-  type: "Slice"
-  bottom: "Slice278"
-  top: "Slice279"
-  top: "Slice280"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice281"
-  type: "Slice"
-  bottom: "Slice280"
-  top: "Slice281"
-  top: "Slice282"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise44"
-  type: "Eltwise"
-  bottom: "Eltwise43"
-  bottom: "Slice281"
-  top: "Eltwise44"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power11"
-  type: "Power"
-  bottom: "Eltwise44"
-  top: "Power11"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Eltwise45"
-  type: "Eltwise"
-  bottom: "Slice243"
-  bottom: "Slice253"
-  top: "Eltwise45"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise46"
-  type: "Eltwise"
-  bottom: "Eltwise45"
-  bottom: "Slice263"
-  top: "Eltwise46"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise47"
-  type: "Eltwise"
-  bottom: "Eltwise46"
-  bottom: "Slice273"
-  top: "Eltwise47"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice283"
-  type: "Slice"
-  bottom: "Slice282"
-  top: "Slice283"
-  top: "Slice284"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise48"
-  type: "Eltwise"
-  bottom: "Eltwise47"
-  bottom: "Slice283"
-  top: "Eltwise48"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power12"
-  type: "Power"
-  bottom: "Eltwise48"
-  top: "Power12"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat76"
-  type: "Concat"
-  bottom: "Power11"
-  bottom: "Power12"
-  top: "Concat76"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Eltwise49"
-  type: "Eltwise"
-  bottom: "Slice245"
-  bottom: "Slice255"
-  top: "Eltwise49"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise50"
-  type: "Eltwise"
-  bottom: "Eltwise49"
-  bottom: "Slice265"
-  top: "Eltwise50"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise51"
-  type: "Eltwise"
-  bottom: "Eltwise50"
-  bottom: "Slice275"
-  top: "Eltwise51"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice285"
-  type: "Slice"
-  bottom: "Slice284"
-  top: "Slice285"
-  top: "Slice286"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise52"
-  type: "Eltwise"
-  bottom: "Eltwise51"
-  bottom: "Slice285"
-  top: "Eltwise52"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power13"
-  type: "Power"
-  bottom: "Eltwise52"
-  top: "Power13"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat77"
-  type: "Concat"
-  bottom: "Concat76"
-  bottom: "Power13"
-  top: "Concat77"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Eltwise53"
-  type: "Eltwise"
-  bottom: "Slice247"
-  bottom: "Slice257"
-  top: "Eltwise53"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise54"
-  type: "Eltwise"
-  bottom: "Eltwise53"
-  bottom: "Slice267"
-  top: "Eltwise54"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise55"
-  type: "Eltwise"
-  bottom: "Eltwise54"
-  bottom: "Slice277"
-  top: "Eltwise55"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice287"
-  type: "Slice"
-  bottom: "Slice286"
-  top: "Slice287"
-  top: "Slice288"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise56"
-  type: "Eltwise"
-  bottom: "Eltwise55"
-  bottom: "Slice287"
-  top: "Eltwise56"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power14"
-  type: "Power"
-  bottom: "Eltwise56"
-  top: "Power14"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat78"
-  type: "Concat"
-  bottom: "Concat77"
-  bottom: "Power14"
-  top: "Concat78"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Eltwise57"
-  type: "Eltwise"
-  bottom: "Slice249"
-  bottom: "Slice259"
-  top: "Eltwise57"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise58"
-  type: "Eltwise"
-  bottom: "Eltwise57"
-  bottom: "Slice269"
-  top: "Eltwise58"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise59"
-  type: "Eltwise"
-  bottom: "Eltwise58"
-  bottom: "Slice279"
-  top: "Eltwise59"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise60"
-  type: "Eltwise"
-  bottom: "Eltwise59"
-  bottom: "Slice288"
-  top: "Eltwise60"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power15"
-  type: "Power"
-  bottom: "Eltwise60"
-  top: "Power15"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "predict_hor"
-  type: "Concat"
-  bottom: "Concat78"
-  bottom: "Power15"
-  top: "predict_hor"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Slice289"
-  type: "Slice"
-  bottom: "label"
-  top: "Slice289"
-  top: "Slice290"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice291"
-  type: "Slice"
-  bottom: "Slice290"
-  top: "Slice291"
-  top: "Slice292"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice293"
-  type: "Slice"
-  bottom: "Slice292"
-  top: "Slice293"
-  top: "Slice294"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice295"
-  type: "Slice"
-  bottom: "Slice294"
-  top: "Slice295"
-  top: "Slice296"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice297"
-  type: "Slice"
-  bottom: "Slice296"
-  top: "Slice297"
-  top: "Slice298"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice299"
-  type: "Slice"
-  bottom: "Slice298"
-  top: "Slice299"
-  top: "Slice300"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise61"
-  type: "Eltwise"
-  bottom: "Slice289"
-  bottom: "Slice299"
-  top: "Eltwise61"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice301"
-  type: "Slice"
-  bottom: "Slice300"
-  top: "Slice301"
-  top: "Slice302"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice303"
-  type: "Slice"
-  bottom: "Slice302"
-  top: "Slice303"
-  top: "Slice304"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice305"
-  type: "Slice"
-  bottom: "Slice304"
-  top: "Slice305"
-  top: "Slice306"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice307"
-  type: "Slice"
-  bottom: "Slice306"
-  top: "Slice307"
-  top: "Slice308"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice309"
-  type: "Slice"
-  bottom: "Slice308"
-  top: "Slice309"
-  top: "Slice310"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise62"
-  type: "Eltwise"
-  bottom: "Eltwise61"
-  bottom: "Slice309"
-  top: "Eltwise62"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice311"
-  type: "Slice"
-  bottom: "Slice310"
-  top: "Slice311"
-  top: "Slice312"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice313"
-  type: "Slice"
-  bottom: "Slice312"
-  top: "Slice313"
-  top: "Slice314"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice315"
-  type: "Slice"
-  bottom: "Slice314"
-  top: "Slice315"
-  top: "Slice316"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice317"
-  type: "Slice"
-  bottom: "Slice316"
-  top: "Slice317"
-  top: "Slice318"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice319"
-  type: "Slice"
-  bottom: "Slice318"
-  top: "Slice319"
-  top: "Slice320"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise63"
-  type: "Eltwise"
-  bottom: "Eltwise62"
-  bottom: "Slice319"
-  top: "Eltwise63"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice321"
-  type: "Slice"
-  bottom: "Slice320"
-  top: "Slice321"
-  top: "Slice322"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice323"
-  type: "Slice"
-  bottom: "Slice322"
-  top: "Slice323"
-  top: "Slice324"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice325"
-  type: "Slice"
-  bottom: "Slice324"
-  top: "Slice325"
-  top: "Slice326"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice327"
-  type: "Slice"
-  bottom: "Slice326"
-  top: "Slice327"
-  top: "Slice328"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Slice329"
-  type: "Slice"
-  bottom: "Slice328"
-  top: "Slice329"
-  top: "Slice330"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise64"
-  type: "Eltwise"
-  bottom: "Eltwise63"
-  bottom: "Slice329"
-  top: "Eltwise64"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power16"
-  type: "Power"
-  bottom: "Eltwise64"
-  top: "Power16"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Eltwise65"
-  type: "Eltwise"
-  bottom: "Slice291"
-  bottom: "Slice301"
-  top: "Eltwise65"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise66"
-  type: "Eltwise"
-  bottom: "Eltwise65"
-  bottom: "Slice311"
-  top: "Eltwise66"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise67"
-  type: "Eltwise"
-  bottom: "Eltwise66"
-  bottom: "Slice321"
-  top: "Eltwise67"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice331"
-  type: "Slice"
-  bottom: "Slice330"
-  top: "Slice331"
-  top: "Slice332"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise68"
-  type: "Eltwise"
-  bottom: "Eltwise67"
-  bottom: "Slice331"
-  top: "Eltwise68"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power17"
-  type: "Power"
-  bottom: "Eltwise68"
-  top: "Power17"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat79"
-  type: "Concat"
-  bottom: "Power16"
-  bottom: "Power17"
-  top: "Concat79"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Eltwise69"
-  type: "Eltwise"
-  bottom: "Slice293"
-  bottom: "Slice303"
-  top: "Eltwise69"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise70"
-  type: "Eltwise"
-  bottom: "Eltwise69"
-  bottom: "Slice313"
-  top: "Eltwise70"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise71"
-  type: "Eltwise"
-  bottom: "Eltwise70"
-  bottom: "Slice323"
-  top: "Eltwise71"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice333"
-  type: "Slice"
-  bottom: "Slice332"
-  top: "Slice333"
-  top: "Slice334"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise72"
-  type: "Eltwise"
-  bottom: "Eltwise71"
-  bottom: "Slice333"
-  top: "Eltwise72"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power18"
-  type: "Power"
-  bottom: "Eltwise72"
-  top: "Power18"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat80"
-  type: "Concat"
-  bottom: "Concat79"
-  bottom: "Power18"
-  top: "Concat80"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Eltwise73"
-  type: "Eltwise"
-  bottom: "Slice295"
-  bottom: "Slice305"
-  top: "Eltwise73"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise74"
-  type: "Eltwise"
-  bottom: "Eltwise73"
-  bottom: "Slice315"
-  top: "Eltwise74"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise75"
-  type: "Eltwise"
-  bottom: "Eltwise74"
-  bottom: "Slice325"
-  top: "Eltwise75"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Slice335"
-  type: "Slice"
-  bottom: "Slice334"
-  top: "Slice335"
-  top: "Slice336"
-  slice_param {
-    slice_dim: 1
-    slice_point: 1
-  }
-}
-layer {
-  name: "Eltwise76"
-  type: "Eltwise"
-  bottom: "Eltwise75"
-  bottom: "Slice335"
-  top: "Eltwise76"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power19"
-  type: "Power"
-  bottom: "Eltwise76"
-  top: "Power19"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "Concat81"
-  type: "Concat"
-  bottom: "Concat80"
-  bottom: "Power19"
-  top: "Concat81"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Eltwise77"
-  type: "Eltwise"
-  bottom: "Slice297"
-  bottom: "Slice307"
-  top: "Eltwise77"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise78"
-  type: "Eltwise"
-  bottom: "Eltwise77"
-  bottom: "Slice317"
-  top: "Eltwise78"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise79"
-  type: "Eltwise"
-  bottom: "Eltwise78"
-  bottom: "Slice327"
-  top: "Eltwise79"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Eltwise80"
-  type: "Eltwise"
-  bottom: "Eltwise79"
-  bottom: "Slice336"
-  top: "Eltwise80"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "Power20"
-  type: "Power"
-  bottom: "Eltwise80"
-  top: "Power20"
-  power_param {
-    power: 1.0
-    scale: 1.0
-    shift: 0.0
-  }
-}
-layer {
-  name: "label_hor"
-  type: "Concat"
-  bottom: "Concat81"
-  bottom: "Power20"
-  top: "label_hor"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "loss_ver"
-  type: "AbsLoss"
-  bottom: "predict_ver"
-  bottom: "label_ver"
-  top: "loss_ver"
-  loss_weight: 1
-}
-layer {
-  name: "loss_hor"
-  type: "AbsLoss"
-  bottom: "predict_hor"
-  bottom: "label_hor"
-  top: "loss_hor"
-  loss_weight: 1
 }
 layer {
   name: "loss"
   type: "AbsLoss"
-  bottom: "predict"
-  bottom: "label"
+  bottom: "predict_crop"
+  bottom: "label_crop"
   top: "loss"
   loss_weight: 1
 }

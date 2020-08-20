@@ -1,13 +1,13 @@
 layer {
-  name: "input"
+  name: "input_org"
   type: "ImageData"
-  top: "input"
+  top: "input_org"
   top: "ImageData1"
   transform_param {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source12.txt"
+    source: "./datas/face_dataset/source12.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -22,7 +22,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source24.txt"
+    source: "./datas/face_dataset/source24.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -31,23 +31,23 @@ layer {
 layer {
   name: "Python1"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python1"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": -1.6}"
+    param_str: "{\"tx\": -0.8, \"ty\": -0.8}"
   }
 }
 layer {
   name: "Python2"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python2"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": -0.8}"
+    param_str: "{\"tx\": -0.8, \"ty\": -0.4}"
   }
 }
 layer {
@@ -63,12 +63,12 @@ layer {
 layer {
   name: "Python3"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python3"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": 0}"
+    param_str: "{\"tx\": -0.8, \"ty\": 0}"
   }
 }
 layer {
@@ -84,12 +84,12 @@ layer {
 layer {
   name: "Python4"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python4"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": 0.8}"
+    param_str: "{\"tx\": -0.8, \"ty\": 0.4}"
   }
 }
 layer {
@@ -105,12 +105,12 @@ layer {
 layer {
   name: "Python5"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python5"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.6, \"ty\": 1.6}"
+    param_str: "{\"tx\": -0.8, \"ty\": 0.8}"
   }
 }
 layer {
@@ -126,12 +126,12 @@ layer {
 layer {
   name: "Python6"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python6"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": -1.6}"
+    param_str: "{\"tx\": -0.4, \"ty\": -0.8}"
   }
 }
 layer {
@@ -147,12 +147,12 @@ layer {
 layer {
   name: "Python7"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python7"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": -0.8}"
+    param_str: "{\"tx\": -0.4, \"ty\": -0.4}"
   }
 }
 layer {
@@ -168,12 +168,12 @@ layer {
 layer {
   name: "Python8"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python8"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": 0}"
+    param_str: "{\"tx\": -0.4, \"ty\": 0}"
   }
 }
 layer {
@@ -189,12 +189,12 @@ layer {
 layer {
   name: "Python9"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python9"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": 0.8}"
+    param_str: "{\"tx\": -0.4, \"ty\": 0.4}"
   }
 }
 layer {
@@ -210,12 +210,12 @@ layer {
 layer {
   name: "Python10"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python10"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.8, \"ty\": 1.6}"
+    param_str: "{\"tx\": -0.4, \"ty\": 0.8}"
   }
 }
 layer {
@@ -231,12 +231,12 @@ layer {
 layer {
   name: "Python11"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python11"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -1.6}"
+    param_str: "{\"tx\": 0, \"ty\": -0.8}"
   }
 }
 layer {
@@ -252,12 +252,12 @@ layer {
 layer {
   name: "Python12"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python12"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -0.8}"
+    param_str: "{\"tx\": 0, \"ty\": -0.4}"
   }
 }
 layer {
@@ -273,7 +273,7 @@ layer {
 layer {
   name: "Python13"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python13"
   python_param {
     module: "input_shifting_layer"
@@ -294,12 +294,12 @@ layer {
 layer {
   name: "Python14"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python14"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 0.8}"
+    param_str: "{\"tx\": 0, \"ty\": 0.4}"
   }
 }
 layer {
@@ -315,12 +315,12 @@ layer {
 layer {
   name: "Python15"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python15"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 1.6}"
+    param_str: "{\"tx\": 0, \"ty\": 0.8}"
   }
 }
 layer {
@@ -336,12 +336,12 @@ layer {
 layer {
   name: "Python16"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python16"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": -1.6}"
+    param_str: "{\"tx\": 0.4, \"ty\": -0.8}"
   }
 }
 layer {
@@ -357,12 +357,12 @@ layer {
 layer {
   name: "Python17"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python17"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": -0.8}"
+    param_str: "{\"tx\": 0.4, \"ty\": -0.4}"
   }
 }
 layer {
@@ -378,12 +378,12 @@ layer {
 layer {
   name: "Python18"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python18"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": 0}"
+    param_str: "{\"tx\": 0.4, \"ty\": 0}"
   }
 }
 layer {
@@ -399,12 +399,12 @@ layer {
 layer {
   name: "Python19"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python19"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": 0.8}"
+    param_str: "{\"tx\": 0.4, \"ty\": 0.4}"
   }
 }
 layer {
@@ -420,12 +420,12 @@ layer {
 layer {
   name: "Python20"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python20"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.8, \"ty\": 1.6}"
+    param_str: "{\"tx\": 0.4, \"ty\": 0.8}"
   }
 }
 layer {
@@ -441,12 +441,12 @@ layer {
 layer {
   name: "Python21"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python21"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": -1.6}"
+    param_str: "{\"tx\": 0.8, \"ty\": -0.8}"
   }
 }
 layer {
@@ -462,12 +462,12 @@ layer {
 layer {
   name: "Python22"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python22"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": -0.8}"
+    param_str: "{\"tx\": 0.8, \"ty\": -0.4}"
   }
 }
 layer {
@@ -483,12 +483,12 @@ layer {
 layer {
   name: "Python23"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python23"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": 0}"
+    param_str: "{\"tx\": 0.8, \"ty\": 0}"
   }
 }
 layer {
@@ -504,12 +504,12 @@ layer {
 layer {
   name: "Python24"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python24"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": 0.8}"
+    param_str: "{\"tx\": 0.8, \"ty\": 0.4}"
   }
 }
 layer {
@@ -525,20 +525,20 @@ layer {
 layer {
   name: "Python25"
   type: "Python"
-  bottom: "input"
+  bottom: "input_org"
   top: "Python25"
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.6, \"ty\": 1.6}"
+    param_str: "{\"tx\": 0.8, \"ty\": 0.8}"
   }
 }
 layer {
-  name: "shift"
+  name: "shift_org"
   type: "Concat"
   bottom: "Concat23"
   bottom: "Python25"
-  top: "shift"
+  top: "shift_org"
   concat_param {
     axis: 1
   }
@@ -552,7 +552,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source0.txt"
+    source: "./datas/face_dataset/source0.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -567,7 +567,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source1.txt"
+    source: "./datas/face_dataset/source1.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -592,7 +592,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source2.txt"
+    source: "./datas/face_dataset/source2.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -617,7 +617,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source3.txt"
+    source: "./datas/face_dataset/source3.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -642,7 +642,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source4.txt"
+    source: "./datas/face_dataset/source4.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -667,7 +667,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source5.txt"
+    source: "./datas/face_dataset/source5.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -692,7 +692,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source6.txt"
+    source: "./datas/face_dataset/source6.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -717,7 +717,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source7.txt"
+    source: "./datas/face_dataset/source7.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -742,7 +742,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source8.txt"
+    source: "./datas/face_dataset/source8.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -767,7 +767,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source9.txt"
+    source: "./datas/face_dataset/source9.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -792,7 +792,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source10.txt"
+    source: "./datas/face_dataset/source10.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -817,7 +817,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source11.txt"
+    source: "./datas/face_dataset/source11.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -842,7 +842,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source12.txt"
+    source: "./datas/face_dataset/source12.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -867,7 +867,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source13.txt"
+    source: "./datas/face_dataset/source13.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -892,7 +892,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source14.txt"
+    source: "./datas/face_dataset/source14.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -917,7 +917,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source15.txt"
+    source: "./datas/face_dataset/source15.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -942,7 +942,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source16.txt"
+    source: "./datas/face_dataset/source16.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -967,7 +967,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source17.txt"
+    source: "./datas/face_dataset/source17.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -992,7 +992,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source18.txt"
+    source: "./datas/face_dataset/source18.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -1017,7 +1017,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source19.txt"
+    source: "./datas/face_dataset/source19.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -1042,7 +1042,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source20.txt"
+    source: "./datas/face_dataset/source20.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -1067,7 +1067,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source21.txt"
+    source: "./datas/face_dataset/source21.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -1092,7 +1092,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source22.txt"
+    source: "./datas/face_dataset/source22.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -1117,7 +1117,7 @@ layer {
     scale: 1.0
   }
   image_data_param {
-    source: "/docker/lf_depth/datas/FlowerLF/source23.txt"
+    source: "./datas/face_dataset/source23.txt"
     batch_size: 1
     shuffle: false
     is_color: false
@@ -1134,13 +1134,85 @@ layer {
   }
 }
 layer {
-  name: "label"
+  name: "label_org"
   type: "Concat"
   bottom: "Concat46"
   bottom: "ImageData2"
-  top: "label"
+  top: "label_org"
   concat_param {
     axis: 1
+  }
+}
+layer {
+  name: "dum1"
+  type: "DummyData"
+  top: "dum1"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 3
+      dim: 190
+      dim: 190
+    }
+  }
+}
+layer {
+  name: "dum2"
+  type: "DummyData"
+  top: "dum2"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 3
+      dim: 190
+      dim: 190
+    }
+  }
+}
+layer {
+  name: "dum3"
+  type: "DummyData"
+  top: "dum3"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 3
+      dim: 190
+      dim: 190
+    }
+  }
+}
+layer {
+  name: "input"
+  type: "Crop"
+  bottom: "input_org"
+  bottom: "dum1"
+  top: "input"
+  crop_param {
+    axis: 2
+    offset: 1
+  }
+}
+layer {
+  name: "shift"
+  type: "Crop"
+  bottom: "shift_org"
+  bottom: "dum2"
+  top: "shift"
+  crop_param {
+    axis: 2
+    offset: 1
+  }
+}
+layer {
+  name: "label"
+  type: "Crop"
+  bottom: "label_org"
+  bottom: "dum3"
+  top: "label"
+  crop_param {
+    axis: 2
+    offset: 1
   }
 }
 layer {
@@ -1587,7 +1659,7 @@ layer {
   convolution_param {
     num_output: 256
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1674,7 +1746,7 @@ layer {
   convolution_param {
     num_output: 128
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1761,7 +1833,7 @@ layer {
   convolution_param {
     num_output: 64
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1848,7 +1920,7 @@ layer {
   convolution_param {
     num_output: 64
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1935,7 +2007,7 @@ layer {
   convolution_param {
     num_output: 64
     pad: 0
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1949,9 +2021,33 @@ layer {
   }
 }
 layer {
+  name: "DummyData1"
+  type: "DummyData"
+  top: "DummyData1"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 64
+      dim: 190
+      dim: 190
+    }
+  }
+}
+layer {
+  name: "Crop1"
+  type: "Crop"
+  bottom: "ReLU15"
+  bottom: "DummyData1"
+  top: "Crop1"
+  crop_param {
+    axis: 2
+    offset: 0
+  }
+}
+layer {
   name: "deconv9"
   type: "Concat"
-  bottom: "ReLU15"
+  bottom: "Crop1"
   bottom: "conv1"
   top: "deconv9"
   concat_param {
@@ -2129,7 +2225,7 @@ layer {
   python_param {
     module: "visualization_layer"
     layer: "VisualizationLayer"
-    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'demo_flow_h\', \'mult\': 30}"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'flow_h\', \'mult\': 30}"
   }
 }
 layer {
@@ -2140,7 +2236,7 @@ layer {
   python_param {
     module: "visualization_layer"
     layer: "VisualizationLayer"
-    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'demo_flow_v\', \'mult\': 30}"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'flow_v\', \'mult\': 30}"
   }
 }
 layer {
@@ -2151,7 +2247,7 @@ layer {
   python_param {
     module: "visualization_layer"
     layer: "VisualizationLayer"
-    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'demo_shift\', \'mult\': 1}"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'input\', \'mult\': 1}"
   }
 }
 layer {
@@ -2162,7 +2258,7 @@ layer {
   python_param {
     module: "visualization_layer"
     layer: "VisualizationLayer"
-    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'demo_label\', \'mult\': 1}"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'label\', \'mult\': 1}"
   }
 }
 layer {
@@ -2173,6 +2269,6 @@ layer {
   python_param {
     module: "visualization_layer"
     layer: "VisualizationLayer"
-    param_str: "{\'path\': \'/docker/lf_depth/datas\', \'name\': \'demo_predict\', \'mult\': 1}"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'predict\', \'mult\': 1}"
   }
 }

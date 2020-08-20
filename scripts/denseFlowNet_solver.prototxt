@@ -7,7 +7,7 @@ gamma: 0.75
 power: 0.75
 momentum: 0.9
 stepsize: 1000
-snapshot: 10000
+snapshot: 2000
 snapshot_prefix: "/docker/lf_depth/models"
 solver_mode: GPU
 test_initialization: false

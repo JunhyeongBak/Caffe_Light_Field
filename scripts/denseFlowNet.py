@@ -8,8 +8,8 @@ from caffe.io import caffe_pb2
 from caffe import layers as L
 from caffe import params as P
 
-np.set_printoptions(threshold=sys.maxsize)
 caffe.set_mode_gpu()
+np.set_printoptions(threshold=sys.maxsize)
 
 CENTER_SAI = 12
 
@@ -32,18 +32,6 @@ CENTER_SAI = 12
 # +---+----+----+----+----+----+----+----+
 
 # +---+----+----+----+----+
-# | 9  | 17 | 25 | 33 | 41 |
-# +---+----+----+----+----+
-# | 10 | 18 | 26 | 34 | 42 |
-# +---+----+----+----+----+
-# | 11 | 19 | 27 | 35 | 43 |
-# +---+----+----+----+----+
-# | 12 | 20 | 28 | 36 | 44 |
-# +---+----+----+----+----+
-# | 13 | 21 | 29 | 37 | 45 |
-# +---+----+----+----+----+
-
-# +---+----+----+----+----+
 # | 0 |  5 | 10 | 15 | 20 |
 # +---+----+----+----+----+
 # | 1 |  6 | 11 | 16 | 21 |
@@ -58,30 +46,30 @@ CENTER_SAI = 12
 if __name__ == "__main__":
     def shift_value_5x5(i, shift_value):
         if i<=4:
-            tx = 2*shift_value
+            tx = -2*shift_value
         elif i>4 and i<=9:
-            tx = 1*shift_value
+            tx = -1*shift_value
         elif i>9 and i<=14:
             tx = 0
         elif i>14 and i<=19:
-            tx = -1*shift_value
+            tx = 1*shift_value
         elif i>19 and i<=24:
-            tx = -2*shift_value
+            tx = 2*shift_value
         else:
-            tx = -3*shift_value
+            tx = 3*shift_value
         if i == 0 or (i)%5==0:
-            ty = 2*shift_value
+            ty = -2*shift_value
         elif i == 1 or (i-1)%5==0:
-            ty = 1*shift_value
+            ty = -1*shift_value
         elif i == 2 or (i-2)%5==0:
             ty = 0
         elif i == 3 or (i-3)%5==0:
-            ty = -1*shift_value
+            ty = 1*shift_value
         elif i == 4 or (i-4)%5==0:
-            ty = -2*shift_value
+            ty = 2*shift_value
         else:
-            ty = -3*shift_value
-        return -tx, -ty
+            ty = 3*shift_value
+        return tx, ty
 
     def conv_relu(bottom, ks, nout, stride=1, pad=0):
         conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
@@ -111,7 +99,7 @@ if __name__ == "__main__":
         con = None
         for i in range(25):
             center = bottom
-            tx, ty = shift_value_5x5(i, 0.8)
+            tx, ty = shift_value_5x5(i, 1.4) # 0.8
             param_str = json.dumps({'tx': tx, 'ty': ty})
             shift = L.Python(center, module = 'input_shifting_layer', layer = 'InputShiftingLayer', ntop = 1, param_str = param_str)
             if i == 0:
@@ -124,7 +112,7 @@ if __name__ == "__main__":
         con = None
         for i in range(25):
             label, trash = L.ImageData(batch_size=batch_size,
-                                    source='/docker/lf_depth/datas/FlowerLF/source'+str(i)+'.txt',
+                                    source='/docker/lf_depth/datas/FaceLF/source'+str(i)+'.txt',
                                     transform_param=dict(scale=1./1.),
                                     shuffle=False,
                                     ntop=2,
@@ -300,7 +288,7 @@ if __name__ == "__main__":
 
         # Data loading
         n.input, n.trash = L.ImageData(batch_size=batch_size,
-                                source='/docker/lf_depth/datas/FlowerLF/source'+str(CENTER_SAI)+'.txt',
+                                source='/docker/lf_depth/datas/FaceLF/source'+str(CENTER_SAI)+'.txt',
                                 transform_param=dict(scale=1./1.),
                                 shuffle=False,
                                 ntop=2,
@@ -390,7 +378,7 @@ if __name__ == "__main__":
 
         s.display = 1
 
-        s.snapshot = 10000
+        s.snapshot = 2000
         if snapshot_path is not None:
             s.snapshot_prefix = snapshot_path
 
@@ -415,5 +403,5 @@ if __name__ == "__main__":
     generate_net()
     generate_solver()
     solver = caffe.get_solver(SOLVER_PATH)
-    solver.net.copy_from('/docker/lf_depth/models/denseFlowNet.caffemodel')
+    solver.net.copy_from('/docker/lf_depth/models/denseFlowNet_solver_iter_10000.caffemodel')
     solver.solve()
