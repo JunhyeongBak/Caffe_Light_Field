@@ -16,7 +16,7 @@ def dataset_resize():
             dst_img = cv2.resize(src_img, (WIDTH, HEIGHT), interpolation=cv2.INTER_CUBIC)
             cv2.imwrite('./utils/sai_small/sai'+str(i_tot)+'_'+str(i_sai)+'.png', dst_img)
 
-def sai_to_lf():
+def sais_to_lf():
     TOT = 4
     SAI_HEIGHT = 192
     SAI_WIDTH = 192
@@ -61,6 +61,33 @@ def sai_to_lf():
 
         cv2.imwrite('./utils/lf/lf'+str(i_tot)+'.jpg', imgLF)
 
+def lf_to_sais():
+    TOT = 1257
+    ANGULAR_RES = 14
+    TARGET_RES = 5
+    LF_WIDTH = 7574  #3584
+    LF_HEIGHT = 5264 #2688
+    SAI_HEIGHT = 192 # int(LF_HEIGHT / ANGULAR_RES) # SPATIAL_HEIGHT
+    SAI_WIDTH = 256 # int(LF_WIDTH / ANGULAR_RES) # SPATIAL_WIDTH
+    CH = 3
+
+    for i_tot in tqdm(range(TOT)):
+        lf = cv2.imread('./FlowerSAIs/lf_raw'+str(i_tot)+'.png', cv2.IMREAD_COLOR)
+        full_sais = np.zeros((SAI_HEIGHT, SAI_WIDTH, CH, ANGULAR_RES, ANGULAR_RES))
+        for ax in range(ANGULAR_RES):
+            for ay in range(ANGULAR_RES):
+                sai_resize = cv2.resize(lf[ay::ANGULAR_RES, ax::ANGULAR_RES, :], dsize=(SAI_WIDTH, SAI_HEIGHT), interpolation=cv2.INTER_CUBIC)
+                full_sais[:, :, :, ay, ax] = sai_resize
+
+        crop_sais = full_sais[:, :, :, ((ANGULAR_RES-TARGET_RES)//2):((ANGULAR_RES-TARGET_RES)//2)+TARGET_RES, ((ANGULAR_RES-TARGET_RES)//2):((ANGULAR_RES-TARGET_RES)//2)+TARGET_RES]
+        sais_list = np.zeros((SAI_HEIGHT, SAI_WIDTH, CH, TARGET_RES*TARGET_RES))
+        sai_cnt = 0
+        for ax in range(TARGET_RES):
+            for ay in range(TARGET_RES):
+                #sais_list[:, :, :, sai_cnt] = crop_sais[:, :, :, ay, ax]
+                cv2.imwrite('./SAIs/sai'+str(i_tot)+'_'+str(sai_cnt)+'.png', crop_sais[:, :, :, ay, ax])
+                sai_cnt = sai_cnt + 1
+
 def gif_maker():
     TOT = 1
     SAI = 25
@@ -80,8 +107,16 @@ def renamer():
             img_src = cv2.imread('./utils/sai_est/sai'+str(i_sai)+'.png', cv2.IMREAD_COLOR)
             cv2.imwrite('./utils/sai_est/sai'+str(i_tot)+'_'+str(i_sai)+'.png', img_src)
 
+def renamer_glob():
+    i_cnt = 0
+    for path in glob.glob('./utils/lf_raw/org/*.png'):
+        lf = cv2.imread(path, cv2.IMREAD_COLOR)
+        cv2.imwrite('./utils/lf_raw/lf_raw'+str(i_cnt)+'.png', lf)
+        i_cnt = i_cnt + 1
+
 if __name__ == '__main__':
     #dataset_resize()
-    #sai_to_lf()
-    gif_maker()
+    #sais_to_lf()
+    #gif_maker()
     #renamer()
+    renamer_glob()
