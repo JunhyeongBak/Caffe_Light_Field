@@ -266,6 +266,7 @@ if __name__ == "__main__":
 
     # Input images
     src_color = cv2.imread(SRC_PATH, cv2.IMREAD_COLOR)
+    src_color = cv2.resize(src_color, dsize=(192, 192), interpolation=cv2.INTER_AREA) ###
     src_luma = cv2.cvtColor(src_color, cv2.COLOR_BGR2GRAY)
     src_blob_color = np.zeros((1, 3, 192, 192))
     src_blob_luma = np.zeros((1, 1, 192, 192))
