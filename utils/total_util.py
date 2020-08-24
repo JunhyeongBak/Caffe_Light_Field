@@ -62,17 +62,17 @@ def sais_to_lf():
         cv2.imwrite('./utils/lf/lf'+str(i_tot)+'.jpg', imgLF)
 
 def lf_to_sais():
-    TOT = 1257
+    TOT = 77
     ANGULAR_RES = 14
     TARGET_RES = 5
     LF_WIDTH = 7574  #3584
     LF_HEIGHT = 5264 #2688
-    SAI_HEIGHT = 192 # int(LF_HEIGHT / ANGULAR_RES) # SPATIAL_HEIGHT
-    SAI_WIDTH = 256 # int(LF_WIDTH / ANGULAR_RES) # SPATIAL_WIDTH
+    SAI_HEIGHT = 376 # 192 # int(LF_HEIGHT / ANGULAR_RES) # SPATIAL_HEIGHT
+    SAI_WIDTH = 541 # 256 # int(LF_WIDTH / ANGULAR_RES) # SPATIAL_WIDTH
     CH = 3
 
     for i_tot in tqdm(range(TOT)):
-        lf = cv2.imread('./FlowerSAIs/lf_raw'+str(i_tot)+'.png', cv2.IMREAD_COLOR)
+        lf = cv2.imread('./utils/lf/lf'+str(i_tot)+'.png', cv2.IMREAD_COLOR)
         full_sais = np.zeros((SAI_HEIGHT, SAI_WIDTH, CH, ANGULAR_RES, ANGULAR_RES))
         for ax in range(ANGULAR_RES):
             for ay in range(ANGULAR_RES):
@@ -85,7 +85,7 @@ def lf_to_sais():
         for ax in range(TARGET_RES):
             for ay in range(TARGET_RES):
                 #sais_list[:, :, :, sai_cnt] = crop_sais[:, :, :, ay, ax]
-                cv2.imwrite('./SAIs/sai'+str(i_tot)+'_'+str(sai_cnt)+'.png', crop_sais[:, :, :, ay, ax])
+                cv2.imwrite('./utils/sai_val/sai'+str(i_tot)+'_'+str(sai_cnt)+'.png', crop_sais[:, ((SAI_WIDTH-SAI_HEIGHT)//2):((SAI_WIDTH-SAI_HEIGHT)//2)+SAI_HEIGHT, :, ay, ax])
                 sai_cnt = sai_cnt + 1
 
 def gif_maker():
@@ -114,9 +114,21 @@ def renamer_glob():
         cv2.imwrite('./utils/lf_raw/lf_raw'+str(i_cnt)+'.png', lf)
         i_cnt = i_cnt + 1
 
+def flower_cropper():
+    TOT = 3343
+    SAI = 25
+    for i_tot in tqdm(range(TOT)):
+        crop_point = np.random.randint(10, 54+1)
+        for i_sai in range(SAI):
+            img_src = cv2.imread('./datasets/SAIs/sai'+str(i_tot)+'_'+str(i_sai)+'.png', cv2.IMREAD_COLOR)
+            img_dst = img_src[:, crop_point:crop_point+192, :]
+            #print('none flip', crop_point)
+            cv2.imwrite('./datasets/SAIs_Crop/sai'+str(i_tot+3343+3343)+'_'+str(i_sai)+'.png', img_dst)
+            
 if __name__ == '__main__':
     #dataset_resize()
     #sais_to_lf()
     #gif_maker()
     #renamer()
-    renamer_glob()
+    #renamer_glob()
+    lf_to_sais()

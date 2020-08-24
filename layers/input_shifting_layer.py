@@ -20,12 +20,12 @@ class InputShiftingLayer(caffe.Layer):
         if bottom[0].data.shape[1] != 3:
             for b in range(bottom[0].data.shape[0]):
                 top[0].data[b, 0, :, :] = cv2.warpAffine(bottom[0].data[b, 0, :, :], M, (bottom[0].data.shape[3], bottom[0].data.shape[2]),
-                                                        flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+                                                        flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_CONSTANT)
         else:
             for b in range(bottom[0].data.shape[0]):
                 for c in range(3):
                     top[0].data[b, c, :, :] = cv2.warpAffine(bottom[0].data[b, c, :, :], M, (bottom[0].data.shape[3], bottom[0].data.shape[2]),
-                                                            flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+                                                            flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_CONSTANT)
 
     def backward(self, top, propagate_down, bottom):
         # Transfer gradient

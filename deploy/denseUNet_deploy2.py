@@ -40,14 +40,16 @@ import caffe
 import json
 from caffe import layers as L, params as P
 from caffe.proto import caffe_pb2
+import math
+from skimage.measure import compare_ssim as ssim
 
 SHIFT_VALUE = 0.8
 
-# caffe.set_mode_gpu()
+caffe.set_mode_gpu()
 caffe.set_device(0)
 
 def trans_SAIs_to_LF(imgSAIs):
-    imgLF = np.zeros((192*3*5, 192*3*5, 3))
+    imgLF = np.zeros((192*1*5, 192*1*5, 3))
     full_LF_crop = np.zeros((192, 192, 3, 5, 5))
     for ax in range(5):
         for ay in range(5):
@@ -55,7 +57,7 @@ def trans_SAIs_to_LF(imgSAIs):
     for ax in range(5):
         for ay in range(5):
             resized2 = full_LF_crop[:, :, :, ay, ax]
-            resized2 = cv2.resize(resized2, dsize=(192*3, 192*3), interpolation=cv2.INTER_LINEAR) 
+            resized2 = cv2.resize(resized2, dsize=(192*1, 192*1), interpolation=cv2.INTER_LINEAR) 
             imgLF[ay::5, ax::5, :] = resized2
     return imgLF
 
@@ -235,105 +237,131 @@ def denseUNet_deploy():
     return n.to_proto()
 
 if __name__ == "__main__":
-    start = time.time()
-    
-    '''
-    # Parsing
-    parser = argparse.ArgumentParser(description='Configuration')
-    parser.add_argument('-m', '--mode', type=str, required=True, help='Mode : 1.run, 2.gen')
-    parser.add_argument('-p', '--path', type=str, required=True, help='Path')
-    args = parser.parse_args()
-    '''
-    
+    TOT = 77
     PATH = './deploy'
-    MODEL_PATH = PATH + '/denseUNet_deploy.prototxt'
+    NET_PATH = PATH + '/denseUNet_deploy.prototxt'
     WEIGHTS_PATH = PATH + '/denseUNet_deploy.caffemodel'
-    #SRC_PATH = PATH + '/input/input_image.png'
-    SRC_PATH = '/docker/Caffe_LF_Depth/datas/flower_dataset/SAIs_Crop/sai1_12.png'
-    if not os.path.isfile(SRC_PATH):
-        SRC_PATH = PATH + '/input/input_image.jpg'
-        if not os.path.isfile(SRC_PATH):
-            raise Exception('(ERR) The image file is not exist!')
 
     # Generate a network
     def generate_net():
-        with open(MODEL_PATH, 'w') as f:
+        with open(NET_PATH, 'w') as f:
             f.write(str(denseUNet_deploy()))
     generate_net()
 
     # Set a model
-    net = caffe.Net(MODEL_PATH, WEIGHTS_PATH, caffe.TEST)
+    net = caffe.Net(NET_PATH, WEIGHTS_PATH, caffe.TEST)
 
-    # Input images
-    src_color = cv2.imread(SRC_PATH, cv2.IMREAD_COLOR)
-    src_color = cv2.resize(src_color, dsize=(192, 192), interpolation=cv2.INTER_AREA) ###
-    src_luma = cv2.cvtColor(src_color, cv2.COLOR_BGR2GRAY)
-    src_blob_color = np.zeros((1, 3, 192, 192))
-    src_blob_luma = np.zeros((1, 1, 192, 192))
-    for i in range(3):
-        src_blob_color[:, i, :, :] = src_color[:, :, i]
-    src_blob_luma[:, 0, :, :] = src_luma[:, :]
-    net.blobs['input'].data[...] = src_blob_color
-    net.blobs['input_luma'].data[...] = src_blob_luma
+    psnr_mean = 0
+    ssim_mean = 0
+    time_mean = 0
+    for i_tot in range(TOT):
+        start = time.time()
 
-    # Forward        
-    res = net.forward()
+        # Input images
+        if not os.path.isfile(PATH + '/input/sai'+str(i_tot)+'_12.png'):
+            if not os.path.isfile(PATH + '/input/sai'+str(i_tot)+'_12.jpg'):
+                raise Exception('(ERR) The image file is not exist!')
+        src_color = cv2.imread(PATH + '/input/sai'+str(i_tot)+'_12.png', cv2.IMREAD_COLOR)
+        src_color = cv2.resize(src_color, dsize=(192, 192), interpolation=cv2.INTER_AREA) ###
+        src_luma = cv2.cvtColor(src_color, cv2.COLOR_BGR2GRAY)
+        src_blob_color = np.zeros((1, 3, 192, 192))
+        src_blob_luma = np.zeros((1, 1, 192, 192))
+        for i in range(3):
+            src_blob_color[:, i, :, :] = src_color[:, :, i]
+        src_blob_luma[:, 0, :, :] = src_luma[:, :]
+        net.blobs['input'].data[...] = src_blob_color
+        net.blobs['input_luma'].data[...] = src_blob_luma
 
-    # Print SAI results
-    dst = np.zeros((192, 192, 3))
-    dst_blob = net.blobs['predict'].data[...]
-    for i in range(25):
-        dst_blob_slice = dst_blob[:, 3*i:3*i+3, :, :]
-        for c in range(3):
-            dst[:, :, c] = cv2.resize(dst_blob_slice[0, c, :, :], dsize=(192, 192), interpolation=cv2.INTER_AREA)
-        cv2.imwrite(PATH+'/output/sai0_'+str(i)+'.png', dst)
+        # Net forward        
+        res = net.forward()
 
-    # Badook2
-    sai_grid = np.zeros((192*5, 192*5, 3))
-    sai_uv = np.zeros((192, 192, 3, 5, 5))
-    for ax in range(5):
-        for ay in range(5):
-            dst_blob_slice = dst_blob[0, 3*(5*ax+ay):3*(5*ax+ay)+3, :, :]
-            for ch in range(3):
-                sai_grid[192*ay:192*ay+192, 192*ax:192*ax+192, ch] =  dst_blob_slice[ch, : ,:]
-                sai_uv[:, :, ch, ay, ax] = dst_blob_slice[ch, : ,:]
-    cv2.imwrite(PATH+'/output/sai_grid.png', sai_grid)
+        ########## Predict ##########
 
-    sai_epi_ver = np.zeros((192, 5*5, 3))
-    sai_epi_hor = np.zeros((5*5, 192, 3))
+        # Get and print sai
+        sai = np.zeros((192, 192, 3))
+        sai_list =  np.zeros((192, 192, 3, 5*5))
+        dst_blob = net.blobs['predict'].data[...]
+        for i in range(25):
+            dst_blob_slice = dst_blob[:, 3*i:3*i+3, :, :]
+            for c in range(3):
+                sai[:, :, c] = cv2.resize(dst_blob_slice[0, c, :, :], dsize=(192, 192), interpolation=cv2.INTER_AREA)
+            sai_list[:, :, :, i] = sai
+            cv2.imwrite(PATH+'/output/sai'+str(i_tot)+'_'+str(i)+'.png', sai)
+        
+        # Print lf
+        sai_list2 = trans_order(sai_list)
+        lf = trans_SAIs_to_LF(sai_list2)
+        cv2.imwrite(PATH+'/output/result_lf'+str(i_tot)+'.jpg', lf)
+        
+        # Print grid and epi
+        sai_uv = np.zeros((192, 192, 3, 5, 5))
+        sai_grid = np.zeros((192*5, 192*5, 3))
+        sai_epi_ver = np.zeros((192, 5*5, 3))
+        sai_epi_hor = np.zeros((5*5, 192, 3))
+        for ax in range(5):
+            for ay in range(5):
+                sai = sai_list[:, :, :, 5*ax+ay]
+                sai_uv[:, :, :, ay, ax] = sai
+                sai_grid[192*ay:192*ay+192, 192*ax:192*ax+192, :] = sai
+                sai_epi_ver[:, 5*ax+ay, :] = sai_uv[:, 192//2, :, ay, ax]
+                sai_epi_hor[5*ax+ay, :, :] = sai_uv[192//2, :, :, ay, ax]
+        cv2.imwrite(PATH+'/output/sai_grid'+str(i_tot)+'.png', sai_grid)
+        cv2.imwrite(PATH+'/output/sai_epi_ver'+str(i_tot)+'.png', sai_epi_ver)
+        cv2.imwrite(PATH+'/output/sai_epi_hor'+str(i_tot)+'.png', sai_epi_hor)
 
-    for ax in range(5):
-        for ay in range(5):
-            sai_epi_ver[:, 5*ax+ay, :] = sai_uv[:, 192//2, :, ay, ax]
-    cv2.imwrite(PATH+'/output/sai_epi_ver.png', sai_epi_ver)
+        ########## GT ##########  
 
-    for ax in range(5):
-        for ay in range(5):
-            sai_epi_hor[5*ax+ay, :, :] = sai_uv[192//2, :, :, ay, ax]
-    cv2.imwrite(PATH+'/output/sai_epi_hor.png', sai_epi_hor)    
+        # Get sai
+        sai_GT_list = np.zeros((192, 192, 3, 25))
+        for i in range(25):
+            sai_GT = cv2.imread(PATH+'/input/sai'+str(i_tot)+'_'+str(i)+'.png')
+            sai_GT = cv2.resize(sai_GT, dsize=(192, 192), interpolation=cv2.INTER_AREA)
+            sai_GT_list[:, :, :, i] = sai_GT
+        
+        # Print lf
+        sai_GT_list2 = trans_order(sai_GT_list)
+        lf_GT = trans_SAIs_to_LF(sai_GT_list2)
+        cv2.imwrite(PATH+'/output_GT/result_lf'+str(i_tot)+'.jpg', lf_GT)
+        
+        # Print grid and epi
+        sai_GT_uv = np.zeros((192, 192, 3, 5, 5))
+        sai_GT_grid = np.zeros((192*5, 192*5, 3))
+        sai_GT_epi_ver = np.zeros((192, 5*5, 3))
+        sai_GT_epi_hor = np.zeros((5*5, 192, 3))
+        for ax in range(5):
+            for ay in range(5):
+                sai_GT = sai_GT_list[:, :, :, 5*ax+ay]
+                sai_GT_uv[:, :, :, ay, ax] = sai_GT
+                sai_GT_grid[192*ay:192*ay+192, 192*ax:192*ax+192, :] = sai_GT
+                sai_GT_epi_ver[:, 5*ax+ay, :] = sai_GT_uv[:, 192//2, :, ay, ax]
+                sai_GT_epi_hor[5*ax+ay, :, :] = sai_GT_uv[192//2, :, :, ay, ax]
+        cv2.imwrite(PATH+'/output_GT/sai_grid'+str(i_tot)+'.png', sai_GT_grid)
+        cv2.imwrite(PATH+'/output_GT/sai_epi_ver'+str(i_tot)+'.png', sai_GT_epi_ver)
+        cv2.imwrite(PATH+'/output_GT/sai_epi_hor'+str(i_tot)+'.png', sai_GT_epi_hor)
 
-    # Print a LF result
-    imgSAIs = np.zeros((192, 192, 3, 25))
-    for i in range(25):
-        imgSAI = dst_blob[:, 3*i:3*i+3, :, :]
-        for c in range(3):
-            imgSAIs[:, :, c, i] = cv2.resize(imgSAI[0, c, :, :], dsize=(192, 192), interpolation=cv2.INTER_AREA)
-    imgSAIs = trans_order(imgSAIs)
-    imgLF = trans_SAIs_to_LF(imgSAIs)
-    cv2.imwrite(PATH+'/output/result_lf.jpg', imgLF)
+        # PSNR
+        mse = np.mean( (sai_grid - sai_GT_grid) ** 2 )
+        psnr = 0
+        if mse == 0:
+            psnr = 100
+        else:
+            PIXEL_MAX = 255.0
+            psnr = 20 * math.log10(PIXEL_MAX / math.sqrt(mse))
 
-    end = time.time()
-    print('time labs : ', str(end-start))
+        # SSIM
+        ssim_noise = ssim(sai_GT_grid, sai_grid, multichannel=True, data_range=sai_grid.max() - sai_grid.min())
 
+        end = time.time()
 
+        psnr_mean = psnr_mean + psnr
+        ssim_mean = ssim_mean + ssim_noise
+        time_mean = time_mean + end-start
+        print('i : '+str(i_tot)+' | '+'time labs : '+str(end-start)+' | '+'PSNR : '+str(psnr)+' | '+'SSIM : '+str(ssim_noise))
 
-
-
-
-
-
-
-
+    psnr_mean = psnr_mean / TOT
+    ssim_mean = ssim_mean / TOT
+    time_mean = time_mean / TOT
+    print('Total result | '+'time labs : '+str(time_mean)+' | '+'PSNR : '+str(psnr_mean)+' | '+'SSIM : '+str(ssim_mean))
 
     """
     # GT

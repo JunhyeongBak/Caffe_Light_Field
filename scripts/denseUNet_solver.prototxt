@@ -2,7 +2,7 @@ train_net: "./scripts/denseUNet_train.prototxt"
 test_net: "./scripts/denseUNet_test.prototxt"
 test_iter: 1
 test_interval: 50
-base_lr: 5e-06
+base_lr: 5e-05
 display: 1
 max_iter: 500000
 lr_policy: "fixed"
@@ -10,10 +10,10 @@ gamma: 0.75
 power: 0.75
 momentum: 0.9
 stepsize: 1000
-snapshot: 2000
+snapshot: 500
 snapshot_prefix: "./models"
 solver_mode: GPU
-clip_gradients: 10
+clip_gradients: 1
 iter_size: 1
 momentum2: 0.999
-type: "Adam"
+type: "SGD"
