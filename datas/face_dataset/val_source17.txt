@@ -1,0 +1,1 @@
+./datas/face_dataset/face_sai/sai33_17.png 0

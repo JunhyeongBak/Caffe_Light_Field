@@ -7,7 +7,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source12.txt"
+    source: "./datas/face_dataset/train_source12.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -24,7 +24,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source24.txt"
+    source: "./datas/face_dataset/train_source24.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -580,7 +580,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source0.txt"
+    source: "./datas/face_dataset/train_source0.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -597,7 +597,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source1.txt"
+    source: "./datas/face_dataset/train_source1.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -624,7 +624,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source2.txt"
+    source: "./datas/face_dataset/train_source2.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -651,7 +651,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source3.txt"
+    source: "./datas/face_dataset/train_source3.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -678,7 +678,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source4.txt"
+    source: "./datas/face_dataset/train_source4.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -705,7 +705,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source5.txt"
+    source: "./datas/face_dataset/train_source5.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -732,7 +732,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source6.txt"
+    source: "./datas/face_dataset/train_source6.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -759,7 +759,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source7.txt"
+    source: "./datas/face_dataset/train_source7.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -786,7 +786,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source8.txt"
+    source: "./datas/face_dataset/train_source8.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -813,7 +813,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source9.txt"
+    source: "./datas/face_dataset/train_source9.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -840,7 +840,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source10.txt"
+    source: "./datas/face_dataset/train_source10.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -867,7 +867,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source11.txt"
+    source: "./datas/face_dataset/train_source11.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -894,7 +894,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source12.txt"
+    source: "./datas/face_dataset/train_source12.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -921,7 +921,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source13.txt"
+    source: "./datas/face_dataset/train_source13.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -948,7 +948,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source14.txt"
+    source: "./datas/face_dataset/train_source14.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -975,7 +975,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source15.txt"
+    source: "./datas/face_dataset/train_source15.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -1002,7 +1002,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source16.txt"
+    source: "./datas/face_dataset/train_source16.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -1029,7 +1029,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source17.txt"
+    source: "./datas/face_dataset/train_source17.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -1056,7 +1056,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source18.txt"
+    source: "./datas/face_dataset/train_source18.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -1083,7 +1083,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source19.txt"
+    source: "./datas/face_dataset/train_source19.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -1110,7 +1110,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source20.txt"
+    source: "./datas/face_dataset/train_source20.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -1137,7 +1137,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source21.txt"
+    source: "./datas/face_dataset/train_source21.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -1164,7 +1164,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source22.txt"
+    source: "./datas/face_dataset/train_source22.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -1191,7 +1191,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source23.txt"
+    source: "./datas/face_dataset/train_source23.txt"
     batch_size: 1
     shuffle: false
     new_height: 196
@@ -3584,7 +3584,7 @@ layer {
   python_param {
     module: "visualization_layer"
     layer: "VisualizationLayer"
-    param_str: "{\'path\': \'./datas/flower_dataset\', \'name\': \'flow_h\', \'mult\': 30}"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'flow_h\', \'mult\': 30}"
   }
 }
 layer {
@@ -3595,7 +3595,7 @@ layer {
   python_param {
     module: "visualization_layer"
     layer: "VisualizationLayer"
-    param_str: "{\'path\': \'./datas/flower_dataset\', \'name\': \'flow_v\', \'mult\': 30}"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'flow_v\', \'mult\': 30}"
   }
 }
 layer {
@@ -3606,7 +3606,7 @@ layer {
   python_param {
     module: "visualization_layer"
     layer: "VisualizationLayer"
-    param_str: "{\'path\': \'./datas/flower_dataset\', \'name\': \'input\', \'mult\': 256}"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'input\', \'mult\': 256}"
   }
 }
 layer {
@@ -3617,7 +3617,7 @@ layer {
   python_param {
     module: "visualization_layer"
     layer: "VisualizationLayer"
-    param_str: "{\'path\': \'./datas/flower_dataset\', \'name\': \'label\', \'mult\': 256}"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'label\', \'mult\': 256}"
   }
 }
 layer {
@@ -3628,6 +3628,6 @@ layer {
   python_param {
     module: "visualization_layer"
     layer: "VisualizationLayer"
-    param_str: "{\'path\': \'./datas/flower_dataset\', \'name\': \'predict\', \'mult\': 256}"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'predict\', \'mult\': 256}"
   }
 }

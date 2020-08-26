@@ -7,8 +7,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source12.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source12.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -24,8 +24,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source24.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source24.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -553,7 +553,7 @@ layer {
   top: "DummyData1"
   dummy_data_param {
     shape {
-      dim: 1
+      dim: 6
       dim: 1
       dim: 192
       dim: 192
@@ -580,8 +580,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source0.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source0.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -597,8 +597,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source1.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source1.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -624,8 +624,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source2.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source2.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -651,8 +651,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source3.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source3.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -678,8 +678,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source4.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source4.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -705,8 +705,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source5.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source5.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -732,8 +732,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source6.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source6.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -759,8 +759,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source7.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source7.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -786,8 +786,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source8.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source8.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -813,8 +813,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source9.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source9.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -840,8 +840,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source10.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source10.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -867,8 +867,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source11.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source11.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -894,8 +894,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source12.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source12.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -921,8 +921,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source13.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source13.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -948,8 +948,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source14.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source14.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -975,8 +975,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source15.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source15.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -1002,8 +1002,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source16.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source16.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -1029,8 +1029,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source17.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source17.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -1056,8 +1056,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source18.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source18.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -1083,8 +1083,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source19.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source19.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -1110,8 +1110,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source20.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source20.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -1137,8 +1137,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source21.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source21.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -1164,8 +1164,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source22.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source22.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -1191,8 +1191,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/flower_dataset/source23.txt"
-    batch_size: 1
+    source: "./datas/face_dataset/train_source23.txt"
+    batch_size: 6
     shuffle: false
     new_height: 196
     new_width: 196
@@ -1225,7 +1225,7 @@ layer {
   top: "DummyData2"
   dummy_data_param {
     shape {
-      dim: 1
+      dim: 6
       dim: 1
       dim: 192
       dim: 192
@@ -1249,7 +1249,7 @@ layer {
   top: "dum_input"
   dummy_data_param {
     shape {
-      dim: 1
+      dim: 6
       dim: 1
       dim: 192
       dim: 192
@@ -1676,9 +1676,18 @@ layer {
   }
 }
 layer {
+  name: "Dropout1"
+  type: "Dropout"
+  bottom: "ReLU6"
+  top: "Dropout1"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
   name: "Convolution12"
   type: "Convolution"
-  bottom: "ReLU6"
+  bottom: "Dropout1"
   top: "Convolution12"
   convolution_param {
     num_output: 512
@@ -1730,7 +1739,7 @@ layer {
   top: "DummyData3"
   dummy_data_param {
     shape {
-      dim: 1
+      dim: 6
       dim: 256
       dim: 12
       dim: 12
@@ -1787,9 +1796,18 @@ layer {
   }
 }
 layer {
+  name: "Dropout2"
+  type: "Dropout"
+  bottom: "ReLU8"
+  top: "Dropout2"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
   name: "Convolution14"
   type: "Convolution"
-  bottom: "ReLU8"
+  bottom: "Dropout2"
   top: "Convolution14"
   convolution_param {
     num_output: 256
@@ -1841,7 +1859,7 @@ layer {
   top: "DummyData4"
   dummy_data_param {
     shape {
-      dim: 1
+      dim: 6
       dim: 128
       dim: 24
       dim: 24
@@ -1898,9 +1916,18 @@ layer {
   }
 }
 layer {
+  name: "Dropout3"
+  type: "Dropout"
+  bottom: "ReLU10"
+  top: "Dropout3"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
   name: "Convolution16"
   type: "Convolution"
-  bottom: "ReLU10"
+  bottom: "Dropout3"
   top: "Convolution16"
   convolution_param {
     num_output: 128
@@ -1952,7 +1979,7 @@ layer {
   top: "DummyData5"
   dummy_data_param {
     shape {
-      dim: 1
+      dim: 6
       dim: 64
       dim: 48
       dim: 48
@@ -2009,9 +2036,18 @@ layer {
   }
 }
 layer {
+  name: "Dropout4"
+  type: "Dropout"
+  bottom: "ReLU12"
+  top: "Dropout4"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
   name: "Convolution18"
   type: "Convolution"
-  bottom: "ReLU12"
+  bottom: "Dropout4"
   top: "Convolution18"
   convolution_param {
     num_output: 64
@@ -2063,7 +2099,7 @@ layer {
   top: "DummyData6"
   dummy_data_param {
     shape {
-      dim: 1
+      dim: 6
       dim: 64
       dim: 96
       dim: 96
@@ -2120,9 +2156,18 @@ layer {
   }
 }
 layer {
+  name: "Dropout5"
+  type: "Dropout"
+  bottom: "ReLU14"
+  top: "Dropout5"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
   name: "Convolution20"
   type: "Convolution"
-  bottom: "ReLU14"
+  bottom: "Dropout5"
   top: "Convolution20"
   convolution_param {
     num_output: 64
@@ -2174,7 +2219,7 @@ layer {
   top: "DummyData7"
   dummy_data_param {
     shape {
-      dim: 1
+      dim: 6
       dim: 64
       dim: 192
       dim: 192
@@ -2231,9 +2276,18 @@ layer {
   }
 }
 layer {
+  name: "Dropout6"
+  type: "Dropout"
+  bottom: "ReLU16"
+  top: "Dropout6"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
   name: "Convolution22"
   type: "Convolution"
-  bottom: "ReLU16"
+  bottom: "Dropout6"
   top: "Convolution22"
   convolution_param {
     num_output: 64
@@ -3577,15 +3631,25 @@ layer {
   }
 }
 layer {
+  name: "edge"
+  type: "Python"
+  bottom: "predict"
+  top: "edge"
+  python_param {
+    module: "edge_layer"
+    layer: "EdgeLayer"
+  }
+}
+layer {
   name: "dum_predict"
   type: "DummyData"
   top: "dum_predict"
   dummy_data_param {
     shape {
+      dim: 6
       dim: 1
-      dim: 1
-      dim: 184
-      dim: 184
+      dim: 180
+      dim: 180
     }
   }
 }
@@ -3597,7 +3661,7 @@ layer {
   top: "predict_crop"
   crop_param {
     axis: 2
-    offset: 4
+    offset: 6
   }
 }
 layer {
@@ -3606,10 +3670,10 @@ layer {
   top: "dum_label"
   dummy_data_param {
     shape {
+      dim: 6
       dim: 1
-      dim: 1
-      dim: 184
-      dim: 184
+      dim: 180
+      dim: 180
     }
   }
 }
@@ -3621,14 +3685,57 @@ layer {
   top: "label_crop"
   crop_param {
     axis: 2
-    offset: 4
+    offset: 6
   }
 }
 layer {
-  name: "loss"
+  name: "loss1"
   type: "AbsLoss"
   bottom: "predict_crop"
   bottom: "label_crop"
-  top: "loss"
+  top: "loss1"
   loss_weight: 1
+}
+layer {
+  name: "dum_predict2"
+  type: "DummyData"
+  top: "dum_predict2"
+  dummy_data_param {
+    shape {
+      dim: 6
+      dim: 1
+      dim: 180
+      dim: 180
+    }
+  }
+}
+layer {
+  name: "edge_crop"
+  type: "Crop"
+  bottom: "edge"
+  bottom: "dum_predict2"
+  top: "edge_crop"
+  crop_param {
+    axis: 2
+    offset: 6
+  }
+}
+layer {
+  name: "edge_abs"
+  type: "AbsLoss"
+  bottom: "edge_crop"
+  bottom: "label_crop"
+  top: "edge_abs"
+}
+layer {
+  name: "loss2"
+  type: "Power"
+  bottom: "edge_abs"
+  top: "loss2"
+  loss_weight: 1
+  power_param {
+    power: 1.0
+    scale: 0.01
+    shift: 0.0
+  }
 }

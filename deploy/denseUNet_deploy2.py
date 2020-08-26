@@ -362,45 +362,4 @@ if __name__ == "__main__":
     ssim_mean = ssim_mean / TOT
     time_mean = time_mean / TOT
     print('Total result | '+'time labs : '+str(time_mean)+' | '+'PSNR : '+str(psnr_mean)+' | '+'SSIM : '+str(ssim_mean))
-
-    """
-    # GT
-    sai_GT_list = np.zeros((192, 192, 3, 25))
-    sai_GT_uv = np.zeros((192, 192, 3, 5, 5))
-    sai_GT_grid = np.zeros((192*5, 192*5, 3))
-
-    for i in range(25):
-        sai_GT_list[:, :, :, i] = cv2.imread('/docker/Caffe_LF_Depth/datas/flower_dataset/SAIs_Crop/sai1_'+str(i)+'.png')
-
-    for ax in range(5):
-        for ay in range(5):
-            sai_GT_uv[:, :, :, ay, ax] = sai_GT_list[:, :, :, 5*ax+ay]
-
-    for ax in range(5):
-        for ay in range(5):
-            sai_GT_grid[192*ay:192*ay+192, 192*ax:192*ax+192, :] = sai_GT_uv[:, :, :, ay, ax]
-    cv2.imwrite(PATH+'/output_GT/sai_grid.png', sai_GT_grid)
-
-    sai_GT_epi_ver = np.zeros((192, 5*5, 3))
-    sai_GT_epi_hor = np.zeros((5*5, 192, 3))
-
-    for ax in range(5):
-        for ay in range(5):
-            sai_GT_epi_ver[:, 5*ax+ay, :] = sai_GT_uv[:, 192//2, :, ay, ax]
-    cv2.imwrite(PATH+'/output_GT/sai_epi_ver.png', sai_GT_epi_ver)
-
-    for ax in range(5):
-        for ay in range(5):
-            sai_GT_epi_hor[5*ax+ay, :, :] = sai_GT_uv[192//2, :, :, ay, ax]
-    cv2.imwrite(PATH+'/output_GT/sai_epi_hor.png', sai_GT_epi_hor)
-
-    # Print a LF result
-    #imgSAIs = np.zeros((192, 192, 3, 25))
-    #for i in range(25):
-    #imgSAI = sai_GT_list
-    sai_GT_list = trans_order(sai_GT_list)
-    imgLF = trans_SAIs_to_LF(sai_GT_list)
-    cv2.imwrite(PATH+'/output_GT/result_lf.jpg', imgLF)
-    """    
-
     exit(0)

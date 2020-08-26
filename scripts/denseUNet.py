@@ -96,10 +96,12 @@ def conv_final_layer(bottom=None, ks=3, nout=1, stride=1, pad=1):
     conv = L.TanH(conv, in_place=False)
     return conv
 
-def conv_conv_layer(bottom=None, ks=3, nout=1, stride=1, pad=1):
+def conv_conv_layer(bottom=None, ks=3, nout=1, stride=1, pad=1, drop=0.5):
     conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
                                 num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
     conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+    if drop != 0: 
+        conv = L.Dropout(conv, dropout_param=dict(dropout_ratio=drop))
     conv = L.Convolution(conv, kernel_size=ks, stride=stride,
                                 num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
     conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
@@ -192,11 +194,11 @@ def input_shifting_5x5(bottom, batch_size):
     con_crop = L.Crop(con, dum_input, crop_param=dict(axis=2, offset=2))
     return con_crop
 
-def image_data_5x5(batch_size=1):
+def image_data_5x5(batch_size=1, source='train_source'):
     con = None
     for i in range(25):
         label, trash = L.ImageData(batch_size=batch_size,
-                                source='./datas/flower_dataset/source'+str(i)+'.txt',
+                                source='./datas/face_dataset/'+source+str(i)+'.txt',
                                 transform_param=dict(scale=1./256.),
                                 shuffle=False,
                                 ntop=2,
@@ -398,7 +400,7 @@ def denseUNet_train(batch_size=1):
 
     # Data loading
     n.input, n.trash = L.ImageData(batch_size=batch_size,
-                            source='./datas/flower_dataset/source'+str(CENTER_SAI)+'.txt',
+                            source='./datas/face_dataset/train_source'+str(CENTER_SAI)+'.txt',
                             transform_param=dict(scale=1./256.),
                             shuffle=False,
                             ntop=2,
@@ -406,7 +408,7 @@ def denseUNet_train(batch_size=1):
                             new_width=196,
                             is_color=False)
     n.shift = input_shifting_5x5(n.input, batch_size)
-    n.label, n.trash = image_data_5x5(batch_size)
+    n.label, n.trash = image_data_5x5(batch_size, 'train_source')
 
     # Network
     n.dum_input = L.DummyData(shape=dict(dim=[batch_size, 1, 192, 192]))
@@ -417,18 +419,18 @@ def denseUNet_train(batch_size=1):
     n.conv4, n.poo4 = conv_conv_downsample_layer(n.poo3, 3, 128, 2, 1)
     n.conv5, n.poo5 = conv_conv_downsample_layer(n.poo4, 3, 256, 2, 1)
 
-    n.feature = conv_conv_layer(n.poo5, 3, 512, 1, 1)
+    n.feature = conv_conv_layer(n.poo5, 3, 512, 1, 1, 0.5)
 
     n.deconv5 = upsample_concat_layer(n.feature, n.conv5, 3, 256, 2, 0, batch_size, 12)
-    n.conv6 = conv_conv_layer(n.deconv5, 3, 256, 1, 1)
+    n.conv6 = conv_conv_layer(n.deconv5, 3, 256, 1, 1, 0.5)
     n.deconv6 = upsample_concat_layer(n.conv6, n.conv4, 3, 128, 2, 0, batch_size, 24)
-    n.conv7 = conv_conv_layer(n.deconv6, 3, 128, 1, 1)
+    n.conv7 = conv_conv_layer(n.deconv6, 3, 128, 1, 1, 0.5)
     n.deconv7 = upsample_concat_layer(n.conv7, n.conv3, 3, 64, 2, 0, batch_size, 48)
-    n.conv8 = conv_conv_layer(n.deconv7, 3, 64, 1, 1)
+    n.conv8 = conv_conv_layer(n.deconv7, 3, 64, 1, 1, 0.5)
     n.deconv8 = upsample_concat_layer(n.conv8, n.conv2, 3, 64, 2, 0, batch_size, 96)
-    n.conv9 = conv_conv_layer(n.deconv8, 3, 64, 1, 1)
+    n.conv9 = conv_conv_layer(n.deconv8, 3, 64, 1, 1, 0.5)
     n.deconv9 = upsample_concat_layer(n.conv9, n.conv1, 3, 64, 2, 0, batch_size, 192)
-    n.conv10 = conv_conv_layer(n.deconv9, 3, 64, 1, 1)
+    n.conv10 = conv_conv_layer(n.deconv9, 3, 64, 1, 1, 0.5)
 
     n.flow = flow_layer(n.conv10, 25*2)
     
@@ -436,13 +438,19 @@ def denseUNet_train(batch_size=1):
     n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
     n.predict = slice_warp(n.shift, n.flow_h, n.flow_v)
 
-    # Loss
-    n.dum_predict = L.DummyData(shape=dict(dim=[batch_size, 1, 184, 184]))
-    n.predict_crop = L.Crop(n.predict, n.dum_predict, crop_param=dict(axis=2, offset=4))
-    n.dum_label = L.DummyData(shape=dict(dim=[batch_size, 1, 184, 184]))
-    n.label_crop = L.Crop(n.label, n.dum_label, crop_param=dict(axis=2, offset=4))     
-    n.loss = L.AbsLoss(n.predict_crop, n.label_crop, loss_weight=1)
+    n.edge = L.Python(n.predict, module='edge_layer', layer='EdgeLayer', ntop=1)
 
+    # Loss
+    n.dum_predict = L.DummyData(shape=dict(dim=[batch_size, 1, 180, 180]))
+    n.predict_crop = L.Crop(n.predict, n.dum_predict, crop_param=dict(axis=2, offset=6))
+    n.dum_label = L.DummyData(shape=dict(dim=[batch_size, 1, 180, 180]))
+    n.label_crop = L.Crop(n.label, n.dum_label, crop_param=dict(axis=2, offset=6))     
+    n.loss1 = L.AbsLoss(n.predict_crop, n.label_crop, loss_weight=1)
+
+    n.dum_predict2 = L.DummyData(shape=dict(dim=[batch_size, 1, 180, 180]))
+    n.edge_crop = L.Crop(n.edge, n.dum_predict2, crop_param=dict(axis=2, offset=6))
+    n.edge_abs = L.AbsLoss(n.edge_crop, n.label_crop)
+    n.loss2 = L.Power(n.edge_abs, power=1.0, scale=0.01, shift=0.0, in_place=False, loss_weight=1)
 
     return n.to_proto()
 
@@ -451,7 +459,7 @@ def denseUNet_test(batch_size=1):
 
     # Data loading
     n.input, n.trash = L.ImageData(batch_size=batch_size,
-                            source='./datas/flower_dataset/source'+str(CENTER_SAI)+'.txt',
+                            source='./datas/face_dataset/train_source'+str(CENTER_SAI)+'.txt',
                             transform_param=dict(scale=1./256.),
                             shuffle=False,
                             ntop=2,
@@ -459,7 +467,7 @@ def denseUNet_test(batch_size=1):
                             new_width=196,
                             is_color=False)
     n.shift = input_shifting_5x5(n.input, batch_size)
-    n.label, n.trash = image_data_5x5(batch_size)
+    n.label, n.trash = image_data_5x5(batch_size, 'train_source')
 
     n.dum_input = L.DummyData(shape=dict(dim=[batch_size, 1, 192, 192]))
     n.input_crop = L.Crop(n.input, n.dum_input, crop_param=dict(axis=2, offset=2))    
@@ -470,18 +478,18 @@ def denseUNet_test(batch_size=1):
     n.conv4, n.poo4 = conv_conv_downsample_layer(n.poo3, 3, 128, 2, 1)
     n.conv5, n.poo5 = conv_conv_downsample_layer(n.poo4, 3, 256, 2, 1)
 
-    n.feature = conv_conv_layer(n.poo5, 3, 512, 1, 1)
+    n.feature = conv_conv_layer(n.poo5, 3, 512, 1, 1, 0.0)
     
     n.deconv5 = upsample_concat_layer(n.feature, n.conv5, 3, 256, 2, 0, batch_size, 12)
-    n.conv6 = conv_conv_layer(n.deconv5, 3, 256, 1, 1)
+    n.conv6 = conv_conv_layer(n.deconv5, 3, 256, 1, 1, 0.0)
     n.deconv6 = upsample_concat_layer(n.conv6, n.conv4, 3, 128, 2, 0, batch_size, 24)
-    n.conv7 = conv_conv_layer(n.deconv6, 3, 128, 1, 1)
+    n.conv7 = conv_conv_layer(n.deconv6, 3, 128, 1, 1, 0.0)
     n.deconv7 = upsample_concat_layer(n.conv7, n.conv3, 3, 64, 2, 0, batch_size, 48)
-    n.conv8 = conv_conv_layer(n.deconv7, 3, 64, 1, 1)
+    n.conv8 = conv_conv_layer(n.deconv7, 3, 64, 1, 1, 0.0)
     n.deconv8 = upsample_concat_layer(n.conv8, n.conv2, 3, 64, 2, 0, batch_size, 96)
-    n.conv9 = conv_conv_layer(n.deconv8, 3, 64, 1, 1)
+    n.conv9 = conv_conv_layer(n.deconv8, 3, 64, 1, 1, 0.0)
     n.deconv9 = upsample_concat_layer(n.conv9, n.conv1, 3, 64, 2, 0, batch_size, 192)
-    n.conv10 = conv_conv_layer(n.deconv9, 3, 64, 1, 1)
+    n.conv10 = conv_conv_layer(n.deconv9, 3, 64, 1, 1, 0.0)
 
     n.flow = flow_layer(n.conv10, 25*2)
 
@@ -495,15 +503,15 @@ def denseUNet_test(batch_size=1):
 
     # Visualization
     n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/flower_dataset', name='flow_h', mult=30)))
+                    param_str=str(dict(path='./datas/face_dataset', name='flow_h', mult=30)))
     n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/flower_dataset', name='flow_v', mult=30)))
+                    param_str=str(dict(path='./datas/face_dataset', name='flow_v', mult=30)))
     n.trash3 = L.Python(n.shift, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/flower_dataset', name='input', mult=1*256)))
+                    param_str=str(dict(path='./datas/face_dataset', name='input', mult=1*256)))
     n.trash4 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/flower_dataset', name='label', mult=1*256)))
+                    param_str=str(dict(path='./datas/face_dataset', name='label', mult=1*256)))
     n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/flower_dataset', name='predict', mult=1*256)))
+                    param_str=str(dict(path='./datas/face_dataset', name='predict', mult=1*256)))
 
     return n.to_proto()
 1
@@ -513,7 +521,7 @@ def denseUNet_solver(train_net_path, test_net_path=None, snapshot_path=None):
     s.train_net = train_net_path
     if test_net_path is not None:
         s.test_net.append(test_net_path)
-        s.test_interval = 50
+        s.test_interval = 18
         s.test_iter.append(1)
     else:
         s.test_initialization = False
@@ -548,7 +556,7 @@ if __name__ == "__main__":
 
     def generate_net():
         with open(TRAIN_PATH, 'w') as f:
-            f.write(str(denseUNet_train(1)))    
+            f.write(str(denseUNet_train(6)))    
         with open(TEST_PATH, 'w') as f:
             f.write(str(denseUNet_test(1)))
     
@@ -559,5 +567,5 @@ if __name__ == "__main__":
     generate_net()
     generate_solver()
     solver = caffe.get_solver(SOLVER_PATH)
-    solver.net.copy_from('./models/denseUNet_solver_iter_28500.caffemodel')
+    solver.net.copy_from('./models/denseUNet_solver_iter_20000.caffemodel')
     solver.solve()
