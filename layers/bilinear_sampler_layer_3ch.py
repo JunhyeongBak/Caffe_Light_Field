@@ -2,7 +2,7 @@ import caffe
 import numpy as np
 import cv2
 
-def warp_flow(img_in, flow):
+def warp_flow(img_in, flow, color):
     res = np.zeros((img_in.shape))
     for ch in range(3):
         img = img_in[ch, :, :]
@@ -15,11 +15,14 @@ def warp_flow(img_in, flow):
         new_flow[:,:,0] += np.arange(w)
         new_flow[:,:,1] += np.arange(h)[:,np.newaxis]
         res[ch, :, :] = cv2.remap(img[:, :], new_flow, None, interpolation = cv2.INTER_LINEAR, borderMode = cv2.BORDER_WRAP)
+
     return res
 
 class BilinearSamplerLayer3ch(caffe.Layer):
     def setup(self, bottom, top):
-        pass
+        params = eval(self.param_str)
+        self.flow_size = params["flow_size"]
+        self.color_size = params["color_size"]
     
     def reshape(self, bottom, top):
         self.src = bottom[0].data[...] # shifted SAIs -> 25 x 3ch
@@ -31,11 +34,11 @@ class BilinearSamplerLayer3ch(caffe.Layer):
     def forward(self, bottom, top):
         self.dst = np.zeros((self.src_shape))
         for b in range(self.src_shape[0]):
-            for c in range(25):
+            for c in range(self.flow_size):
                 vec_trans = np.zeros((2, self.src_shape[2], self.src_shape[3]))
                 vec_trans[0, :, :] = self.vec[b, c, :, :]
-                vec_trans[1, :, :] = self.vec[b, c+25, :, :]
-                self.dst[b, c*3:c*3+3, :, :] = warp_flow(self.src[b, c*3:c*3+3, :, :], vec_trans)
+                vec_trans[1, :, :] = self.vec[b, c+self.flow_size, :, :]
+                self.dst[b, c*self.color_size:c*self.color_size+self.color_size, :, :] = warp_flow(self.src[b, c*self.color_size:c*self.color_size+self.color_size, :, :], vec_trans, self.color_size)
         top[0].data[...] = self.dst
 
     def backward(self, top, propagate_down, bottom):

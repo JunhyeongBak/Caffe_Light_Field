@@ -76,10 +76,10 @@ def shift_value_5x5(i):
 def flow_layer(bottom=None, nout=1):
     conv = L.Convolution(bottom, kernel_size=3, stride=1,
                                 num_output=nout, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
     conv = L.Convolution(conv, kernel_size=3, stride=1,
                                 num_output=nout, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
     conv = L.Convolution(conv, kernel_size=1, stride=1,
                                 num_output=nout, pad=0, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
     return conv
@@ -87,39 +87,39 @@ def flow_layer(bottom=None, nout=1):
 def conv_layer(bottom=None, ks=3, nout=1, stride=1, pad=1):
     conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
                                 num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
     return conv
 
 def conv_final_layer(bottom=None, ks=3, nout=1, stride=1, pad=1):
     conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
                                 num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.TanH(conv, in_place=False)
+    conv = L.TanH(conv, in_place=True)
     return conv
 
 def conv_conv_layer(bottom=None, ks=3, nout=1, stride=1, pad=1, drop=0.5):
     conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
                                 num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
     if drop != 0: 
         conv = L.Dropout(conv, dropout_param=dict(dropout_ratio=drop))
     conv = L.Convolution(conv, kernel_size=ks, stride=stride,
                                 num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
     return conv
 
 def downsample_layer(bottom=None, ks=3, stride=2):
     pool = L.Pooling(bottom, kernel_size=ks, stride=stride, pool=P.Pooling.MAX)
-    pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=False)
+    pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=True)
     return pool
 
 def upsample_layer(bottom=None, ks=2, nout=1, stride=2):
     deconv = L.Deconvolution(bottom, convolution_param=dict(num_output=nout, kernel_size=ks, stride=stride, pad=0))
-    deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=False)
+    deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=True)
     return deconv
 
 def upsample_concat_layer(bottom1=None, bottom2=None, ks=2, nout=1, stride=2, pad=0, batch_size=1, crop_size=0):
     deconv = L.Deconvolution(bottom1, convolution_param=dict(num_output=nout, kernel_size=ks, stride=stride, pad=pad))
-    deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=False)
+    deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=True)
     dum = L.DummyData(shape=dict(dim=[batch_size, nout, crop_size, crop_size]))
     deconv_crop = L.Crop(deconv, dum, crop_param=dict(axis=2, offset=0))
     conc = L.Concat(*[deconv_crop, bottom2], concat_param={'axis': 1})
@@ -127,7 +127,7 @@ def upsample_concat_layer(bottom1=None, bottom2=None, ks=2, nout=1, stride=2, pa
 
 def upsample_concat_crop_layer(bottom1=None, bottom2=None, ks=2, nout=1, stride=2, pad=0, batch_size=1, crop_size=0):
     deconv = L.Deconvolution(bottom1, convolution_param=dict(num_output=nout, kernel_size=ks, stride=stride, pad=pad))
-    deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=False)
+    deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=True)
     dum = L.DummyData(shape=dict(dim=[batch_size, 64, 192, 192]))
     deconv_crop = L.Crop(deconv, dum, crop_param=dict(axis=2, offset=0))
     conc = L.Concat(*[deconv_crop, bottom2], concat_param={'axis': 1})
@@ -135,10 +135,10 @@ def upsample_concat_crop_layer(bottom1=None, bottom2=None, ks=2, nout=1, stride=
 
 def upsample_conv_conv_layer(bottom=None, ks=3, nout=1, stride=2, pad=1):
     deconv = L.Deconvolution(bottom, convolution_param=dict(num_output=nout, kernel_size=ks, stride=stride))
-    deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=False)
+    deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=True)
     conv = L.Convolution(deconv, kernel_size=ks, stride=1,
                                 num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
     conv = L.Convolution(conv, kernel_size=ks, stride=1,
                                 num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
     conv = L.TanH(conv, in_place=False)
@@ -147,26 +147,26 @@ def upsample_conv_conv_layer(bottom=None, ks=3, nout=1, stride=2, pad=1):
 def conv_conv_downsample_layer(bottom=None, ks=3, nout=1, stride=2, pad=0):
     conv = L.Convolution(bottom, kernel_size=ks, stride=1,
                                 num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
     conv = L.Convolution(conv, kernel_size=ks, stride=1,
                                 num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
     pool = L.Pooling(conv, kernel_size=ks, stride=stride, pool=P.Pooling.MAX)
-    pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=False)
+    pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=True)
     return conv, pool
 
 def conv_relu(bottom, ks, nout, stride=1, pad=0):
     conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
                                 num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    relu = L.ReLU(conv, relu_param=dict(negative_slope=0.0), in_place=False)
+    relu = L.ReLU(conv, relu_param=dict(negative_slope=0.0), in_place=True)
     return relu
 
 def block(bottom, ks, nout, dilation=1, stride=1, pad=0):
     conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
                                 num_output=nout, pad=pad, dilation=dilation, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    relu = L.ReLU(conv, relu_param=dict(negative_slope=0.1), in_place=False)
+    relu = L.ReLU(conv, relu_param=dict(negative_slope=0.1), in_place=True)
     ccat = L.Concat(relu, bottom, axis=1)
-    relu = L.ReLU(ccat, relu_param=dict(negative_slope=0.0), in_place=False)
+    relu = L.ReLU(ccat, relu_param=dict(negative_slope=0.0), in_place=True)
     return relu
 
 def fc_block(bottom, nout):
@@ -408,7 +408,6 @@ def denseUNet_train(batch_size=1):
                             new_width=196,
                             is_color=False)
     n.shift = input_shifting_5x5(n.input, batch_size)
-    n.label, n.trash = image_data_5x5(batch_size, 'train_source')
 
     # Network
     n.dum_input = L.DummyData(shape=dict(dim=[batch_size, 1, 192, 192]))
@@ -441,6 +440,8 @@ def denseUNet_train(batch_size=1):
     n.edge = L.Python(n.predict, module='edge_layer', layer='EdgeLayer', ntop=1)
 
     # Loss
+    n.label, n.trash = image_data_5x5(batch_size, 'train_source')
+
     n.dum_predict = L.DummyData(shape=dict(dim=[batch_size, 1, 180, 180]))
     n.predict_crop = L.Crop(n.predict, n.dum_predict, crop_param=dict(axis=2, offset=6))
     n.dum_label = L.DummyData(shape=dict(dim=[batch_size, 1, 180, 180]))
@@ -467,7 +468,6 @@ def denseUNet_test(batch_size=1):
                             new_width=196,
                             is_color=False)
     n.shift = input_shifting_5x5(n.input, batch_size)
-    n.label, n.trash = image_data_5x5(batch_size, 'train_source')
 
     n.dum_input = L.DummyData(shape=dict(dim=[batch_size, 1, 192, 192]))
     n.input_crop = L.Crop(n.input, n.dum_input, crop_param=dict(axis=2, offset=2))    
@@ -502,6 +502,7 @@ def denseUNet_test(batch_size=1):
     n.predict = slice_warp(n.shift, n.flow_h, n.flow_v)
 
     # Visualization
+    n.label, n.trash = image_data_5x5(batch_size, 'train_source')
     n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                     param_str=str(dict(path='./datas/face_dataset', name='flow_h', mult=30)))
     n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
@@ -556,7 +557,7 @@ if __name__ == "__main__":
 
     def generate_net():
         with open(TRAIN_PATH, 'w') as f:
-            f.write(str(denseUNet_train(6)))    
+            f.write(str(denseUNet_train(8)))    
         with open(TEST_PATH, 'w') as f:
             f.write(str(denseUNet_test(1)))
     

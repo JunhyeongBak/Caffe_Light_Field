@@ -547,7 +547,7 @@ layer {
   power_param {
     power: 1.0
     scale: 0.00390625
-    shift: 0.0
+    shift: 0
   }
 }
 layer {
@@ -1542,7 +1542,7 @@ layer {
   }
 }
 layer {
-  name: "Convolution23"
+  name: "flow25_1"
   type: "Convolution"
   bottom: "conv10"
   top: "Convolution23"
@@ -1570,7 +1570,7 @@ layer {
   }
 }
 layer {
-  name: "Convolution24"
+  name: "flow25_2"
   type: "Convolution"
   bottom: "ReLU17"
   top: "Convolution24"
@@ -1598,10 +1598,10 @@ layer {
   }
 }
 layer {
-  name: "flow"
+  name: "flow25_3"
   type: "Convolution"
   bottom: "ReLU18"
-  top: "flow"
+  top: "flow25"
   convolution_param {
     num_output: 50
     bias_term: true
@@ -1619,7 +1619,7 @@ layer {
 layer {
   name: "flow_h"
   type: "Slice"
-  bottom: "flow"
+  bottom: "flow25"
   top: "flow_h"
   top: "flow_v"
   slice_param {
@@ -1646,5 +1646,6 @@ layer {
   python_param {
     module: "bilinear_sampler_layer_3ch"
     layer: "BilinearSamplerLayer3ch"
+    param_str: "{\"flow_size\": 25, \"color_size\": 3}"
   }
 }

@@ -4,6 +4,8 @@ from tqdm import tqdm
 import glob
 import imageio
 import warnings
+from multiprocessing import Process
+from threading import Thread
 
 def dataset_resize():
     TOT = 4
@@ -61,18 +63,18 @@ def sais_to_lf():
 
         cv2.imwrite('./utils/lf/lf'+str(i_tot)+'.jpg', imgLF)
 
-def lf_to_sais():
-    TOT = 77
+def lf_to_sais(i_start, i_finish):
     ANGULAR_RES = 14
-    TARGET_RES = 5
-    LF_WIDTH = 7574  #3584
-    LF_HEIGHT = 5264 #2688
-    SAI_HEIGHT = 376 # 192 # int(LF_HEIGHT / ANGULAR_RES) # SPATIAL_HEIGHT
-    SAI_WIDTH = 541 # 256 # int(LF_WIDTH / ANGULAR_RES) # SPATIAL_WIDTH
+    TARGET_RES = 8
+    LF_WIDTH = 7574
+    LF_HEIGHT = 5264
+    SAI_HEIGHT = 376 # int(LF_HEIGHT / ANGULAR_RES) or the value you want
+    SAI_WIDTH = 541 # int(LF_WIDTH / ANGULAR_RES) or the value you want
     CH = 3
 
-    for i_tot in tqdm(range(TOT)):
-        lf = cv2.imread('./utils/lf/lf'+str(i_tot)+'.png', cv2.IMREAD_COLOR)
+    for i_tot in tqdm(range(i_start, i_finish)):
+        lf = cv2.imread('/docker/LF_Datas/LF_Flower_Raw_Val/lf_raw'+str(i_tot)+'.png', cv2.IMREAD_COLOR)
+        
         full_sais = np.zeros((SAI_HEIGHT, SAI_WIDTH, CH, ANGULAR_RES, ANGULAR_RES))
         for ax in range(ANGULAR_RES):
             for ay in range(ANGULAR_RES):
@@ -84,8 +86,7 @@ def lf_to_sais():
         sai_cnt = 0
         for ax in range(TARGET_RES):
             for ay in range(TARGET_RES):
-                #sais_list[:, :, :, sai_cnt] = crop_sais[:, :, :, ay, ax]
-                cv2.imwrite('./utils/sai_val/sai'+str(i_tot)+'_'+str(sai_cnt)+'.png', crop_sais[:, ((SAI_WIDTH-SAI_HEIGHT)//2):((SAI_WIDTH-SAI_HEIGHT)//2)+SAI_HEIGHT, :, ay, ax])
+                cv2.imwrite('/docker/LF_Datas/LF_Flower_SAI_Val/sai'+str(i_tot)+'_'+str(sai_cnt)+'.png', crop_sais[:, ((SAI_WIDTH-SAI_HEIGHT)//2):((SAI_WIDTH-SAI_HEIGHT)//2)+SAI_HEIGHT, :, ay, ax])
                 sai_cnt = sai_cnt + 1
 
 def gif_maker():
@@ -109,9 +110,11 @@ def renamer():
 
 def renamer_glob():
     i_cnt = 0
-    for path in glob.glob('./utils/lf_raw/org/*.png'):
+    for path in tqdm(glob.glob('/docker/LF_Datas/LF_Flower_Raw_Val/*.png')):
+        if i_cnt == 69:
+            print(path)
         lf = cv2.imread(path, cv2.IMREAD_COLOR)
-        cv2.imwrite('./utils/lf_raw/lf_raw'+str(i_cnt)+'.png', lf)
+        cv2.imwrite('/docker/LF_Datas/LF_Flower_Raw_Val2/lf_raw'+str(i_cnt)+'.png', lf)
         i_cnt = i_cnt + 1
 
 def flower_cropper():
@@ -124,7 +127,42 @@ def flower_cropper():
             img_dst = img_src[:, crop_point:crop_point+192, :]
             #print('none flip', crop_point)
             cv2.imwrite('./datasets/SAIs_Crop/sai'+str(i_tot+3343+3343)+'_'+str(i_sai)+'.png', img_dst)
+
+
+def flower_cropper2(a, b, c):
+    TOT = 1
+    SAI = 64
+    """
+    for i_tot in tqdm(range(TOT)):
+        crop_point = np.random.randint(10, 54+1)
+        for i_sai in range(SAI):
+            img_src = cv2.imread('./SAIs/sai'+str(i_tot)+'_'+str(i_sai)+'.png', cv2.IMREAD_COLOR)
+            img_dst = img_src[:, crop_point:crop_point+192, :]
+            #print('none flip', crop_point)
+            cv2.imwrite('./SAIs_Crop/sai'+str(i_tot)+'_'+str(i_sai)+'.png', img_dst)
+    """
+    for i_tot in tqdm(range(a, b)):
+        cpr_h = np.random.randint(0, 376-200)
+        cps_h = 376-cpr_h
+        cpr_v = np.random.randint(0, 541-cps_h)
+        cps_v = cps_h
+
+
             
+        for i_sai in range(SAI):
+            #print('./SAIs3/sai'+str(i_tot)+'_'+str(i_sai)+'.png')
+            img_src = cv2.imread('./SAIs3/sai'+str(i_tot)+'_'+str(i_sai)+'.png', cv2.IMREAD_COLOR)
+            img_dst = img_src[cpr_h:cpr_h+cps_h, cpr_v:cpr_v+cps_v, :]
+            while img_dst.shape[0] != img_dst.shape[1]:
+                cpr_h = np.random.randint(0, 376-200)
+                cps_h = 376-cpr_h
+                cpr_v = np.random.randint(0, 541-cps_h)
+                cps_v = cps_h
+                print('err')
+            img_dst = img_src[cpr_h:cpr_h+cps_h, cpr_v:cpr_v+cps_v, :]
+            #print('none flip', crop_point)
+            cv2.imwrite('./SAIs_Crop2/sai'+str(i_tot+3343*c)+'_'+str(i_sai)+'.png', img_dst)
+
 if __name__ == '__main__':
     #dataset_resize()
     #sais_to_lf()
@@ -132,3 +170,17 @@ if __name__ == '__main__':
     #renamer()
     #renamer_glob()
     #lf_to_sais()
+    #lf_to_sais(0, 77)
+
+    p1 = Thread(target=lf_to_sais, args=(0, 20))
+    p2 = Thread(target=lf_to_sais, args=(20, 40))
+    p3 = Thread(target=lf_to_sais, args=(40, 60))
+    p4 = Thread(target=lf_to_sais, args=(60, 77))
+    p1.start()
+    p2.start()
+    p3.start()
+    p4.start()
+    p1.join()
+    p2.join()
+    p3.join()
+    p4.join()

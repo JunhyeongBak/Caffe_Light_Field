@@ -5,13 +5,16 @@ import cv2
 from tqdm import tqdm
 
 def source_txt_gen():
-    TOT = 1257
-    SAI = 25
+    TOT = 3343*3
+    SAI = 64
 
     for i_sai in tqdm(range(SAI), desc='i_sai'):
-        f = open('./datas/face_dataset/val_source'+str(i_sai)+'.txt', 'w')
+        f = open('./datas/flower_dataset/train_source'+str(i_sai)+'.txt', 'w')
         for i_tot in tqdm(range(TOT), desc='i_tot'):
-            data = './datas/face_dataset/face_sai/sai'+str(i_tot)+'_'+str(i_sai)+'.png 0'+'\n'
+            #if (i_tot >= 240 and i_tot <= 250) or (i_tot >= 740 and i_tot <= 750) or (i_tot >= 2475 and i_tot <= 2485):
+            #    pass
+            #else:
+            data = './datas/flower_dataset/SAIs_Crop/sai'+str(i_tot)+'_'+str(i_sai)+'.png 0'+'\n'
             f.write(data)
         f.close()
 
