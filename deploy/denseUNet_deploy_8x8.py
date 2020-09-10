@@ -257,7 +257,7 @@ if __name__ == "__main__":
     TOT = 77
     PATH = './deploy'
     NET_PATH = PATH + '/denseUNet_deploy.prototxt'
-    WEIGHTS_PATH = PATH + '/denseUNet_solver_iter_23000.caffemodel'
+    WEIGHTS_PATH = PATH + '/denseUNet_solver_iter_10000.caffemodel'
 
     # Generate a network
     def generate_net():

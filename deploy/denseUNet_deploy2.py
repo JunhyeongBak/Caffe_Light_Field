@@ -37,16 +37,33 @@ import time
 import numpy as np
 import argparse
 import caffe
+import skimage
 import json
 from caffe import layers as L, params as P
 from caffe.proto import caffe_pb2
 import math
-from skimage.measure import compare_ssim as ssim
+#from skimage.measure import compare_ssim as ssim
 
-SHIFT_VALUE = 0.8
+SHIFT_VALUE = 0.4
 
 caffe.set_mode_gpu()
 caffe.set_device(0)
+
+def index_5x5_picker(i):
+    '''
+    list_5x5 = [9, 10, 11, 12, 13,
+                17, 18, 19, 20, 21,
+                25, 26, 27, 28, 29,
+                33, 34, 35, 36, 37,
+                41, 42, 43, 44, 45]
+    '''
+    list_5x5 = [9, 10, 11, 12, 13,
+                17, 18, 19, 20, 21,
+                25, 26, 27, 28, 29,
+                33, 34, 35, 36, 37,
+                41, 42, 43, 44, 45]
+    i_dst = list_5x5[i]
+    return i_dst
 
 def trans_SAIs_to_LF(imgSAIs):
     imgLF = np.zeros((192*1*5, 192*1*5, 3))
@@ -106,13 +123,7 @@ def shift_value_5x5(i):
 
 def flow_layer(bottom=None, nout=1):
     conv = L.Convolution(bottom, kernel_size=3, stride=1,
-                                num_output=nout, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'), name='flow25_1')
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
-    conv = L.Convolution(conv, kernel_size=3, stride=1,
-                                num_output=nout, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'), name='flow25_2')
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
-    conv = L.Convolution(conv, kernel_size=1, stride=1,
-                                num_output=nout, pad=0, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'), name='flow25_3')
+                                num_output=nout, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'), name='flow'+str(nout//2)+'0')
     return conv
 
 def conv_layer(bottom=None, ks=3, nout=1, stride=1, pad=1):
@@ -228,10 +239,10 @@ def denseUNet_deploy():
     n.deconv9 = upsample_concat_layer(n.conv9, n.conv1, 3, 64, 2, 0, batch_size, 192)
     n.conv10 = conv_conv_layer(n.deconv9, 3, 64, 1, 1)
 
-    n.flow25 = flow_layer(n.conv10, 25*2)
+    n.flow = flow_layer(n.conv10, 25*2)
 
     # Translation
-    n.flow_h, n.flow_v = L.Slice(n.flow25, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+    n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
     n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
     #n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1)
     param_str = json.dumps({'flow_size': 25, 'color_size': 3})
@@ -240,10 +251,10 @@ def denseUNet_deploy():
     return n.to_proto()
 
 if __name__ == "__main__":
-    TOT = 76
+    TOT = 77
     PATH = './deploy'
     NET_PATH = PATH + '/denseUNet_deploy.prototxt'
-    WEIGHTS_PATH = PATH + '/denseUNet_solver_iter_49000.caffemodel'
+    WEIGHTS_PATH = PATH + '/denseUNet_solver_iter_6500.caffemodel'
 
     # Generate a network
     def generate_net():
@@ -261,10 +272,12 @@ if __name__ == "__main__":
         start = time.time()
 
         # Input images
-        if not os.path.isfile(PATH + '/input_flower_5x5/sai'+str(i_tot+1)+'_12.png'):
-            if not os.path.isfile(PATH + '/input_flower_5x5/sai'+str(i_tot+1)+'_12.jpg'):
+        src_color = cv2.imread(PATH + '/input_flower_8x8/sai'+str(i_tot)+'_27.png', cv2.IMREAD_COLOR)
+        if not os.path.isfile(PATH + '/input_flower_8x8/sai'+str(i_tot)+'_27.png'):
+            src_color = cv2.imread(PATH + '/input_flower_8x8/sai'+str(i_tot)+'_27.jpg', cv2.IMREAD_COLOR)
+            if not os.path.isfile(PATH + '/input_flower_8x8/sai'+str(i_tot)+'_27.jpg'):
                 raise Exception('(ERR) The image file is not exist!')
-        src_color = cv2.imread(PATH + '/input_flower_5x5/sai'+str(i_tot+1)+'_12.png', cv2.IMREAD_COLOR)
+        
         src_color = cv2.resize(src_color, dsize=(192, 192), interpolation=cv2.INTER_AREA) ###
         src_luma = cv2.cvtColor(src_color, cv2.COLOR_BGR2GRAY)
         src_blob_color = np.zeros((1, 3, 192, 192))
@@ -317,7 +330,9 @@ if __name__ == "__main__":
         # Get sai
         sai_GT_list = np.zeros((192, 192, 3, 25))
         for i in range(25):
-            sai_GT = cv2.imread(PATH+'/input_flower_5x5/sai'+str(i_tot+1)+'_'+str(i)+'.png')
+            i_change = index_5x5_picker(i)
+            sai_GT = cv2.imread(PATH+'/input_flower_8x8/sai'+str(i_tot)+'_'+str(i_change)+'.png')
+
             sai_GT = cv2.resize(sai_GT, dsize=(192, 192), interpolation=cv2.INTER_AREA)
             sai_GT_list[:, :, :, i] = sai_GT
         
@@ -342,23 +357,20 @@ if __name__ == "__main__":
         cv2.imwrite(PATH+'/output_GT/sai_epi_ver'+str(i_tot)+'.png', sai_GT_epi_ver)
         cv2.imwrite(PATH+'/output_GT/sai_epi_hor'+str(i_tot)+'.png', sai_GT_epi_hor)
 
+        sai_list = sai_list.astype('uint8')
+        sai_GT_list = sai_GT_list.astype('uint8')
+
         # PSNR
         psnr_tot = 0
         for i in range(25):
-            mse = np.mean( (sai_list[:, :, :, i] - sai_GT_list[:, :, :, i]) ** 2 )
-            psnr = 0
-            if mse == 0:
-                psnr = 100
-            else:
-                PIXEL_MAX = 255.0
-                psnr = 20 * math.log10(PIXEL_MAX / math.sqrt(mse))
+            psnr = skimage.metrics.peak_signal_noise_ratio(sai_list[:, :, :, i], sai_GT_list[:, :, :, i])
             psnr_tot = psnr_tot+psnr
         psnr = psnr_tot / 25
 
         # SSIM
         ssim_noise_tot = 0
         for i in range(25):
-            ssim_noise = ssim(sai_list[:, :, :, i], sai_GT_list[:, :, :, i], multichannel=True, data_range=sai_grid.max() - sai_grid.min())
+            ssim_noise = skimage.metrics.structural_similarity(sai_list[:, :, :, i], sai_GT_list[:, :, :, i], multichannel=True, data_range=sai_list[:, :, :, i].max() - sai_list[:, :, :, i].min())
             ssim_noise_tot = ssim_noise_tot + ssim_noise
         ssim_noise = ssim_noise_tot / 25
 

@@ -73,6 +73,50 @@ def shift_value_5x5(i):
         ty = 3*SHIFT_VALUE
     return tx, ty
 
+def shift_value_8x8(i, shift_val):
+    if i<=7:
+        tx = -3*shift_val
+    elif i>7 and i<=15:
+        tx = -2*shift_val
+    elif i>15 and i<=23:
+        tx = -1*shift_val
+    elif i>23 and i<=31:
+        tx = 0
+    elif i>31 and i<=39:
+        tx = 1*shift_val
+    elif i>39 and i<=47:
+        tx = 2*shift_val
+    elif i>47 and i<=55:
+        tx = 3*shift_val
+    else:
+        tx = 4*shift_val
+    if i==0 or (i%8==0 and i>7):
+        ty = -3*shift_val
+    elif i == 1 or (i-1)%8==0:
+        ty = -2*shift_val
+    elif i == 2 or (i-2)%8==0:
+        ty = -1*shift_val
+    elif i == 3 or (i-3)%8==0:
+        ty = 0
+    elif i == 4 or (i-4)%8==0:
+        ty = 1*shift_val
+    elif i == 5 or (i-5)%8==0:
+        ty = 2*shift_val
+    elif i == 6 or (i-6)%8==0:
+        ty = 3*shift_val
+    else:
+        ty = 4*shift_val
+    return tx, ty
+    
+def index_5x5_picker(i):
+    list_5x5 = [9, 10, 11, 12, 13,
+                17, 18, 19, 20, 21,
+                25, 26, 27, 28, 29,
+                33, 34, 35, 36, 37,
+                41, 42, 43, 44, 45]
+    i_dst = list_5x5[i]
+    return i_dst
+
 def flow_layer(bottom=None, nout=1):
     conv = L.Convolution(bottom, kernel_size=3, stride=1,
                                 num_output=nout, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
@@ -198,7 +242,7 @@ def image_data_5x5(batch_size=1, source='train_source'):
     con = None
     for i in range(25):
         label, trash = L.ImageData(batch_size=batch_size,
-                                source='./datas/face_dataset/'+source+str(i)+'.txt',
+                                source='./datas/flower_dataset/'+source+str(i)+'.txt',
                                 transform_param=dict(scale=1./256.),
                                 shuffle=False,
                                 ntop=2,
@@ -400,7 +444,7 @@ def denseUNet_train(batch_size=1):
 
     # Data loading
     n.input, n.trash = L.ImageData(batch_size=batch_size,
-                            source='./datas/face_dataset/train_source'+str(CENTER_SAI)+'.txt',
+                            source='./datas/flower_dataset/train_source'+str(CENTER_SAI)+'.txt',
                             transform_param=dict(scale=1./256.),
                             shuffle=False,
                             ntop=2,
@@ -460,7 +504,7 @@ def denseUNet_test(batch_size=1):
 
     # Data loading
     n.input, n.trash = L.ImageData(batch_size=batch_size,
-                            source='./datas/face_dataset/train_source'+str(CENTER_SAI)+'.txt',
+                            source='./datas/flower_dataset/train_source'+str(CENTER_SAI)+'.txt',
                             transform_param=dict(scale=1./256.),
                             shuffle=False,
                             ntop=2,
@@ -504,15 +548,15 @@ def denseUNet_test(batch_size=1):
     # Visualization
     n.label, n.trash = image_data_5x5(batch_size, 'train_source')
     n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset', name='flow_h', mult=30)))
+                    param_str=str(dict(path='./datas/flower_dataset', name='flow_h', mult=30)))
     n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset', name='flow_v', mult=30)))
+                    param_str=str(dict(path='./datas/flower_dataset', name='flow_v', mult=30)))
     n.trash3 = L.Python(n.shift, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset', name='input', mult=1*256)))
+                    param_str=str(dict(path='./datas/flower_dataset', name='input', mult=1*256)))
     n.trash4 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset', name='label', mult=1*256)))
+                    param_str=str(dict(path='./datas/flower_dataset', name='label', mult=1*256)))
     n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset', name='predict', mult=1*256)))
+                    param_str=str(dict(path='./datas/flower_dataset', name='predict', mult=1*256)))
 
     return n.to_proto()
 1
@@ -557,7 +601,7 @@ if __name__ == "__main__":
 
     def generate_net():
         with open(TRAIN_PATH, 'w') as f:
-            f.write(str(denseUNet_train(8)))    
+            f.write(str(denseUNet_train(6)))    
         with open(TEST_PATH, 'w') as f:
             f.write(str(denseUNet_test(1)))
     
@@ -568,5 +612,5 @@ if __name__ == "__main__":
     generate_net()
     generate_solver()
     solver = caffe.get_solver(SOLVER_PATH)
-    solver.net.copy_from('./models/denseUNet_solver_iter_20000.caffemodel')
+    #solver.net.copy_from('./models/denseUNet_solver_iter_20000.caffemodel')
     solver.solve()
