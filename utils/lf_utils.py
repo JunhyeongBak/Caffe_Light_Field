@@ -7,6 +7,23 @@ import warnings
 from multiprocessing import Process
 from threading import Thread
 
+def index_5x5_picker(i):
+    '''
+    list_5x5 = [9, 10, 11, 12, 13,
+                17, 18, 19, 20, 21,
+                25, 26, 27, 28, 29,
+                33, 34, 35, 36, 37,
+                41, 42, 43, 44, 45]
+    '''
+    list_5x5 = [9, 10, 11, 12, 13,
+                17, 18, 19, 20, 21,
+                25, 26, 27, 28, 29,
+                33, 34, 35, 36, 37,
+                41, 42, 43, 44, 45]
+    i_dst = list_5x5[i]
+    return i_dst
+
+
 def dataset_resize():
     TOT = 4
     SAI = 25
@@ -92,13 +109,15 @@ def lf_to_sais(i_start, i_finish):
 def gif_maker():
     TOT = 1
     SAI = 25
-    for i_tot in tqdm(range(TOT)):
+    for i_tot in tqdm(range(82, 83)):
         img_list = []
         for i_sai in range(SAI):
-            img_src = cv2.imread('./utils/sai_est/sai'+str(i_tot)+'_'+str(i_sai)+'.png', cv2.IMREAD_COLOR)
+            #i_pick = index_5x5_picker(i_sai)
+            img_src = cv2.imread('./utils/gif/sai'+str(i_tot)+'_'+str(i_sai)+'.png', cv2.IMREAD_COLOR)
+            img_src = cv2.resize(img_src, dsize=(192, 192), interpolation=cv2.INTER_AREA)
             img_src = cv2.cvtColor(img_src, cv2.COLOR_BGR2RGB)
             img_list.append(img_src)
-        imageio.mimsave('./utils/gif/gif'+str(i_tot)+'.gif', img_list, duration=0.2)
+        imageio.mimsave('./utils/gif/gif'+str(i_tot)+'.gif', img_list, duration=0.1)
 
 def renamer():
     TOT = 1
@@ -106,6 +125,7 @@ def renamer():
     for i_tot in tqdm(range(TOT)):
         for i_sai in range(SAI):
             img_src = cv2.imread('./utils/sai_est/sai'+str(i_sai)+'.png', cv2.IMREAD_COLOR)
+            
             cv2.imwrite('./utils/sai_est/sai'+str(i_tot)+'_'+str(i_sai)+'.png', img_src)
 
 def renamer_glob():
@@ -171,7 +191,7 @@ if __name__ == '__main__':
     #renamer_glob()
     #lf_to_sais()
     #lf_to_sais(0, 77)
-
+    '''
     p1 = Thread(target=lf_to_sais, args=(0, 20))
     p2 = Thread(target=lf_to_sais, args=(20, 40))
     p3 = Thread(target=lf_to_sais, args=(40, 60))
@@ -184,3 +204,5 @@ if __name__ == '__main__':
     p2.join()
     p3.join()
     p4.join()
+    '''
+    gif_maker()

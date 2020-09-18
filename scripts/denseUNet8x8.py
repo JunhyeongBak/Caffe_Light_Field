@@ -108,12 +108,26 @@ def conv_conv_layer(bottom=None, ks=3, nout=1, stride=1, pad=1, drop=0.5):
     conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
                                 num_output=nout, pad=pad, dilation=1, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
     conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
-    if drop != 0: 
-        conv = L.Dropout(conv, dropout_param=dict(dropout_ratio=drop), in_place=False)
+    conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
+                                num_output=nout, pad=pad+2, dilation=3, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
     conv = L.Convolution(conv, kernel_size=ks, stride=stride,
-                                num_output=nout, pad=pad, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+                                num_output=nout, pad=pad+5, dilation=6, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
     conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
     return conv
+
+def conv_conv_dense_layer(bottom=None, ks=3, nout=1, stride=1, pad=1, drop=0.5):
+    bottom = L.Convolution(bottom, kernel_size=ks, stride=stride,
+                                num_output=nout, pad=pad, dilation=1, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    bottom = L.ReLU(bottom, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
+                                num_output=nout, pad=pad+2, dilation=3, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    conv = L.Convolution(conv, kernel_size=ks, stride=stride,
+                                num_output=nout, pad=pad+5, dilation=6, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conc = L.Eltwise(conv, bottom, operation=P.Eltwise.SUM)
+    conc = L.ReLU(conc, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    return conc   
 
 def downsample_layer(bottom=None, ks=3, stride=2):
     pool = L.Pooling(bottom, kernel_size=ks, stride=stride, pool=P.Pooling.MAX)
@@ -130,6 +144,7 @@ def upsample_concat_layer(bottom1=None, bottom2=None, ks=2, nout=1, stride=2, pa
     deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
     dum = L.DummyData(shape=dict(dim=[batch_size, nout, crop_size, crop_size]))
     deconv_crop = L.Crop(deconv, dum, crop_param=dict(axis=2, offset=0))
+
     conc = L.Concat(*[deconv_crop, bottom2], concat_param={'axis': 1})
     return conc
 
@@ -312,8 +327,7 @@ def axis_mean_loss_layer(bottom_predict, bottom_GT, res):
     mean_predict = None
     mean_GT = None
     loss = None
-    #loss_tot = None
-
+    #loss_tot = NoneAF_INPLACE
     return loss_tot
 
 def axis_order_change_layer(bottom, batch_size, res):
@@ -349,7 +363,7 @@ def denseUNet_train(batch_size=1):
     n.conv4, n.poo4 = conv_conv_downsample_layer(n.poo3, 3, 128, 2, 1)
     n.conv5, n.poo5 = conv_conv_downsample_layer(n.poo4, 3, 256, 2, 1)
 
-    n.feature = conv_conv_layer(n.poo5, 3, 512, 1, 1, 0.5)
+    n.feature = conv_conv_dense_layer(n.poo5, 3, 512, 1, 1, 0.5)
 
     n.deconv5 = upsample_concat_layer(n.feature, n.conv5, 3, 256, 2, 0, batch_size, 12)
     n.conv6 = conv_conv_layer(n.deconv5, 3, 256, 1, 1, 0.5)
@@ -365,13 +379,13 @@ def denseUNet_train(batch_size=1):
     #n.flow64 = flow_layer(n.conv10, 64*2)
     n.flow25 = flow_layer(n.conv10, 25*2)
 
-
+    '''
     n.flow25_mean = L.Reduction(n.flow25, axis=1, operation=P.Reduction.MEAN)
     n.flow25_mean_GT = L.DummyData(shape=dict(dim=[batch_size, 1]))
     n.flow25_mean_GT = L.Power(n.flow25_mean_GT, power=1.0, scale=0.0, shift=0.0, in_place=True)
     n.flow25_mean_loss = L.AbsLoss(n.flow25_mean, n.flow25_mean_GT)
-    n.flow25_mean_loss = L.Power(n.flow25_mean_loss, power=1.0, scale=1000000.0, shift=0.0, in_place=True, loss_weight=1) #1000000
-
+    n.flow25_mean_loss = L.Power(n.flow25_mean_loss, power=1.0, scale=1000.0, shift=0.0, in_place=True, loss_weight=1) #1000000
+    '''
     #n.flow25_mean = L.Reduction(n.flow25_mean, axis=1, operation=P.Reduction.MEAN)
     #n.flow25_mean = L.Reduction(n.flow25_mean, axis=1, operation=P.Reduction.MEAN)
     
@@ -401,16 +415,16 @@ def denseUNet_train(batch_size=1):
     n.loss_tot = L.Power(n.loss_tot, power=1.0, scale=5000.0, shift=0.0, in_place=True)
     '''
     #n.loss1 = L.AbsLoss(n.predict, n.label)
-    n.loss2 = L.AbsLoss(n.predict2_crop, n.label2_crop)
+    n.loss2 = L.EuclideanLoss(n.predict2_crop, n.label2_crop)
     #n.loss1 = L.Power(n.loss1, power=1.0, scale=1.0, shift=0.0, in_place=True, loss_weight=1)
     n.loss2 = L.Power(n.loss2, power=1.0, scale=1.0, shift=0.0, in_place=True, loss_weight=1)
 
-
+    '''
     n.predict2_edge = L.Python(n.predict2_crop, module = 'edge_layer', layer = 'EdgeLayer')
     n.label2_edge = L.Python(n.label2_crop, module = 'edge_layer', layer = 'EdgeLayer')
     n.loss3 = L.AbsLoss(n.predict2_edge, n.label2_edge)
-    n.loss3 = L.Power(n.loss3, power=1.0, scale=1000.0, shift=0.0, in_place=True, loss_weight=1) # 1000
-
+    n.loss3 = L.Power(n.loss3, power=1.0, scale=0.0, shift=0.0, in_place=True, loss_weight=1) # 1000
+    '''
 
     return n.to_proto()
 
@@ -429,7 +443,7 @@ def denseUNet_test(batch_size=1):
     n.conv4, n.poo4 = conv_conv_downsample_layer(n.poo3, 3, 128, 2, 1)
     n.conv5, n.poo5 = conv_conv_downsample_layer(n.poo4, 3, 256, 2, 1)
 
-    n.feature = conv_conv_layer(n.poo5, 3, 512, 1, 1, 0.5)
+    n.feature = conv_conv_dense_layer(n.poo5, 3, 512, 1, 1, 0.5)
 
     n.deconv5 = upsample_concat_layer(n.feature, n.conv5, 3, 256, 2, 0, batch_size, 12)
     n.conv6 = conv_conv_layer(n.deconv5, 3, 256, 1, 1, 0.5)
@@ -456,15 +470,15 @@ def denseUNet_test(batch_size=1):
     # Visualization
     n.label, n.trash_tot = image_data(batch_size, 'train_source', 25)
     n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/flower_dataset', name='flow_h', mult=30)))
+                    param_str=str(dict(path='./datas/face_dataset', name='flow_h', mult=110)))
     n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/flower_dataset', name='flow_v', mult=30)))
+                    param_str=str(dict(path='./datas/face_dataset', name='flow_v', mult=110)))
     n.trash3 = L.Python(n.shift, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/flower_dataset', name='input', mult=1*256)))
+                    param_str=str(dict(path='./datas/face_dataset', name='input', mult=1*256)))
     n.trash4 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/flower_dataset', name='label', mult=1*256)))
+                    param_str=str(dict(path='./datas/face_dataset', name='label', mult=1*256)))
     n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/flower_dataset', name='predict', mult=1*256)))
+                    param_str=str(dict(path='./datas/face_dataset', name='predict', mult=1*256)))
 
     return n.to_proto()
 
@@ -481,8 +495,8 @@ def denseUNet_solver(train_net_path=None, test_net_path=None, snapshot_path=None
     
     s.iter_size = 1
     s.max_iter = 500000
-    s.type = 'SGD'
-    s.base_lr = 0.0005 # 0.0005,  0.0000001 # 0.000005(basic), 0.0000001
+    s.type = 'Adam'
+    s.base_lr = 0.00005 # 0.0005,  0.0000001 # 0.000005(basic), 0.0000001
     s.lr_policy = 'fixed'
     s.gamma = 0.75
     s.power = 0.75
@@ -503,19 +517,19 @@ def denseUNet_solver(train_net_path=None, test_net_path=None, snapshot_path=None
     return s
 
 if __name__ == "__main__":
-    DATA_PATH = './datas/flower_dataset'
+    DATA_PATH = './datas/face_dataset'
     MODEL_PATH = './models'
     TRAIN_PATH = './scripts/denseUNet_train.prototxt'
     TEST_PATH = './scripts/denseUNet_test.prototxt'
     SOLVER_PATH = './scripts/denseUNet_solver.prototxt'
 
-    SHIFT_VAL = 0.8
+    SHIFT_VAL = 0.4
     AF_INPLACE = True
     BIAS_TERM = True
     
     def generate_net():
         with open(TRAIN_PATH, 'w') as f:
-            f.write(str(denseUNet_train(6)))    
+            f.write(str(denseUNet_train(8)))    
         with open(TEST_PATH, 'w') as f:
             f.write(str(denseUNet_test(1)))
     
@@ -526,5 +540,5 @@ if __name__ == "__main__":
     generate_net()
     generate_solver()
     solver = caffe.get_solver(SOLVER_PATH)
-    solver.net.copy_from('./models/denseUNet_solver_iter_17000.caffemodel')
+    solver.net.copy_from('./models/denseUNet_solver_iter_3000.caffemodel')
     solver.solve()

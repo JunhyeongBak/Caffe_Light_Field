@@ -567,13 +567,14 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 1
   }
 }
 layer {
   name: "ReLU1"
   type: "ReLU"
   bottom: "Convolution1"
-  top: "ReLU1"
+  top: "Convolution1"
   relu_param {
     negative_slope: 0.2
   }
@@ -581,7 +582,7 @@ layer {
 layer {
   name: "Convolution2"
   type: "Convolution"
-  bottom: "ReLU1"
+  bottom: "Convolution1"
   top: "Convolution2"
   convolution_param {
     num_output: 16
@@ -601,7 +602,7 @@ layer {
   name: "conv1"
   type: "ReLU"
   bottom: "Convolution2"
-  top: "conv1"
+  top: "Convolution2"
   relu_param {
     negative_slope: 0.2
   }
@@ -609,7 +610,7 @@ layer {
 layer {
   name: "Pooling1"
   type: "Pooling"
-  bottom: "conv1"
+  bottom: "Convolution2"
   top: "Pooling1"
   pooling_param {
     pool: MAX
@@ -621,7 +622,7 @@ layer {
   name: "poo1"
   type: "ReLU"
   bottom: "Pooling1"
-  top: "poo1"
+  top: "Pooling1"
   relu_param {
     negative_slope: 0.2
   }
@@ -629,7 +630,7 @@ layer {
 layer {
   name: "Convolution3"
   type: "Convolution"
-  bottom: "poo1"
+  bottom: "Pooling1"
   top: "Convolution3"
   convolution_param {
     num_output: 32
@@ -643,13 +644,14 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 1
   }
 }
 layer {
   name: "ReLU2"
   type: "ReLU"
   bottom: "Convolution3"
-  top: "ReLU2"
+  top: "Convolution3"
   relu_param {
     negative_slope: 0.2
   }
@@ -657,7 +659,7 @@ layer {
 layer {
   name: "Convolution4"
   type: "Convolution"
-  bottom: "ReLU2"
+  bottom: "Convolution3"
   top: "Convolution4"
   convolution_param {
     num_output: 32
@@ -677,7 +679,7 @@ layer {
   name: "conv2"
   type: "ReLU"
   bottom: "Convolution4"
-  top: "conv2"
+  top: "Convolution4"
   relu_param {
     negative_slope: 0.2
   }
@@ -685,7 +687,7 @@ layer {
 layer {
   name: "Pooling2"
   type: "Pooling"
-  bottom: "conv2"
+  bottom: "Convolution4"
   top: "Pooling2"
   pooling_param {
     pool: MAX
@@ -697,7 +699,7 @@ layer {
   name: "poo2"
   type: "ReLU"
   bottom: "Pooling2"
-  top: "poo2"
+  top: "Pooling2"
   relu_param {
     negative_slope: 0.2
   }
@@ -705,7 +707,7 @@ layer {
 layer {
   name: "Convolution5"
   type: "Convolution"
-  bottom: "poo2"
+  bottom: "Pooling2"
   top: "Convolution5"
   convolution_param {
     num_output: 64
@@ -719,13 +721,14 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 1
   }
 }
 layer {
   name: "ReLU3"
   type: "ReLU"
   bottom: "Convolution5"
-  top: "ReLU3"
+  top: "Convolution5"
   relu_param {
     negative_slope: 0.2
   }
@@ -733,7 +736,7 @@ layer {
 layer {
   name: "Convolution6"
   type: "Convolution"
-  bottom: "ReLU3"
+  bottom: "Convolution5"
   top: "Convolution6"
   convolution_param {
     num_output: 64
@@ -753,7 +756,7 @@ layer {
   name: "conv3"
   type: "ReLU"
   bottom: "Convolution6"
-  top: "conv3"
+  top: "Convolution6"
   relu_param {
     negative_slope: 0.2
   }
@@ -761,7 +764,7 @@ layer {
 layer {
   name: "Pooling3"
   type: "Pooling"
-  bottom: "conv3"
+  bottom: "Convolution6"
   top: "Pooling3"
   pooling_param {
     pool: MAX
@@ -773,7 +776,7 @@ layer {
   name: "poo3"
   type: "ReLU"
   bottom: "Pooling3"
-  top: "poo3"
+  top: "Pooling3"
   relu_param {
     negative_slope: 0.2
   }
@@ -781,7 +784,7 @@ layer {
 layer {
   name: "Convolution7"
   type: "Convolution"
-  bottom: "poo3"
+  bottom: "Pooling3"
   top: "Convolution7"
   convolution_param {
     num_output: 128
@@ -795,13 +798,14 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 1
   }
 }
 layer {
   name: "ReLU4"
   type: "ReLU"
   bottom: "Convolution7"
-  top: "ReLU4"
+  top: "Convolution7"
   relu_param {
     negative_slope: 0.2
   }
@@ -809,7 +813,7 @@ layer {
 layer {
   name: "Convolution8"
   type: "Convolution"
-  bottom: "ReLU4"
+  bottom: "Convolution7"
   top: "Convolution8"
   convolution_param {
     num_output: 128
@@ -829,7 +833,7 @@ layer {
   name: "conv4"
   type: "ReLU"
   bottom: "Convolution8"
-  top: "conv4"
+  top: "Convolution8"
   relu_param {
     negative_slope: 0.2
   }
@@ -837,7 +841,7 @@ layer {
 layer {
   name: "Pooling4"
   type: "Pooling"
-  bottom: "conv4"
+  bottom: "Convolution8"
   top: "Pooling4"
   pooling_param {
     pool: MAX
@@ -849,7 +853,7 @@ layer {
   name: "poo4"
   type: "ReLU"
   bottom: "Pooling4"
-  top: "poo4"
+  top: "Pooling4"
   relu_param {
     negative_slope: 0.2
   }
@@ -857,7 +861,7 @@ layer {
 layer {
   name: "Convolution9"
   type: "Convolution"
-  bottom: "poo4"
+  bottom: "Pooling4"
   top: "Convolution9"
   convolution_param {
     num_output: 256
@@ -871,13 +875,14 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 1
   }
 }
 layer {
   name: "ReLU5"
   type: "ReLU"
   bottom: "Convolution9"
-  top: "ReLU5"
+  top: "Convolution9"
   relu_param {
     negative_slope: 0.2
   }
@@ -885,7 +890,7 @@ layer {
 layer {
   name: "Convolution10"
   type: "Convolution"
-  bottom: "ReLU5"
+  bottom: "Convolution9"
   top: "Convolution10"
   convolution_param {
     num_output: 256
@@ -905,7 +910,7 @@ layer {
   name: "conv5"
   type: "ReLU"
   bottom: "Convolution10"
-  top: "conv5"
+  top: "Convolution10"
   relu_param {
     negative_slope: 0.2
   }
@@ -913,7 +918,7 @@ layer {
 layer {
   name: "Pooling5"
   type: "Pooling"
-  bottom: "conv5"
+  bottom: "Convolution10"
   top: "Pooling5"
   pooling_param {
     pool: MAX
@@ -925,7 +930,7 @@ layer {
   name: "poo5"
   type: "ReLU"
   bottom: "Pooling5"
-  top: "poo5"
+  top: "Pooling5"
   relu_param {
     negative_slope: 0.2
   }
@@ -933,7 +938,7 @@ layer {
 layer {
   name: "Convolution11"
   type: "Convolution"
-  bottom: "poo5"
+  bottom: "Pooling5"
   top: "Convolution11"
   convolution_param {
     num_output: 512
@@ -947,13 +952,14 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 1
   }
 }
 layer {
   name: "ReLU6"
   type: "ReLU"
   bottom: "Convolution11"
-  top: "ReLU6"
+  top: "Convolution11"
   relu_param {
     negative_slope: 0.2
   }
@@ -961,12 +967,12 @@ layer {
 layer {
   name: "Convolution12"
   type: "Convolution"
-  bottom: "ReLU6"
+  bottom: "Convolution11"
   top: "Convolution12"
   convolution_param {
     num_output: 512
     bias_term: true
-    pad: 1
+    pad: 3
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -975,13 +981,53 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 3
+  }
+}
+layer {
+  name: "ReLU7"
+  type: "ReLU"
+  bottom: "Convolution12"
+  top: "Convolution12"
+  relu_param {
+    negative_slope: 0.2
+  }
+}
+layer {
+  name: "Convolution13"
+  type: "Convolution"
+  bottom: "Convolution12"
+  top: "Convolution13"
+  convolution_param {
+    num_output: 512
+    bias_term: true
+    pad: 6
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "xavier"
+    }
+    dilation: 6
+  }
+}
+layer {
+  name: "Eltwise1"
+  type: "Eltwise"
+  bottom: "Convolution13"
+  bottom: "Convolution11"
+  top: "Eltwise1"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "feature"
   type: "ReLU"
-  bottom: "Convolution12"
-  top: "feature"
+  bottom: "Eltwise1"
+  top: "Eltwise1"
   relu_param {
     negative_slope: 0.2
   }
@@ -989,7 +1035,7 @@ layer {
 layer {
   name: "Deconvolution1"
   type: "Deconvolution"
-  bottom: "feature"
+  bottom: "Eltwise1"
   top: "Deconvolution1"
   convolution_param {
     num_output: 256
@@ -999,10 +1045,10 @@ layer {
   }
 }
 layer {
-  name: "ReLU7"
+  name: "ReLU8"
   type: "ReLU"
   bottom: "Deconvolution1"
-  top: "ReLU7"
+  top: "Deconvolution1"
   relu_param {
     negative_slope: 0.2
   }
@@ -1023,7 +1069,7 @@ layer {
 layer {
   name: "Crop1"
   type: "Crop"
-  bottom: "ReLU7"
+  bottom: "Deconvolution1"
   bottom: "DummyData1"
   top: "Crop1"
   crop_param {
@@ -1035,21 +1081,21 @@ layer {
   name: "deconv5"
   type: "Concat"
   bottom: "Crop1"
-  bottom: "conv5"
+  bottom: "Convolution10"
   top: "deconv5"
   concat_param {
     axis: 1
   }
 }
 layer {
-  name: "Convolution13"
+  name: "Convolution14"
   type: "Convolution"
   bottom: "deconv5"
-  top: "Convolution13"
+  top: "Convolution14"
   convolution_param {
     num_output: 256
     bias_term: true
-    pad: 1
+    pad: 3
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -1058,26 +1104,27 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 3
   }
 }
 layer {
-  name: "ReLU8"
+  name: "ReLU9"
   type: "ReLU"
-  bottom: "Convolution13"
-  top: "ReLU8"
+  bottom: "Convolution14"
+  top: "Convolution14"
   relu_param {
     negative_slope: 0.2
   }
 }
 layer {
-  name: "Convolution14"
+  name: "Convolution15"
   type: "Convolution"
-  bottom: "ReLU8"
-  top: "Convolution14"
+  bottom: "Convolution14"
+  top: "Convolution15"
   convolution_param {
     num_output: 256
     bias_term: true
-    pad: 1
+    pad: 6
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -1086,13 +1133,14 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 6
   }
 }
 layer {
   name: "conv6"
   type: "ReLU"
-  bottom: "Convolution14"
-  top: "conv6"
+  bottom: "Convolution15"
+  top: "Convolution15"
   relu_param {
     negative_slope: 0.2
   }
@@ -1100,7 +1148,7 @@ layer {
 layer {
   name: "Deconvolution2"
   type: "Deconvolution"
-  bottom: "conv6"
+  bottom: "Convolution15"
   top: "Deconvolution2"
   convolution_param {
     num_output: 128
@@ -1110,10 +1158,10 @@ layer {
   }
 }
 layer {
-  name: "ReLU9"
+  name: "ReLU10"
   type: "ReLU"
   bottom: "Deconvolution2"
-  top: "ReLU9"
+  top: "Deconvolution2"
   relu_param {
     negative_slope: 0.2
   }
@@ -1134,7 +1182,7 @@ layer {
 layer {
   name: "Crop2"
   type: "Crop"
-  bottom: "ReLU9"
+  bottom: "Deconvolution2"
   bottom: "DummyData2"
   top: "Crop2"
   crop_param {
@@ -1146,21 +1194,21 @@ layer {
   name: "deconv6"
   type: "Concat"
   bottom: "Crop2"
-  bottom: "conv4"
+  bottom: "Convolution8"
   top: "deconv6"
   concat_param {
     axis: 1
   }
 }
 layer {
-  name: "Convolution15"
+  name: "Convolution16"
   type: "Convolution"
   bottom: "deconv6"
-  top: "Convolution15"
+  top: "Convolution16"
   convolution_param {
     num_output: 128
     bias_term: true
-    pad: 1
+    pad: 3
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -1169,26 +1217,27 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 3
   }
 }
 layer {
-  name: "ReLU10"
+  name: "ReLU11"
   type: "ReLU"
-  bottom: "Convolution15"
-  top: "ReLU10"
+  bottom: "Convolution16"
+  top: "Convolution16"
   relu_param {
     negative_slope: 0.2
   }
 }
 layer {
-  name: "Convolution16"
+  name: "Convolution17"
   type: "Convolution"
-  bottom: "ReLU10"
-  top: "Convolution16"
+  bottom: "Convolution16"
+  top: "Convolution17"
   convolution_param {
     num_output: 128
     bias_term: true
-    pad: 1
+    pad: 6
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -1197,13 +1246,14 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 6
   }
 }
 layer {
   name: "conv7"
   type: "ReLU"
-  bottom: "Convolution16"
-  top: "conv7"
+  bottom: "Convolution17"
+  top: "Convolution17"
   relu_param {
     negative_slope: 0.2
   }
@@ -1211,7 +1261,7 @@ layer {
 layer {
   name: "Deconvolution3"
   type: "Deconvolution"
-  bottom: "conv7"
+  bottom: "Convolution17"
   top: "Deconvolution3"
   convolution_param {
     num_output: 64
@@ -1221,10 +1271,10 @@ layer {
   }
 }
 layer {
-  name: "ReLU11"
+  name: "ReLU12"
   type: "ReLU"
   bottom: "Deconvolution3"
-  top: "ReLU11"
+  top: "Deconvolution3"
   relu_param {
     negative_slope: 0.2
   }
@@ -1245,7 +1295,7 @@ layer {
 layer {
   name: "Crop3"
   type: "Crop"
-  bottom: "ReLU11"
+  bottom: "Deconvolution3"
   bottom: "DummyData3"
   top: "Crop3"
   crop_param {
@@ -1257,21 +1307,21 @@ layer {
   name: "deconv7"
   type: "Concat"
   bottom: "Crop3"
-  bottom: "conv3"
+  bottom: "Convolution6"
   top: "deconv7"
   concat_param {
     axis: 1
   }
 }
 layer {
-  name: "Convolution17"
+  name: "Convolution18"
   type: "Convolution"
   bottom: "deconv7"
-  top: "Convolution17"
+  top: "Convolution18"
   convolution_param {
     num_output: 64
     bias_term: true
-    pad: 1
+    pad: 3
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -1280,26 +1330,27 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 3
   }
 }
 layer {
-  name: "ReLU12"
+  name: "ReLU13"
   type: "ReLU"
-  bottom: "Convolution17"
-  top: "ReLU12"
+  bottom: "Convolution18"
+  top: "Convolution18"
   relu_param {
     negative_slope: 0.2
   }
 }
 layer {
-  name: "Convolution18"
+  name: "Convolution19"
   type: "Convolution"
-  bottom: "ReLU12"
-  top: "Convolution18"
+  bottom: "Convolution18"
+  top: "Convolution19"
   convolution_param {
     num_output: 64
     bias_term: true
-    pad: 1
+    pad: 6
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -1308,13 +1359,14 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 6
   }
 }
 layer {
   name: "conv8"
   type: "ReLU"
-  bottom: "Convolution18"
-  top: "conv8"
+  bottom: "Convolution19"
+  top: "Convolution19"
   relu_param {
     negative_slope: 0.2
   }
@@ -1322,7 +1374,7 @@ layer {
 layer {
   name: "Deconvolution4"
   type: "Deconvolution"
-  bottom: "conv8"
+  bottom: "Convolution19"
   top: "Deconvolution4"
   convolution_param {
     num_output: 64
@@ -1332,10 +1384,10 @@ layer {
   }
 }
 layer {
-  name: "ReLU13"
+  name: "ReLU14"
   type: "ReLU"
   bottom: "Deconvolution4"
-  top: "ReLU13"
+  top: "Deconvolution4"
   relu_param {
     negative_slope: 0.2
   }
@@ -1356,7 +1408,7 @@ layer {
 layer {
   name: "Crop4"
   type: "Crop"
-  bottom: "ReLU13"
+  bottom: "Deconvolution4"
   bottom: "DummyData4"
   top: "Crop4"
   crop_param {
@@ -1368,21 +1420,21 @@ layer {
   name: "deconv8"
   type: "Concat"
   bottom: "Crop4"
-  bottom: "conv2"
+  bottom: "Convolution4"
   top: "deconv8"
   concat_param {
     axis: 1
   }
 }
 layer {
-  name: "Convolution19"
+  name: "Convolution20"
   type: "Convolution"
   bottom: "deconv8"
-  top: "Convolution19"
+  top: "Convolution20"
   convolution_param {
     num_output: 64
     bias_term: true
-    pad: 1
+    pad: 3
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -1391,26 +1443,27 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 3
   }
 }
 layer {
-  name: "ReLU14"
+  name: "ReLU15"
   type: "ReLU"
-  bottom: "Convolution19"
-  top: "ReLU14"
+  bottom: "Convolution20"
+  top: "Convolution20"
   relu_param {
     negative_slope: 0.2
   }
 }
 layer {
-  name: "Convolution20"
+  name: "Convolution21"
   type: "Convolution"
-  bottom: "ReLU14"
-  top: "Convolution20"
+  bottom: "Convolution20"
+  top: "Convolution21"
   convolution_param {
     num_output: 64
     bias_term: true
-    pad: 1
+    pad: 6
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -1419,13 +1472,14 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 6
   }
 }
 layer {
   name: "conv9"
   type: "ReLU"
-  bottom: "Convolution20"
-  top: "conv9"
+  bottom: "Convolution21"
+  top: "Convolution21"
   relu_param {
     negative_slope: 0.2
   }
@@ -1433,7 +1487,7 @@ layer {
 layer {
   name: "Deconvolution5"
   type: "Deconvolution"
-  bottom: "conv9"
+  bottom: "Convolution21"
   top: "Deconvolution5"
   convolution_param {
     num_output: 64
@@ -1443,10 +1497,10 @@ layer {
   }
 }
 layer {
-  name: "ReLU15"
+  name: "ReLU16"
   type: "ReLU"
   bottom: "Deconvolution5"
-  top: "ReLU15"
+  top: "Deconvolution5"
   relu_param {
     negative_slope: 0.2
   }
@@ -1467,7 +1521,7 @@ layer {
 layer {
   name: "Crop5"
   type: "Crop"
-  bottom: "ReLU15"
+  bottom: "Deconvolution5"
   bottom: "DummyData5"
   top: "Crop5"
   crop_param {
@@ -1479,21 +1533,21 @@ layer {
   name: "deconv9"
   type: "Concat"
   bottom: "Crop5"
-  bottom: "conv1"
+  bottom: "Convolution2"
   top: "deconv9"
   concat_param {
     axis: 1
   }
 }
 layer {
-  name: "Convolution21"
+  name: "Convolution22"
   type: "Convolution"
   bottom: "deconv9"
-  top: "Convolution21"
+  top: "Convolution22"
   convolution_param {
     num_output: 64
     bias_term: true
-    pad: 1
+    pad: 3
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -1502,26 +1556,27 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 3
   }
 }
 layer {
-  name: "ReLU16"
+  name: "ReLU17"
   type: "ReLU"
-  bottom: "Convolution21"
-  top: "ReLU16"
+  bottom: "Convolution22"
+  top: "Convolution22"
   relu_param {
     negative_slope: 0.2
   }
 }
 layer {
-  name: "Convolution22"
+  name: "Convolution23"
   type: "Convolution"
-  bottom: "ReLU16"
-  top: "Convolution22"
+  bottom: "Convolution22"
+  top: "Convolution23"
   convolution_param {
     num_output: 64
     bias_term: true
-    pad: 1
+    pad: 6
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -1530,13 +1585,14 @@ layer {
     bias_filler {
       type: "xavier"
     }
+    dilation: 6
   }
 }
 layer {
   name: "conv10"
   type: "ReLU"
-  bottom: "Convolution22"
-  top: "conv10"
+  bottom: "Convolution23"
+  top: "Convolution23"
   relu_param {
     negative_slope: 0.2
   }
@@ -1544,7 +1600,7 @@ layer {
 layer {
   name: "flow250"
   type: "Convolution"
-  bottom: "conv10"
+  bottom: "Convolution23"
   top: "flow"
   convolution_param {
     num_output: 50

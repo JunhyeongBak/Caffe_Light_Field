@@ -30,6 +30,7 @@
 # | 4 |  9 | 14 | 19 | 24 |
 # +---+----+----+----+----+
 
+
 import os
 import cv2
 import os.path
@@ -45,6 +46,9 @@ import math
 #from skimage.measure import compare_ssim as ssim
 
 SHIFT_VALUE = 0.4
+
+AF_INPLACE = True
+BIAS_TERM = True
 
 caffe.set_mode_gpu()
 caffe.set_device(0)
@@ -123,7 +127,7 @@ def shift_value_5x5(i):
 
 def flow_layer(bottom=None, nout=1):
     conv = L.Convolution(bottom, kernel_size=3, stride=1,
-                                num_output=nout, pad=1, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'), name='flow'+str(nout//2)+'0')
+                                num_output=nout, pad=1, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'), name='flow'+str(nout//2)+'0')
     return conv
 
 def conv_layer(bottom=None, ks=3, nout=1, stride=1, pad=1):
@@ -138,14 +142,30 @@ def conv_final_layer(bottom=None, ks=3, nout=1, stride=1, pad=1):
     conv = L.TanH(conv, in_place=False)
     return conv
 
-def conv_conv_layer(bottom=None, ks=3, nout=1, stride=1, pad=1):
+def conv_conv_layer(bottom=None, ks=3, nout=1, stride=1, pad=1, drop=0.5):
     conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
-                                num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+                                num_output=nout, pad=pad, dilation=1, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
+                                num_output=nout, pad=pad+2, dilation=3, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
     conv = L.Convolution(conv, kernel_size=ks, stride=stride,
-                                num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+                                num_output=nout, pad=pad+5, dilation=6, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
     return conv
+
+def conv_conv_dense_layer(bottom=None, ks=3, nout=1, stride=1, pad=1, drop=0.5):
+    bottom = L.Convolution(bottom, kernel_size=ks, stride=stride,
+                                num_output=nout, pad=pad, dilation=1, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    bottom = L.ReLU(bottom, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
+                                num_output=nout, pad=pad+2, dilation=3, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    conv = L.Convolution(conv, kernel_size=ks, stride=stride,
+                                num_output=nout, pad=pad+5, dilation=6, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conc = L.Eltwise(conv, bottom, operation=P.Eltwise.SUM)
+    conc = L.ReLU(conc, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    return conc   
 
 def downsample_layer(bottom=None, ks=3, stride=2):
     pool = L.Pooling(bottom, kernel_size=ks, stride=stride, pool=P.Pooling.MAX)
@@ -159,9 +179,10 @@ def upsample_layer(bottom=None, ks=2, nout=1, stride=2):
 
 def upsample_concat_layer(bottom1=None, bottom2=None, ks=2, nout=1, stride=2, pad=0, batch_size=1, crop_size=0):
     deconv = L.Deconvolution(bottom1, convolution_param=dict(num_output=nout, kernel_size=ks, stride=stride, pad=pad))
-    deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=False)
+    deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
     dum = L.DummyData(shape=dict(dim=[batch_size, nout, crop_size, crop_size]))
     deconv_crop = L.Crop(deconv, dum, crop_param=dict(axis=2, offset=0))
+
     conc = L.Concat(*[deconv_crop, bottom2], concat_param={'axis': 1})
     return conc
 
@@ -184,15 +205,15 @@ def upsample_conv_conv_layer(bottom=None, ks=3, nout=1, stride=2, pad=1):
     conv = L.TanH(conv, in_place=False)
     return conv
 
-def conv_conv_downsample_layer(bottom=None, ks=3, nout=1, stride=2, pad=1):
+def conv_conv_downsample_layer(bottom=None, ks=3, nout=1, stride=2, pad=0):
     conv = L.Convolution(bottom, kernel_size=ks, stride=1,
-                                num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
+                                num_output=nout, pad=pad, dilation=1, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
     conv = L.Convolution(conv, kernel_size=ks, stride=1,
-                                num_output=nout, pad=pad, bias_term=True, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
-    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=False)
-    pool = L.Pooling(conv, kernel_size=ks, stride=stride, pool=P.Pooling.MAX)
-    pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=False)
+                                num_output=nout, pad=pad, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    pool = L.Pooling(conv, kernel_size=ks, stride=stride, pool=P.Pooling.MAX) ##
+    pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
     return conv, pool
 
 def input_shifting_5x5(bottom):
@@ -226,7 +247,7 @@ def denseUNet_deploy():
 
     n.conv5, n.poo5 = conv_conv_downsample_layer(n.poo4, 3, 256, 2, 1)
 
-    n.feature = conv_conv_layer(n.poo5, 3, 512, 1, 1)
+    n.feature = conv_conv_dense_layer(n.poo5, 3, 512, 1, 1, 0.5)
 
     n.deconv5 = upsample_concat_layer(n.feature, n.conv5, 3, 256, 2, 0, batch_size, 12)
     n.conv6 = conv_conv_layer(n.deconv5, 3, 256, 1, 1)
@@ -251,10 +272,10 @@ def denseUNet_deploy():
     return n.to_proto()
 
 if __name__ == "__main__":
-    TOT = 77
+    TOT = 98
     PATH = './deploy'
     NET_PATH = PATH + '/denseUNet_deploy.prototxt'
-    WEIGHTS_PATH = PATH + '/denseUNet_solver_iter_6500.caffemodel'
+    WEIGHTS_PATH = PATH + '/denseUNet_solver_iter_3000.caffemodel'
 
     # Generate a network
     def generate_net():
@@ -272,10 +293,10 @@ if __name__ == "__main__":
         start = time.time()
 
         # Input images
-        src_color = cv2.imread(PATH + '/input_flower_8x8/sai'+str(i_tot)+'_27.png', cv2.IMREAD_COLOR)
-        if not os.path.isfile(PATH + '/input_flower_8x8/sai'+str(i_tot)+'_27.png'):
-            src_color = cv2.imread(PATH + '/input_flower_8x8/sai'+str(i_tot)+'_27.jpg', cv2.IMREAD_COLOR)
-            if not os.path.isfile(PATH + '/input_flower_8x8/sai'+str(i_tot)+'_27.jpg'):
+        src_color = cv2.imread(PATH + '/input_face_8x8/sai'+str(i_tot)+'_27.png', cv2.IMREAD_COLOR)
+        if not os.path.isfile(PATH + '/input_face_8x8/sai'+str(i_tot)+'_27.png'):
+            src_color = cv2.imread(PATH + '/input_face_8x8/sai'+str(i_tot)+'_27.jpg', cv2.IMREAD_COLOR)
+            if not os.path.isfile(PATH + '/input_face_8x8/sai'+str(i_tot)+'_27.jpg'):
                 raise Exception('(ERR) The image file is not exist!')
         
         src_color = cv2.resize(src_color, dsize=(192, 192), interpolation=cv2.INTER_AREA) ###
@@ -331,7 +352,7 @@ if __name__ == "__main__":
         sai_GT_list = np.zeros((192, 192, 3, 25))
         for i in range(25):
             i_change = index_5x5_picker(i)
-            sai_GT = cv2.imread(PATH+'/input_flower_8x8/sai'+str(i_tot)+'_'+str(i_change)+'.png')
+            sai_GT = cv2.imread(PATH+'/input_face_8x8/sai'+str(i_tot)+'_'+str(i_change)+'.png')
 
             sai_GT = cv2.resize(sai_GT, dsize=(192, 192), interpolation=cv2.INTER_AREA)
             sai_GT_list[:, :, :, i] = sai_GT

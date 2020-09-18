@@ -230,7 +230,9 @@ def denseUNet_deploy():
     # Translation
     n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
     n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
-    n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1)
+    #n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1)
+    param_str = json.dumps({'flow_size': 25, 'color_size': 3})
+    n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
 
     return n.to_proto()
 
@@ -247,9 +249,9 @@ if __name__ == "__main__":
     
     PATH = './deploy'
     MODEL_PATH = PATH + '/denseUNet_deploy.prototxt'
-    WEIGHTS_PATH = PATH + '/denseUNet_deploy.caffemodel'
+    WEIGHTS_PATH = PATH + '/denseUNet_face_deploy.caffemodel'
     #SRC_PATH = PATH + '/input/input_image.png'
-    SRC_PATH = '/docker/Caffe_LF_Depth/datas/flower_dataset/SAIs_Crop/sai1_12.png'
+    SRC_PATH = '/docker/Caffe_LF_Syn/deploy/input_flower_8x8/sai1_12.png'
     if not os.path.isfile(SRC_PATH):
         SRC_PATH = PATH + '/input/input_image.jpg'
         if not os.path.isfile(SRC_PATH):

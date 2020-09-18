@@ -39,9 +39,19 @@ class VisualizationLayer(caffe.Layer):
             for c in range(bottom[0].data.shape[1]):
                 full_name = 'b'+str(b)+'_'+'c'+str(c)+'_'+self.name
                 full_path = self.path+'/'+full_name+'.png'
-                print('<'+full_name+'>')
-                print(np.mean(bottom[0].data[b, c, :, :]))
-                cv2.imwrite(full_path, abs(bottom[0].data[b, c, :, :]*self.mult))
+                #print('<'+full_name+'>')
+                #print(np.mean(bottom[0].data[b, c, :, :]))
+
+                if self.mult < 256:
+                    im_color = abs(bottom[0].data[b, c, :, :]*self.mult)
+                    im_color = im_color.astype('uint8')
+                    im_color = cv2.applyColorMap(im_color, cv2.COLORMAP_WINTER)
+                    cv2.imwrite(full_path, im_color)
+                else:
+                    im_color = abs(bottom[0].data[b, c, :, :]*self.mult)
+                    im_color = im_color.astype('uint8')
+                    #im_color = cv2.applyColorMap(im_color, cv2.COLORMAP_WINTER)
+                    cv2.imwrite(full_path, im_color)
 
     def backward(self, top, propagate_down, bottom):
         pass
