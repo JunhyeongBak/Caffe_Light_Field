@@ -4,3 +4,8 @@
 *.solverstate
 *.caffemodel
 *.zip
+*.log
+*.log.test
+*.log.train
+*.train
+*.test
