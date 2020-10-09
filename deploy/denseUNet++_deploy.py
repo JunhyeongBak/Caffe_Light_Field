@@ -45,13 +45,58 @@ from caffe.proto import caffe_pb2
 import math
 #from skimage.measure import compare_ssim as ssim
 
-SHIFT_VAL = 0.4
+SHIFT_VAL = -1.4
 
 AF_INPLACE = True
 BIAS_TERM = True
 
 caffe.set_mode_gpu()
 caffe.set_device(0)
+
+def shift_value_5x5(i, shift_val):
+    if i<=4:
+        tx = -2*shift_val
+    elif i>4 and i<=9:
+        tx = -1*shift_val
+    elif i>9 and i<=14:
+        tx = 0
+    elif i>14 and i<=19:
+        tx = 1*shift_val
+    elif i>19 and i<=24:
+        tx = 2*shift_val
+    else:
+        tx = 3*shift_val
+    if i == 0 or (i)%5==0:
+        ty = -2*shift_val
+    elif i == 1 or (i-1)%5==0:
+        ty = -1*shift_val
+    elif i == 2 or (i-2)%5==0:
+        ty = 0
+    elif i == 3 or (i-3)%5==0:
+        ty = 1*shift_val
+    elif i == 4 or (i-4)%5==0:
+        ty = 2*shift_val
+    else:
+        ty = 3*shift_val
+    return tx, -ty
+
+
+def index_picker_5x5(i):
+    '''
+    i_list_5x5 = [9, 10, 11, 12, 13,
+                17, 18, 19, 20, 21,
+                25, 26, 27, 28, 29,
+                33, 34, 35, 36, 37,
+                41, 42, 43, 44, 45]
+    '''
+    i_list_5x5 = [20, 21, 22, 23, 24,
+                29, 30, 31, 32, 33,
+                38, 39, 40, 41, 42,
+                47, 48, 49, 50, 51,
+                56, 57, 58, 59, 60]
+    i_pick = i_list_5x5[i]
+    
+    return i_pick
 
 def shift_value_8x8(i, shift_val):
     if i<=7:
@@ -135,7 +180,18 @@ def conv_conv_layer(bottom=None, nout=1, ks=3, strd=1, pad=1, dil=1):
     conv = L.Convolution(bottom, num_output=nout, kernel_size=ks, stride=strd, pad=pad, dilation=dil,
                             bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
     conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
-    conv = L.Convolution(bottom, num_output=nout, kernel_size=ks, stride=strd, pad=pad, dilation=dil,
+    conv = L.Convolution(conv, num_output=nout, kernel_size=ks, stride=strd, pad=pad, dilation=dil,
+                            bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    return conv
+
+def conv_conv_group_layer(bottom=None, nout=1, ks=3, strd=1, pad=1, dil=1):
+    conv = L.Convolution(bottom, num_output=nout, kernel_size=ks, stride=strd, pad=pad,
+                            bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    conv = L.Convolution(conv, num_output=nout, kernel_size=ks, stride=strd, pad=pad,
+                            group=nout, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.Convolution(conv, num_output=nout, kernel_size=1, stride=strd, pad=0,
                             bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
     conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
     return conv
@@ -164,6 +220,19 @@ def conv_conv_downsample_layer(bottom=None, nout=1, ks=3, strd=2, pad=0):
     pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
     return conv, pool
 
+def conv_conv_downsample_group_layer(bottom=None, nout=1, ks=3, strd=2, pad=0):
+    conv = L.Convolution(bottom, num_output=nout, kernel_size=ks, stride=1, pad=pad,
+                            bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    conv = L.Convolution(conv, num_output=nout, kernel_size=ks, stride=1, pad=pad,
+                            group=nout, bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.Convolution(conv, num_output=nout, kernel_size=1, stride=1, pad=0,
+                            bias_term=BIAS_TERM, weight_filler=dict(type='xavier'), bias_filler=dict(type='xavier'))
+    conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    pool = L.Pooling(conv, kernel_size=ks, stride=strd, pool=P.Pooling.MAX) ##
+    pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
+    return conv, pool
+
 def upsample_concat_layer(bottom1=None, bottom2=None, nout=1, ks=3, strd=2, pad=0, batch_size=1, crop_size=0):
     deconv = L.Deconvolution(bottom1, convolution_param=dict(num_output=nout, kernel_size=ks, stride=strd, pad=pad))
     deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=AF_INPLACE)
@@ -176,10 +245,10 @@ def input_shifting(center, batch_size, grid_size):
     con = None
     for i in range(grid_size):
         if grid_size == 64:
-            tx, ty = shift_value_8x8(i, SHIFT_VAL)
+            tx, ty = shift_value_5x5(i, SHIFT_VAL)
         elif grid_size == 25:
-            i_pick = index_picker_8x8(i)
-            tx, ty = shift_value_8x8(i_pick, SHIFT_VAL)
+            i_pick = index_picker_5x5(i)
+            tx, ty = shift_value_5x5(i_pick, SHIFT_VAL)
         else:
             print('This size is not supported')
         param_str = json.dumps({'tx': tx, 'ty': ty})
@@ -192,7 +261,7 @@ def input_shifting(center, batch_size, grid_size):
     #con_crop = L.Crop(con, dum_input, crop_param=dict(axis=2, offset=2))
     return con
 
-def denseUNet_deploy():
+def denseUNet_deploy_model0():
     batch_size = 1
     n = caffe.NetSpec()
 
@@ -205,69 +274,78 @@ def denseUNet_deploy():
     # Network
     #n.dum_input = L.DummyData(shape=dict(dim=[batch_size, 1, 192, 192]))
     #n.input_crop = L.Crop(n.input, n.dum_input, crop_param=dict(axis=2, offset=2))   
-    n.conv1, n.poo1 = conv_conv_downsample_layer(n.input_luma_down, 16, 3, 2, 1)
-    n.conv2, n.poo2 = conv_conv_downsample_layer(n.poo1, 32, 3, 2, 1)
-    n.conv3, n.poo3 = conv_conv_downsample_layer(n.poo2, 64, 3, 2, 1)
-    n.conv4, n.poo4 = conv_conv_downsample_layer(n.poo3, 128, 3, 2, 1)
-    n.conv5, n.poo5 = conv_conv_downsample_layer(n.poo4, 256, 3, 2, 1)
+    n.conv1_1, n.poo1 = conv_conv_downsample_layer(n.input_luma_down, 16, 3, 2, 1)
+    n.conv2_1, n.poo2 = conv_conv_downsample_layer(n.poo1, 32, 3, 2, 1)
+    n.conv3_1, n.poo3 = conv_conv_downsample_layer(n.poo2, 64, 3, 2, 1)
+    n.conv4_1, n.poo4 = conv_conv_downsample_layer(n.poo3, 128, 3, 2, 1)
+    n.conv5_1, n.poo5 = conv_conv_downsample_layer(n.poo4, 256, 3, 2, 1)
     n.feature = conv_conv_res_dense_layer(n.poo5, 512, 3, 1, 1, 1)
 
-    n.deconv_in_1_1 = upsample_concat_layer(n.conv2, n.conv1, 64, 3, 2, 0, batch_size, 192)
-    n.conv_in_1_1 = conv_conv_layer(n.deconv_in_1_1, 64, 3, 1, 1, 1)
+    n.deconv1 = upsample_concat_layer(n.feature, n.conv5_1, 256, 3, 2, 0, batch_size, 12)
+    n.deconv1 = conv_conv_layer(n.deconv1, 256, 3, 1, 1, 1)
 
+    n.deconv2 = upsample_concat_layer(n.deconv1, n.conv4_1, 128, 3, 2, 0, batch_size, 24)
+    n.deconv2 = conv_conv_layer(n.deconv2, 128, 3, 1, 1, 1)
 
+    n.deconv3 = upsample_concat_layer(n.deconv2, n.conv3_1, 64, 3, 2, 0, batch_size, 48)
+    n.deconv3 = conv_conv_layer(n.deconv3, 64, 3, 1, 1, 1)
 
-    n.deconv_in_2_1 = upsample_concat_layer(n.conv3, n.conv2, 64, 3, 2, 0, batch_size, 96)
-    n.conv_in_2_1 = conv_conv_layer(n.deconv_in_2_1, 64, 3, 1, 1, 1)
-    n.deconv_in_2_2 = upsample_concat_layer(n.conv_in_2_1, n.conv_in_1_1, 64, 3, 2, 0, batch_size, 192)
-    n.conv_in_2_2 = conv_conv_layer(n.deconv_in_2_2, 64, 3, 1, 1, 1)
+    n.deconv4 = upsample_concat_layer(n.deconv3, n.conv2_1, 64, 3, 2, 0, batch_size, 96)
+    n.deconv4 = conv_conv_layer(n.deconv4, 64, 3, 1, 1, 1)
 
+    n.deconv5 = upsample_concat_layer(n.deconv4, n.conv1_1, 64, 3, 2, 0, batch_size, 192)
+    n.deconv5 = conv_conv_layer(n.deconv5, 64, 3, 1, 1, 1)
 
+    n.flow25 = flow_layer(n.deconv5, 25*2)
 
-    n.deconv_in_3_1 = upsample_concat_layer(n.conv4, n.conv3, 64, 3, 2, 0, batch_size, 48)
-    n.conv_in_3_1 = conv_conv_layer(n.deconv_in_3_1, 64, 3, 1, 1, 1)
-    n.deconv_in_3_2 = upsample_concat_layer(n.conv_in_3_1, n.conv_in_2_1, 64, 3, 2, 0, batch_size, 96)
-    n.conv_in_3_2 = conv_conv_layer(n.deconv_in_3_2, 64, 3, 1, 1, 1)
-    n.deconv_in_3_3 = upsample_concat_layer(n.conv_in_3_2, n.conv_in_2_2, 64, 3, 2, 0, batch_size, 192)
-    n.conv_in_3_3 = conv_conv_layer(n.deconv_in_3_3, 64, 3, 1, 1, 1)
+    # Translation
+    n.flow_h, n.flow_v = L.Slice(n.flow25, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+    n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
+    #n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1)
+    param_str = json.dumps({'flow_size': 25, 'color_size': 3})
+    n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
 
+    '''
+    n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_h', mult=110)))
+    n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_v', mult=110)))
+    '''
 
+    return n.to_proto()
 
-    n.deconv_in_4_1 = upsample_concat_layer(n.conv5, n.conv4, 128, 3, 2, 0, batch_size, 24)
-    n.conv_in_4_1 = conv_conv_layer(n.deconv_in_4_1, 128, 3, 1, 1, 1)
-    n.deconv_in_4_2 = upsample_concat_layer(n.conv_in_4_1, n.conv_in_3_1, 64, 3, 2, 0, batch_size, 48)
-    n.conv_in_4_2 = conv_conv_layer(n.deconv_in_4_2, 64, 3, 1, 1, 1)
-    n.deconv_in_4_3 = upsample_concat_layer(n.conv_in_4_2, n.conv_in_3_2, 64, 3, 2, 0, batch_size, 96)
-    n.conv_in_4_3 = conv_conv_layer(n.deconv_in_4_3, 64, 3, 1, 1, 1)
-    n.deconv_in_4_4 = upsample_concat_layer(n.conv_in_4_3, n.conv_in_3_3, 64, 3, 2, 0, batch_size, 192)
-    n.conv_in_4_4 = conv_conv_layer(n.deconv_in_4_4, 64, 3, 1, 1, 1)
+def denseUNet_deploy_model1():
+    batch_size = 1
+    n = caffe.NetSpec()
 
+    # Data loading
+    n.input = L.Input(input_param=dict(shape=dict(dim=[1, 3, 192, 192])))
+    n.input_luma = L.Input(input_param=dict(shape=dict(dim=[1, 1, 192, 192])))
+    n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0, in_place=False)
+    n.shift = input_shifting(n.input, batch_size, 25)
 
+    # Network
+    #n.dum_input = L.DummyData(shape=dict(dim=[batch_size, 1, 192, 192]))
+    #n.input_crop = L.Crop(n.input, n.dum_input, crop_param=dict(axis=2, offset=2))   
+    n.conv1_1, n.poo1 = conv_conv_downsample_layer(n.input_luma_down, 16, 3, 2, 1)
+    n.conv2_1, n.poo2 = conv_conv_downsample_layer(n.poo1, 32, 3, 2, 1)
+    n.conv3_1, n.poo3 = conv_conv_downsample_layer(n.poo2, 64, 3, 2, 1)
+    n.conv4_1, n.poo4 = conv_conv_downsample_layer(n.poo3, 128, 3, 2, 1)
+    n.feature = conv_conv_res_dense_layer(n.poo4, 256, 3, 1, 1, 1)
 
+    n.deconv1 = upsample_concat_layer(n.feature, n.conv4_1, 128, 3, 2, 0, batch_size, 24)
+    n.deconv1 = conv_conv_layer(n.deconv1, 128, 3, 1, 1, 1)
 
+    n.deconv2 = upsample_concat_layer(n.deconv1, n.conv3_1, 64, 3, 2, 0, batch_size, 48)
+    n.deconv2 = conv_conv_layer(n.deconv2, 64, 3, 1, 1, 1)
 
+    n.deconv3 = upsample_concat_layer(n.deconv2, n.conv2_1, 64, 3, 2, 0, batch_size, 96)
+    n.deconv3 = conv_conv_layer(n.deconv3, 64, 3, 1, 1, 1)
 
-    n.deconv1 = upsample_concat_layer(n.feature, n.conv5, 256, 3, 2, 0, batch_size, 12)
-    n.conv6 = conv_conv_layer(n.deconv1, 256, 3, 1, 1, 1)
-    n.deconv2 = upsample_concat_layer(n.conv6, n.conv4, 128, 3, 2, 0, batch_size, 24)
-    n.conv7 = conv_conv_layer(n.deconv2, 128, 3, 1, 1, 1)
-    n.deconv3 = upsample_concat_layer(n.conv7, n.conv3, 64, 3, 2, 0, batch_size, 48)
-    n.conv8 = conv_conv_layer(n.deconv3, 64, 3, 1, 1, 1)
-    n.deconv4 = upsample_concat_layer(n.conv8, n.conv2, 64, 3, 2, 0, batch_size, 96)
-    n.conv9 = conv_conv_layer(n.deconv4, 64, 3, 1, 1, 1)
-    n.deconv5 = upsample_concat_layer(n.conv9, n.conv1, 64, 3, 2, 0, batch_size, 192)
-    n.conv10 = conv_conv_layer(n.deconv5, 64, 3, 1, 1, 1)
+    n.deconv4 = upsample_concat_layer(n.deconv3, n.conv1_1, 64, 3, 2, 0, batch_size, 192)
+    n.deconv4 = conv_conv_layer(n.deconv4, 64, 3, 1, 1, 1)
 
-
-
-
-    n.conc_tot = L.Concat(*[n.conv10, n.conv_in_4_4, n.conv_in_3_3, n.conv_in_2_2, n.conv_in_1_1], concat_param={'axis': 1})
-
-
-
-
-
-    n.flow25 = flow_layer(n.conc_tot, 25*2)
+    n.flow25 = flow_layer(n.deconv4, 25*2)
 
 
     # Translation
@@ -277,10 +355,321 @@ def denseUNet_deploy():
     param_str = json.dumps({'flow_size': 25, 'color_size': 3})
     n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
 
+    '''
     n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                     param_str=str(dict(path='./deploy', name='flow_h', mult=110)))
     n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                     param_str=str(dict(path='./deploy', name='flow_v', mult=110)))
+    '''
+
+    return n.to_proto()
+
+def denseUNet_deploy_model2():
+    batch_size = 1
+    n = caffe.NetSpec()
+
+    # Data loading
+    n.input = L.Input(input_param=dict(shape=dict(dim=[1, 3, 192, 192])))
+    n.input_luma = L.Input(input_param=dict(shape=dict(dim=[1, 1, 192, 192])))
+    n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0, in_place=False)
+    n.shift = input_shifting(n.input, batch_size, 25)
+
+    # Network
+    #n.dum_input = L.DummyData(shape=dict(dim=[batch_size, 1, 192, 192]))
+    #n.input_crop = L.Crop(n.input, n.dum_input, crop_param=dict(axis=2, offset=2))   
+    n.conv1_1, n.poo1 = conv_conv_downsample_layer(n.input_luma_down, 16, 3, 2, 1)
+    n.conv2_1, n.poo2 = conv_conv_downsample_layer(n.poo1, 32, 3, 2, 1)
+    n.conv3_1, n.poo3 = conv_conv_downsample_layer(n.poo2, 64, 3, 2, 1)
+    n.conv4_1, n.poo4 = conv_conv_downsample_layer(n.poo3, 128, 3, 2, 1)
+    n.feature = conv_conv_res_dense_layer(n.poo4, 256, 3, 1, 1, 1)
+
+    n.deconv1 = upsample_concat_layer(n.feature, n.conv4_1, 128, 3, 2, 0, batch_size, 24)
+    n.deconv1 = conv_conv_layer(n.deconv1, 128, 3, 1, 1, 1)
+
+    n.conv3_1 = upsample_concat_layer(n.conv4_1, n.conv3_1, 64, 3, 2, 0, batch_size, 48)
+    n.conv3_2 = conv_conv_layer(n.conv3_1, 64, 3, 1, 1, 1)
+    n.conv3_2 = L.Concat(*[n.conv3_2, n.conv3_1], concat_param={'axis': 1})
+    n.deconv2 = upsample_concat_layer(n.deconv1, n.conv3_2, 64, 3, 2, 0, batch_size, 48)
+    n.deconv2 = conv_conv_layer(n.deconv2, 64, 3, 1, 1, 1)
+
+    n.conv2_1 = upsample_concat_layer(n.conv3_1, n.conv2_1, 64, 3, 2, 0, batch_size, 96)
+    n.conv2_2 = conv_conv_layer(n.conv2_1, 64, 3, 1, 1, 1)
+    n.conv2_2 = L.Concat(*[n.conv2_2, n.conv2_1], concat_param={'axis': 1})
+    n.conv2_2 = upsample_concat_layer(n.conv3_2, n.conv2_2, 64, 3, 2, 0, batch_size, 96)
+    n.conv2_3 = conv_conv_layer(n.conv2_2, 64, 3, 1, 1, 1)
+    n.conv2_3 = L.Concat(*[n.conv2_3, n.conv2_2, n.conv2_1], concat_param={'axis': 1})
+    n.deconv3 = upsample_concat_layer(n.deconv2, n.conv2_3, 64, 3, 2, 0, batch_size, 96)
+    n.deconv3 = conv_conv_layer(n.deconv3, 64, 3, 1, 1, 1)
+
+    n.conv1_1 = upsample_concat_layer(n.conv2_1, n.conv1_1, 64, 3, 2, 0, batch_size, 192)
+    n.conv1_2 = conv_conv_layer(n.conv1_1, 64, 3, 1, 1, 1)
+    n.conv1_2 = L.Concat(*[n.conv1_2, n.conv1_1], concat_param={'axis': 1})
+    n.conv1_2 = upsample_concat_layer(n.conv2_2, n.conv1_2, 64, 3, 2, 0, batch_size, 192)
+    n.conv1_3 = conv_conv_layer(n.conv1_2, 64, 3, 1, 1, 1)
+    n.conv1_3 = L.Concat(*[n.conv1_3, n.conv1_2, n.conv1_1], concat_param={'axis': 1})
+    n.conv1_3 = upsample_concat_layer(n.conv2_3, n.conv1_3, 64, 3, 2, 0, batch_size, 192)
+    n.conv1_4 = conv_conv_layer(n.conv1_3, 64, 3, 1, 1, 1)
+    n.conv1_4 = L.Concat(*[n.conv1_4, n.conv1_3, n.conv1_2, n.conv1_1], concat_param={'axis': 1})
+    n.deconv4 = upsample_concat_layer(n.deconv3, n.conv1_4, 64, 3, 2, 0, batch_size, 192)
+    n.deconv4 = conv_conv_layer(n.deconv4, 64, 3, 1, 1, 1)
+
+    n.flow25 = flow_layer(n.deconv4, 25*2)
+
+
+    # Translation
+    n.flow_h, n.flow_v = L.Slice(n.flow25, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+    n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
+    #n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1)
+    param_str = json.dumps({'flow_size': 25, 'color_size': 3})
+    n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
+
+    '''
+    n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_h', mult=110)))
+    n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_v', mult=110)))
+    '''
+
+    return n.to_proto()
+
+def denseUNet_deploy_model3():
+    batch_size = 1
+    n = caffe.NetSpec()
+
+    # Data loading
+    n.input = L.Input(input_param=dict(shape=dict(dim=[1, 3, 192, 192])))
+    n.input_luma = L.Input(input_param=dict(shape=dict(dim=[1, 1, 192, 192])))
+    n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0, in_place=False)
+    n.shift = input_shifting(n.input, batch_size, 25)
+
+    # Network
+    #n.dum_input = L.DummyData(shape=dict(dim=[batch_size, 1, 192, 192]))
+    #n.input_crop = L.Crop(n.input, n.dum_input, crop_param=dict(axis=2, offset=2))   
+    n.conv1_1, n.poo1 = conv_conv_downsample_layer(n.input_luma_down, 16, 3, 2, 1)
+    n.conv2_1, n.poo2 = conv_conv_downsample_layer(n.poo1, 32, 3, 2, 1)
+    n.conv3_1, n.poo3 = conv_conv_downsample_layer(n.poo2, 64, 3, 2, 1)
+    n.conv4_1, n.poo4 = conv_conv_downsample_layer(n.poo3, 128, 3, 2, 1)
+    n.feature = conv_conv_res_dense_layer(n.poo4, 256, 3, 1, 1, 1)
+
+    n.deconv1 = upsample_concat_layer(n.feature, n.conv4_1, 128, 3, 2, 0, batch_size, 24)
+    n.deconv1 = conv_conv_layer(n.deconv1, 128, 3, 1, 1, 1)
+
+    n.conv3_2 = conv_conv_layer(n.conv3_1, 64, 3, 1, 1, 1)
+    n.conv3_2 = L.Concat(*[n.conv3_2, n.conv3_1], concat_param={'axis': 1})
+    n.deconv2 = upsample_concat_layer(n.deconv1, n.conv3_2, 64, 3, 2, 0, batch_size, 48)
+    n.deconv2 = conv_conv_layer(n.deconv2, 64, 3, 1, 1, 1)
+
+    n.conv2_2 = conv_conv_layer(n.conv2_1, 64, 3, 1, 1, 1)
+    n.conv2_3 = conv_conv_layer(n.conv2_2, 64, 3, 1, 1, 1)
+    n.conv2_3 = L.Concat(*[n.conv2_3, n.conv2_2, n.conv2_1], concat_param={'axis': 1})
+    n.deconv3 = upsample_concat_layer(n.deconv2, n.conv2_3, 64, 3, 2, 0, batch_size, 96)
+    n.deconv3 = conv_conv_layer(n.deconv3, 64, 3, 1, 1, 1)
+
+    n.conv1_2 = conv_conv_layer(n.conv1_1, 64, 3, 1, 1, 1)
+    n.conv1_3 = conv_conv_layer(n.conv1_2, 64, 3, 1, 1, 1)
+    n.conv1_4 = conv_conv_layer(n.conv1_3, 64, 3, 1, 1, 1)
+    n.conv1_4 = L.Concat(*[n.conv1_4, n.conv1_3, n.conv1_2, n.conv1_1], concat_param={'axis': 1})
+    n.deconv4 = upsample_concat_layer(n.deconv3, n.conv1_4, 64, 3, 2, 0, batch_size, 192)
+    n.deconv4 = conv_conv_layer(n.deconv4, 64, 3, 1, 1, 1)
+
+    n.flow25 = flow_layer(n.deconv4, 25*2)
+
+
+    # Translation
+    n.flow_h, n.flow_v = L.Slice(n.flow25, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+    n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
+    #n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1)
+    param_str = json.dumps({'flow_size': 25, 'color_size': 3})
+    n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
+
+    '''
+    n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_h', mult=110)))
+    n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_v', mult=110)))
+    '''
+
+    return n.to_proto()
+
+def denseUNet_deploy_model4():
+    batch_size = 1
+    n = caffe.NetSpec()
+
+    # Data loading
+    n.input = L.Input(input_param=dict(shape=dict(dim=[1, 3, 192, 192])))
+    n.input_luma = L.Input(input_param=dict(shape=dict(dim=[1, 1, 192, 192])))
+    n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0, in_place=False)
+    n.shift = input_shifting(n.input, batch_size, 25)
+
+    # Network
+    #n.dum_input = L.DummyData(shape=dict(dim=[batch_size, 1, 192, 192]))
+    #n.input_crop = L.Crop(n.input, n.dum_input, crop_param=dict(axis=2, offset=2))   
+    n.conv1_1, n.poo1 = conv_conv_downsample_layer(n.input_luma_down, 16, 3, 2, 1)
+    n.conv2_1, n.poo2 = conv_conv_downsample_layer(n.poo1, 32, 3, 2, 1)
+    n.conv3_1, n.poo3 = conv_conv_downsample_layer(n.poo2, 64, 3, 2, 1)
+    n.conv4_1, n.poo4 = conv_conv_downsample_layer(n.poo3, 128, 3, 2, 1)
+    n.feature = conv_conv_res_dense_layer(n.poo4, 256, 3, 1, 1, 1)
+
+    n.deconv1 = upsample_concat_layer(n.feature, n.conv4_1, 128, 3, 2, 0, batch_size, 24)
+    n.deconv1 = conv_conv_layer(n.deconv1, 128, 3, 1, 1, 1)
+
+    n.conv3_2 = conv_conv_layer(n.conv3_1, 64, 3, 1, 1, 1)
+    n.conv3_2 = L.Concat(*[n.conv3_2, n.conv3_1], concat_param={'axis': 1})
+    n.deconv2 = upsample_concat_layer(n.deconv1, n.conv3_2, 64, 3, 2, 0, batch_size, 48)
+    n.deconv2 = conv_conv_layer(n.deconv2, 64, 3, 1, 1, 1)
+
+    n.conv2_2 = conv_conv_layer(n.conv2_1, 64, 3, 1, 1, 1)
+    n.conv2_2 = L.Concat(*[n.conv2_2, n.conv2_1], concat_param={'axis': 1})
+    n.conv2_3 = conv_conv_layer(n.conv2_2, 64, 3, 1, 1, 1)
+    n.conv2_3 = L.Concat(*[n.conv2_3, n.conv2_2, n.conv2_1], concat_param={'axis': 1})
+    n.deconv3 = upsample_concat_layer(n.deconv2, n.conv2_3, 64, 3, 2, 0, batch_size, 96)
+    n.deconv3 = conv_conv_layer(n.deconv3, 64, 3, 1, 1, 1)
+
+    n.conv1_2 = conv_conv_layer(n.conv1_1, 64, 3, 1, 1, 1)
+    n.conv1_2 = L.Concat(*[n.conv1_2, n.conv1_1], concat_param={'axis': 1})
+    n.conv1_3 = conv_conv_layer(n.conv1_2, 64, 3, 1, 1, 1)
+    n.conv1_3 = L.Concat(*[n.conv1_3, n.conv1_2, n.conv1_1], concat_param={'axis': 1})
+    n.conv1_4 = conv_conv_layer(n.conv1_3, 64, 3, 1, 1, 1)
+    n.conv1_4 = L.Concat(*[n.conv1_4, n.conv1_3, n.conv1_2, n.conv1_1], concat_param={'axis': 1})
+    n.deconv4 = upsample_concat_layer(n.deconv3, n.conv1_4, 64, 3, 2, 0, batch_size, 192)
+    n.deconv4 = conv_conv_layer(n.deconv4, 64, 3, 1, 1, 1)
+
+    n.flow25 = flow_layer(n.deconv4, 25*2)
+
+
+    # Translation
+    n.flow_h, n.flow_v = L.Slice(n.flow25, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+    n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
+    #n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1)
+    param_str = json.dumps({'flow_size': 25, 'color_size': 3})
+    n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
+
+    '''
+    n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_h', mult=110)))
+    n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_v', mult=110)))
+    '''
+
+    return n.to_proto()
+
+def denseUNet_deploy_model5():
+    batch_size = 1
+    n = caffe.NetSpec()
+
+    # Data loading
+    n.input = L.Input(input_param=dict(shape=dict(dim=[1, 3, 192, 192])))
+    n.input_luma = L.Input(input_param=dict(shape=dict(dim=[1, 1, 192, 192])))
+    n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0, in_place=False)
+    n.shift = input_shifting(n.input, batch_size, 25)
+
+    # Network
+    #n.dum_input = L.DummyData(shape=dict(dim=[batch_size, 1, 192, 192]))
+    #n.input_crop = L.Crop(n.input, n.dum_input, crop_param=dict(axis=2, offset=2))   
+    n.conv1_1, n.poo1 = conv_conv_downsample_layer(n.input_luma_down, 16, 3, 2, 1)
+    n.conv2_1, n.poo2 = conv_conv_downsample_layer(n.poo1, 32, 3, 2, 1)
+    n.conv3_1, n.poo3 = conv_conv_downsample_layer(n.poo2, 64, 3, 2, 1)
+    n.conv4_1, n.poo4 = conv_conv_downsample_layer(n.poo3, 128, 3, 2, 1)
+    n.feature = conv_conv_res_dense_layer(n.poo4, 256, 3, 1, 1, 1)
+
+    n.deconv1 = upsample_concat_layer(n.feature, n.conv4_1, 128, 3, 2, 0, batch_size, 24)
+    n.deconv1 = conv_conv_layer(n.deconv1, 128, 3, 1, 1, 1)
+
+    n.conv3_1 = upsample_concat_layer(n.conv4_1, n.conv3_1, 64, 3, 2, 0, batch_size, 48)
+    n.conv3_2 = conv_conv_layer(n.conv3_1, 16, 3, 1, 1, 1)
+    n.conv3_2 = L.Concat(*[n.conv3_2, n.conv3_1], concat_param={'axis': 1})
+    n.deconv2 = upsample_concat_layer(n.deconv1, n.conv3_2, 64, 3, 2, 0, batch_size, 48)
+    n.deconv2 = conv_conv_layer(n.deconv2, 64, 3, 1, 1, 1)
+
+    n.conv2_1 = upsample_concat_layer(n.conv3_1, n.conv2_1, 64, 3, 2, 0, batch_size, 96)
+    n.conv2_2 = conv_conv_layer(n.conv2_1, 16, 3, 1, 1, 1)
+    n.conv2_2 = L.Concat(*[n.conv2_2, n.conv2_1], concat_param={'axis': 1})
+    n.conv2_2 = upsample_concat_layer(n.conv3_2, n.conv2_2, 64, 3, 2, 0, batch_size, 96)
+    n.conv2_3 = conv_conv_layer(n.conv2_2, 16, 3, 1, 1, 1)
+    n.conv2_3 = L.Concat(*[n.conv2_3, n.conv2_2, n.conv2_1], concat_param={'axis': 1})
+    n.deconv3 = upsample_concat_layer(n.deconv2, n.conv2_3, 64, 3, 2, 0, batch_size, 96)
+    n.deconv3 = conv_conv_layer(n.deconv3, 64, 3, 1, 1, 1)
+
+    n.conv1_1 = upsample_concat_layer(n.conv2_1, n.conv1_1, 64, 3, 2, 0, batch_size, 192)
+    n.conv1_2 = conv_conv_layer(n.conv1_1, 16, 3, 1, 1, 1)
+    n.conv1_2 = L.Concat(*[n.conv1_2, n.conv1_1], concat_param={'axis': 1})
+    n.conv1_2 = upsample_concat_layer(n.conv2_2, n.conv1_2, 64, 3, 2, 0, batch_size, 192)
+    n.conv1_3 = conv_conv_layer(n.conv1_2, 16, 3, 1, 1, 1)
+    n.conv1_3 = L.Concat(*[n.conv1_3, n.conv1_2, n.conv1_1], concat_param={'axis': 1})
+    n.conv1_3 = upsample_concat_layer(n.conv2_3, n.conv1_3, 64, 3, 2, 0, batch_size, 192)
+    n.conv1_4 = conv_conv_layer(n.conv1_3, 16, 3, 1, 1, 1)
+    n.conv1_4 = L.Concat(*[n.conv1_4, n.conv1_3, n.conv1_2, n.conv1_1], concat_param={'axis': 1})
+    n.deconv4 = upsample_concat_layer(n.deconv3, n.conv1_4, 64, 3, 2, 0, batch_size, 192)
+    n.deconv4 = conv_conv_layer(n.deconv4, 64, 3, 1, 1, 1)
+
+    n.final_con = L.Concat(*[n.deconv4, n.conv1_4, n.conv1_3, n.conv1_2], concat_param={'axis': 1})
+
+    n.flow25 = flow_layer(n.final_con, 25*2)
+
+
+    # Translation
+    n.flow_h, n.flow_v = L.Slice(n.flow25, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+    n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
+    #n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1)
+    param_str = json.dumps({'flow_size': 25, 'color_size': 3})
+    n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
+
+    '''
+    n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_h', mult=110)))
+    n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_v', mult=110)))
+    '''
+
+    return n.to_proto()
+
+def denseUNet_deploy_mobilenet():
+    batch_size = 1
+    n = caffe.NetSpec()
+
+    # Data loading
+    n.input = L.Input(input_param=dict(shape=dict(dim=[1, 3, 192, 192])))
+    n.input_luma = L.Input(input_param=dict(shape=dict(dim=[1, 1, 192, 192])))
+    n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0, in_place=False)
+    n.shift = input_shifting(n.input, batch_size, 25)
+
+    # Network
+    #n.dum_input = L.DummyData(shape=dict(dim=[batch_size, 1, 192, 192]))
+    #n.input_crop = L.Crop(n.input, n.dum_input, crop_param=dict(axis=2, offset=2))   
+    n.conv1_1, n.poo1 = conv_conv_downsample_group_layer(n.input_luma_down, 16, 3, 2, 1)
+    n.conv2_1, n.poo2 = conv_conv_downsample_group_layer(n.poo1, 32, 3, 2, 1)
+    n.conv3_1, n.poo3 = conv_conv_downsample_group_layer(n.poo2, 64, 3, 2, 1)
+    n.conv4_1, n.poo4 = conv_conv_downsample_group_layer(n.poo3, 128, 3, 2, 1)
+    n.feature = conv_conv_res_dense_layer(n.poo4, 256, 3, 1, 1, 1)
+
+    n.deconv1 = upsample_concat_layer(n.feature, n.conv4_1, 128, 3, 2, 0, batch_size, 24)
+    n.deconv1 = conv_conv_group_layer(n.deconv1, 128, 3, 1, 1, 1)
+
+    n.deconv2 = upsample_concat_layer(n.deconv1, n.conv3_1, 64, 3, 2, 0, batch_size, 48)
+    n.deconv2 = conv_conv_group_layer(n.deconv2, 64, 3, 1, 1, 1)
+
+    n.deconv3 = upsample_concat_layer(n.deconv2, n.conv2_1, 64, 3, 2, 0, batch_size, 96)
+    n.deconv3 = conv_conv_group_layer(n.deconv3, 64, 3, 1, 1, 1)
+
+    n.deconv4 = upsample_concat_layer(n.deconv3, n.conv1_1, 64, 3, 2, 0, batch_size, 192)
+    n.deconv4 = conv_conv_group_layer(n.deconv4, 64, 3, 1, 1, 1)
+
+    n.flow25 = flow_layer(n.deconv4, 25*2)
+
+
+    # Translation
+    n.flow_h, n.flow_v = L.Slice(n.flow25, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+    n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
+    #n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1)
+    param_str = json.dumps({'flow_size': 25, 'color_size': 3})
+    n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
+z
+    '''
+    n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_h', mult=110)))
+    n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./deploy', name='flow_v', mult=110)))
+    '''
 
     return n.to_proto()
 
@@ -288,12 +677,12 @@ if __name__ == "__main__":
     TOT = 98
     PATH = './deploy'
     NET_PATH = PATH + '/denseUNet_deploy.prototxt'
-    WEIGHTS_PATH = PATH + '/denseUNet_solver_iter_600.caffemodel'
+    WEIGHTS_PATH = PATH + '/denseUNet_solver_iter_7242.caffemodel' # 3307, 6614, 9921, 13228, 16535
 
     # Generate a network
     def generate_net():
         with open(NET_PATH, 'w') as f:
-            f.write(str(denseUNet_deploy()))
+            f.write(str(denseUNet_deploy_mobilenet()))
     generate_net()
 
     # Set a model

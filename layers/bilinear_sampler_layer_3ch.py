@@ -4,7 +4,7 @@ import cv2
 
 def warp_flow(img_in, flow, color):
     res = np.zeros((img_in.shape))
-    for ch in range(3):
+    for ch in range(color):
         img = img_in[ch, :, :]
         new_flow = np.zeros((flow.shape[1], flow.shape[2], flow.shape[0]), np.float32)
         new_flow[:, :, 0] = flow[1, :, :]

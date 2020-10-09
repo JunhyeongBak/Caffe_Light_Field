@@ -240,27 +240,34 @@ def denseUNet_deploy():
 
     n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0, in_place=False)
     # Network
-    n.conv1, n.poo1 = conv_conv_downsample_layer(n.input_luma_down, 3, 16, 2, 1)
-    n.conv2, n.poo2 = conv_conv_downsample_layer(n.poo1, 3, 32, 2, 1)
-    n.conv3, n.poo3 = conv_conv_downsample_layer(n.poo2, 3, 64, 2, 1)
-    n.conv4, n.poo4 = conv_conv_downsample_layer(n.poo3, 3, 128, 2, 1)
+    n.conv1_1, n.poo1 = conv_conv_downsample_layer(n.input_luma_down, 16, 3, 2, 1)
+    n.conv2_1, n.poo2 = conv_conv_downsample_layer(n.poo1, 32, 3, 2, 1)
+    n.conv3_1, n.poo3 = conv_conv_downsample_layer(n.poo2, 64, 3, 2, 1)
+    n.conv4_1, n.poo4 = conv_conv_downsample_layer(n.poo3, 128, 3, 2, 1)
 
-    n.conv5, n.poo5 = conv_conv_downsample_layer(n.poo4, 3, 256, 2, 1)
+    n.feature = conv_conv_res_dense_layer(n.poo4, 256, 3, 1, 1, 1)
 
-    n.feature = conv_conv_dense_layer(n.poo5, 3, 512, 1, 1, 0.5)
+    n.deconv1 = upsample_concat_layer(n.feature, n.conv4_1, 128, 3, 2, 0, batch_size, 24)
+    n.deconv1 = conv_conv_layer(n.deconv1, 128, 3, 1, 1, 1)
 
-    n.deconv5 = upsample_concat_layer(n.feature, n.conv5, 3, 256, 2, 0, batch_size, 12)
-    n.conv6 = conv_conv_layer(n.deconv5, 3, 256, 1, 1)
-    n.deconv6 = upsample_concat_layer(n.conv6, n.conv4, 3, 128, 2, 0, batch_size, 24)
-    n.conv7 = conv_conv_layer(n.deconv6, 3, 128, 1, 1)
-    n.deconv7 = upsample_concat_layer(n.conv7, n.conv3, 3, 64, 2, 0, batch_size, 48)
-    n.conv8 = conv_conv_layer(n.deconv7, 3, 64, 1, 1)
-    n.deconv8 = upsample_concat_layer(n.conv8, n.conv2, 3, 64, 2, 0, batch_size, 96)
-    n.conv9 = conv_conv_layer(n.deconv8, 3, 64, 1, 1)
-    n.deconv9 = upsample_concat_layer(n.conv9, n.conv1, 3, 64, 2, 0, batch_size, 192)
-    n.conv10 = conv_conv_layer(n.deconv9, 3, 64, 1, 1)
+    n.conv3_2 = conv_conv_layer(n.conv3_1, 64, 3, 1, 1, 1)
+    n.deconv2 = upsample_concat_layer(n.deconv1, n.conv3_2, 64, 3, 2, 0, batch_size, 48)
+    n.deconv2 = conv_conv_layer(n.deconv2, 64, 3, 1, 1, 1)
 
-    n.flow = flow_layer(n.conv10, 25*2)
+    n.conv2_2 = conv_conv_layer(n.conv2_1, 64, 3, 1, 1, 1)
+    n.conv2_3 = conv_conv_layer(n.conv2_2, 64, 3, 1, 1, 1)
+    n.deconv3 = upsample_concat_layer(n.deconv2, n.conv2_3, 64, 3, 2, 0, batch_size, 96)
+    n.deconv3 = conv_conv_layer(n.deconv3, 64, 3, 1, 1, 1)
+
+    n.conv1_2 = conv_conv_layer(n.conv1_1, 64, 3, 1, 1, 1)
+    n.conv1_3 = conv_conv_layer(n.conv1_2, 64, 3, 1, 1, 1)
+    n.conv1_4 = conv_conv_layer(n.conv1_3, 64, 3, 1, 1, 1)
+    n.deconv4 = upsample_concat_layer(n.deconv3, n.conv1_4, 64, 3, 2, 0, batch_size, 192)
+    n.deconv4 = conv_conv_layer(n.deconv4, 64, 3, 1, 1, 1)
+
+
+
+    n.flow25 = flow_layer(n.deconv4, 25*2)
 
     # Translation
     n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
@@ -289,7 +296,7 @@ if __name__ == "__main__":
     psnr_mean = 0
     ssim_mean = 0
     time_mean = 0
-    for i_tot in range(TOT):
+    for i_tot in range(101, 102):
         start = time.time()
 
         # Input images

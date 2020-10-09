@@ -29,4 +29,5 @@ class InputShiftingLayer(caffe.Layer):
 
     def backward(self, top, propagate_down, bottom):
         # Transfer gradient
-        top[0].diff = bottom[0].diff
+        #top[0].diff = bottom[0].diff
+        pass

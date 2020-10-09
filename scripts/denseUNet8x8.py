@@ -377,7 +377,8 @@ def denseUNet_train(batch_size=1):
     n.conv10 = conv_conv_layer(n.deconv9, 3, 64, 1, 1, 0.5)
 
     #n.flow64 = flow_layer(n.conv10, 64*2)
-    n.flow25 = flow_layer(n.conv10, 25*2)
+    n.flow25 = flow_layer(n.conv10, 25*2
+    )
 
     '''
     n.flow25_mean = L.Reduction(n.flow25, axis=1, operation=P.Reduction.MEAN)
