@@ -7,7 +7,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source40.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source12.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -41,7 +41,7 @@ layer {
   bottom: "Convolution1"
   top: "Convolution1"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -91,7 +91,7 @@ layer {
   bottom: "Convolution3"
   top: "Convolution3"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -111,7 +111,7 @@ layer {
   bottom: "Pooling1"
   top: "Pooling1"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -140,7 +140,7 @@ layer {
   bottom: "Convolution4"
   top: "Convolution4"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -190,7 +190,7 @@ layer {
   bottom: "Convolution6"
   top: "Convolution6"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -210,7 +210,7 @@ layer {
   bottom: "Pooling2"
   top: "Pooling2"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -239,7 +239,7 @@ layer {
   bottom: "Convolution7"
   top: "Convolution7"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -289,7 +289,7 @@ layer {
   bottom: "Convolution9"
   top: "Convolution9"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -309,7 +309,7 @@ layer {
   bottom: "Pooling3"
   top: "Pooling3"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -338,7 +338,7 @@ layer {
   bottom: "Convolution10"
   top: "Convolution10"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -388,7 +388,7 @@ layer {
   bottom: "Convolution12"
   top: "Convolution12"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -408,7 +408,7 @@ layer {
   bottom: "Pooling4"
   top: "Pooling4"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -437,7 +437,7 @@ layer {
   bottom: "Convolution13"
   top: "Convolution13"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -466,7 +466,7 @@ layer {
   bottom: "Convolution14"
   top: "Convolution14"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -505,7 +505,7 @@ layer {
   bottom: "Eltwise1"
   top: "Eltwise1"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -589,7 +589,7 @@ layer {
   bottom: "Convolution16"
   top: "Convolution16"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -639,7 +639,7 @@ layer {
   bottom: "Convolution18"
   top: "Convolution18"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -723,7 +723,7 @@ layer {
   bottom: "Convolution19"
   top: "Convolution19"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -773,7 +773,7 @@ layer {
   bottom: "Convolution21"
   top: "Convolution21"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -857,7 +857,7 @@ layer {
   bottom: "Convolution22"
   top: "Convolution22"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -907,7 +907,7 @@ layer {
   bottom: "Convolution24"
   top: "Convolution24"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -991,7 +991,7 @@ layer {
   bottom: "Convolution25"
   top: "Convolution25"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -1041,14 +1041,14 @@ layer {
   bottom: "Convolution27"
   top: "Convolution27"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
   name: "flow"
   type: "Convolution"
   bottom: "Convolution27"
-  top: "flow25"
+  top: "flow"
   convolution_param {
     num_output: 50
     bias_term: false
@@ -1072,7 +1072,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -2.8, \"ty\": -2.8}"
+    param_str: "{\"tx\": -1.4, \"ty\": -1.4}"
   }
 }
 layer {
@@ -1083,7 +1083,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -2.8, \"ty\": -1.4}"
+    param_str: "{\"tx\": -1.4, \"ty\": -0.7}"
   }
 }
 layer {
@@ -1104,7 +1104,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -2.8, \"ty\": 0}"
+    param_str: "{\"tx\": -1.4, \"ty\": 0}"
   }
 }
 layer {
@@ -1125,7 +1125,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -2.8, \"ty\": 1.4}"
+    param_str: "{\"tx\": -1.4, \"ty\": 0.7}"
   }
 }
 layer {
@@ -1146,7 +1146,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -2.8, \"ty\": 2.8}"
+    param_str: "{\"tx\": -1.4, \"ty\": 1.4}"
   }
 }
 layer {
@@ -1167,7 +1167,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 2.8}"
+    param_str: "{\"tx\": -0.7, \"ty\": -1.4}"
   }
 }
 layer {
@@ -1188,7 +1188,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -2.8}"
+    param_str: "{\"tx\": -0.7, \"ty\": -0.7}"
   }
 }
 layer {
@@ -1209,7 +1209,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -1.4}"
+    param_str: "{\"tx\": -0.7, \"ty\": 0}"
   }
 }
 layer {
@@ -1230,7 +1230,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 0}"
+    param_str: "{\"tx\": -0.7, \"ty\": 0.7}"
   }
 }
 layer {
@@ -1251,7 +1251,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 1.4}"
+    param_str: "{\"tx\": -0.7, \"ty\": 1.4}"
   }
 }
 layer {
@@ -1272,7 +1272,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 1.4}"
+    param_str: "{\"tx\": 0, \"ty\": -1.4}"
   }
 }
 layer {
@@ -1293,7 +1293,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 2.8}"
+    param_str: "{\"tx\": 0, \"ty\": -0.7}"
   }
 }
 layer {
@@ -1314,7 +1314,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -2.8}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1335,7 +1335,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -1.4}"
+    param_str: "{\"tx\": 0, \"ty\": 0.7}"
   }
 }
 layer {
@@ -1356,7 +1356,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 0}"
+    param_str: "{\"tx\": 0, \"ty\": 1.4}"
   }
 }
 layer {
@@ -1377,7 +1377,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 0}"
+    param_str: "{\"tx\": 0.7, \"ty\": -1.4}"
   }
 }
 layer {
@@ -1398,7 +1398,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 1.4}"
+    param_str: "{\"tx\": 0.7, \"ty\": -0.7}"
   }
 }
 layer {
@@ -1419,7 +1419,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 2.8}"
+    param_str: "{\"tx\": 0.7, \"ty\": 0}"
   }
 }
 layer {
@@ -1440,7 +1440,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -2.8}"
+    param_str: "{\"tx\": 0.7, \"ty\": 0.7}"
   }
 }
 layer {
@@ -1461,7 +1461,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -1.4}"
+    param_str: "{\"tx\": 0.7, \"ty\": 1.4}"
   }
 }
 layer {
@@ -1482,7 +1482,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -1.4}"
+    param_str: "{\"tx\": 1.4, \"ty\": -1.4}"
   }
 }
 layer {
@@ -1503,7 +1503,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 0}"
+    param_str: "{\"tx\": 1.4, \"ty\": -0.7}"
   }
 }
 layer {
@@ -1524,7 +1524,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 1.4}"
+    param_str: "{\"tx\": 1.4, \"ty\": 0}"
   }
 }
 layer {
@@ -1545,7 +1545,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 2.8}"
+    param_str: "{\"tx\": 1.4, \"ty\": 0.7}"
   }
 }
 layer {
@@ -1566,7 +1566,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -2.8}"
+    param_str: "{\"tx\": 1.4, \"ty\": 1.4}"
   }
 }
 layer {
@@ -1582,7 +1582,7 @@ layer {
 layer {
   name: "flow_h"
   type: "Slice"
-  bottom: "flow25"
+  bottom: "flow"
   top: "flow_h"
   top: "flow_v"
   slice_param {
@@ -1621,7 +1621,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source20.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source0.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1638,7 +1638,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source21.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source1.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1665,7 +1665,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source22.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source2.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1692,7 +1692,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source23.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source3.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1719,7 +1719,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source24.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source4.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1746,7 +1746,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source29.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source5.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1773,7 +1773,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source30.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source6.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1800,7 +1800,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source31.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source7.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1827,7 +1827,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source32.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source8.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1854,7 +1854,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source33.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source9.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1881,7 +1881,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source38.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source10.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1908,7 +1908,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source39.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source11.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1935,7 +1935,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source40.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source12.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1962,7 +1962,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source41.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source13.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -1989,7 +1989,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source42.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source14.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2016,7 +2016,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source47.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source15.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2043,7 +2043,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source48.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source16.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2070,7 +2070,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source49.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source17.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2097,7 +2097,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source50.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source18.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2124,7 +2124,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source51.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source19.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2151,7 +2151,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source56.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source20.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2178,7 +2178,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source57.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source21.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2205,7 +2205,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source58.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source22.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2232,7 +2232,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source59.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source23.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2259,7 +2259,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_9x9_2x/val_source60.txt"
+    source: "./datas/face_dataset/face_test_8x8/test_source24.txt"
     batch_size: 1
     shuffle: false
     new_height: 192

@@ -110,7 +110,7 @@ def lf_to_sais(i_start, i_finish):
 def gif_maker():
     TOT = 1
     SAI = 25
-    for i_tot in tqdm(range(0, 11)):
+    for i_tot in tqdm(range(0, 3)):
         img_list = []
         for i_sai in range(SAI):
             #i_pick = index_5x5_picker(i_sai)

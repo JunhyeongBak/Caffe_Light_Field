@@ -43,7 +43,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -2.8, \"ty\": -2.8}"
+    param_str: "{\"tx\": -1.4, \"ty\": -1.4}"
   }
 }
 layer {
@@ -54,7 +54,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -2.8, \"ty\": -1.4}"
+    param_str: "{\"tx\": -1.4, \"ty\": -0.7}"
   }
 }
 layer {
@@ -75,7 +75,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -2.8, \"ty\": 0}"
+    param_str: "{\"tx\": -1.4, \"ty\": 0}"
   }
 }
 layer {
@@ -96,7 +96,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -2.8, \"ty\": 1.4}"
+    param_str: "{\"tx\": -1.4, \"ty\": 0.7}"
   }
 }
 layer {
@@ -117,7 +117,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -2.8, \"ty\": 2.8}"
+    param_str: "{\"tx\": -1.4, \"ty\": 1.4}"
   }
 }
 layer {
@@ -138,7 +138,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 2.8}"
+    param_str: "{\"tx\": -0.7, \"ty\": -1.4}"
   }
 }
 layer {
@@ -159,7 +159,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -2.8}"
+    param_str: "{\"tx\": -0.7, \"ty\": -0.7}"
   }
 }
 layer {
@@ -180,7 +180,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -1.4}"
+    param_str: "{\"tx\": -0.7, \"ty\": 0}"
   }
 }
 layer {
@@ -201,7 +201,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 0}"
+    param_str: "{\"tx\": -0.7, \"ty\": 0.7}"
   }
 }
 layer {
@@ -222,7 +222,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 1.4}"
+    param_str: "{\"tx\": -0.7, \"ty\": 1.4}"
   }
 }
 layer {
@@ -243,7 +243,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 1.4}"
+    param_str: "{\"tx\": 0, \"ty\": -1.4}"
   }
 }
 layer {
@@ -264,7 +264,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 2.8}"
+    param_str: "{\"tx\": 0, \"ty\": -0.7}"
   }
 }
 layer {
@@ -285,7 +285,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -2.8}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -306,7 +306,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -1.4}"
+    param_str: "{\"tx\": 0, \"ty\": 0.7}"
   }
 }
 layer {
@@ -327,7 +327,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 0}"
+    param_str: "{\"tx\": 0, \"ty\": 1.4}"
   }
 }
 layer {
@@ -348,7 +348,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 0}"
+    param_str: "{\"tx\": 0.7, \"ty\": -1.4}"
   }
 }
 layer {
@@ -369,7 +369,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 1.4}"
+    param_str: "{\"tx\": 0.7, \"ty\": -0.7}"
   }
 }
 layer {
@@ -390,7 +390,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 2.8}"
+    param_str: "{\"tx\": 0.7, \"ty\": 0}"
   }
 }
 layer {
@@ -411,7 +411,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -2.8}"
+    param_str: "{\"tx\": 0.7, \"ty\": 0.7}"
   }
 }
 layer {
@@ -432,7 +432,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -1.4}"
+    param_str: "{\"tx\": 0.7, \"ty\": 1.4}"
   }
 }
 layer {
@@ -453,7 +453,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -1.4}"
+    param_str: "{\"tx\": 1.4, \"ty\": -1.4}"
   }
 }
 layer {
@@ -474,7 +474,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 0}"
+    param_str: "{\"tx\": 1.4, \"ty\": -0.7}"
   }
 }
 layer {
@@ -495,7 +495,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 1.4}"
+    param_str: "{\"tx\": 1.4, \"ty\": 0}"
   }
 }
 layer {
@@ -516,7 +516,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": 2.8}"
+    param_str: "{\"tx\": 1.4, \"ty\": 0.7}"
   }
 }
 layer {
@@ -537,7 +537,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -4.199999999999999, \"ty\": -2.8}"
+    param_str: "{\"tx\": 1.4, \"ty\": 1.4}"
   }
 }
 layer {
@@ -576,7 +576,7 @@ layer {
   bottom: "Convolution1"
   top: "Convolution1"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -626,7 +626,7 @@ layer {
   bottom: "Convolution3"
   top: "Convolution3"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -646,7 +646,7 @@ layer {
   bottom: "Pooling1"
   top: "Pooling1"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -675,7 +675,7 @@ layer {
   bottom: "Convolution4"
   top: "Convolution4"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -725,7 +725,7 @@ layer {
   bottom: "Convolution6"
   top: "Convolution6"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -745,7 +745,7 @@ layer {
   bottom: "Pooling2"
   top: "Pooling2"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -774,7 +774,7 @@ layer {
   bottom: "Convolution7"
   top: "Convolution7"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -824,7 +824,7 @@ layer {
   bottom: "Convolution9"
   top: "Convolution9"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -844,7 +844,7 @@ layer {
   bottom: "Pooling3"
   top: "Pooling3"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -873,7 +873,7 @@ layer {
   bottom: "Convolution10"
   top: "Convolution10"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -923,7 +923,7 @@ layer {
   bottom: "Convolution12"
   top: "Convolution12"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -943,7 +943,7 @@ layer {
   bottom: "Pooling4"
   top: "Pooling4"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -972,7 +972,7 @@ layer {
   bottom: "Convolution13"
   top: "Convolution13"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -1001,7 +1001,7 @@ layer {
   bottom: "Convolution14"
   top: "Convolution14"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -1040,7 +1040,7 @@ layer {
   bottom: "Eltwise1"
   top: "Eltwise1"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -1124,7 +1124,7 @@ layer {
   bottom: "Convolution16"
   top: "Convolution16"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -1174,7 +1174,7 @@ layer {
   bottom: "Convolution18"
   top: "Convolution18"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -1258,7 +1258,7 @@ layer {
   bottom: "Convolution19"
   top: "Convolution19"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -1308,7 +1308,7 @@ layer {
   bottom: "Convolution21"
   top: "Convolution21"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -1392,7 +1392,7 @@ layer {
   bottom: "Convolution22"
   top: "Convolution22"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -1442,7 +1442,7 @@ layer {
   bottom: "Convolution24"
   top: "Convolution24"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -1526,7 +1526,7 @@ layer {
   bottom: "Convolution25"
   top: "Convolution25"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
@@ -1576,14 +1576,14 @@ layer {
   bottom: "Convolution27"
   top: "Convolution27"
   relu_param {
-    negative_slope: 0.0
+    negative_slope: 0.2
   }
 }
 layer {
   name: "flow"
   type: "Convolution"
   bottom: "Convolution27"
-  top: "flow25"
+  top: "flow"
   convolution_param {
     num_output: 50
     bias_term: false
@@ -1602,7 +1602,7 @@ layer {
 layer {
   name: "flow_h"
   type: "Slice"
-  bottom: "flow25"
+  bottom: "flow"
   top: "flow_h"
   top: "flow_v"
   slice_param {

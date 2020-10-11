@@ -6,18 +6,16 @@ import numpy as np
 import threading
 import time
 import Queue
-#import denseUNet
+import denseUNet
 np.set_printoptions(threshold=sys.maxsize)
 running = False
 capture_thread = None
 form_class = uic.loadUiType("simple.ui")[0]
 q = Queue.Queue()
 
-SHIFT_VAL = -1.4 
 DEPLOY_PATH = './scripts/denseUNet_deploy.prototxt'
-MODEL_PATH = './models'
-#denseUNet.denseUNet_deploy(DEPLOY_PATH, tot=1207, sai=25, batch_size=1, shift_val=SHIFT_VAL)
-
+MODEL_PATH = './models/denseUNet_solver_iter_2000.caffemodel'
+denseUNet.denseUNet_deploy(script_path=DEPLOY_PATH, batch_size=1, sai=25, shift_val=0.7)
 
 face_mask = cv2.imread('./face_color.png', 1)
 face_mask = cv2.resize(face_mask, (468, 351), interpolation = cv2.INTER_CUBIC)
@@ -138,7 +136,9 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
                 img_frame = img_frame[:, 80:80+480, :]
                 img_frame = cv2.resize(img_frame, (192, 192), interpolation=cv2.INTER_CUBIC)
                 #test_img = cv2.imread('./test.png', 1)
-                self.img_list = denseUNet.denseUNet_runner(DEPLOY_PATH, MODEL_PATH+'/denseUNet_solver_iter_44659.caffemodel', img_frame)
+
+                self.img_list, ret = denseUNet.denseUNet_runner(script_path=DEPLOY_PATH, model_path=MODEL_PATH, src_color=img_frame, n=None)
+                ret = None
                 self.test_cnt = self.test_cnt + 1
                 self.render_init = True
 
