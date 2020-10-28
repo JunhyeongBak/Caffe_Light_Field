@@ -7,7 +7,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source12.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source12.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -32,6 +32,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -42,6 +43,7 @@ layer {
   top: "Convolution1"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -62,6 +64,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -82,6 +85,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -92,6 +96,7 @@ layer {
   top: "Convolution3"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -112,6 +117,7 @@ layer {
   top: "Pooling1"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -131,6 +137,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -141,6 +148,7 @@ layer {
   top: "Convolution4"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -161,6 +169,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -181,6 +190,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -191,6 +201,7 @@ layer {
   top: "Convolution6"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -211,6 +222,7 @@ layer {
   top: "Pooling2"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -230,6 +242,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -240,6 +253,7 @@ layer {
   top: "Convolution7"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -260,6 +274,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -280,6 +295,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -290,6 +306,7 @@ layer {
   top: "Convolution9"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -310,6 +327,7 @@ layer {
   top: "Pooling3"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -329,6 +347,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -339,6 +358,7 @@ layer {
   top: "Convolution10"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -359,6 +379,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -379,6 +400,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -389,6 +411,7 @@ layer {
   top: "Convolution12"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -409,6 +432,7 @@ layer {
   top: "Pooling4"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -428,6 +452,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -438,6 +463,7 @@ layer {
   top: "Convolution13"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -457,6 +483,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 3
   }
 }
@@ -467,6 +494,7 @@ layer {
   top: "Convolution14"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -486,6 +514,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 6
   }
 }
@@ -506,6 +535,7 @@ layer {
   top: "Eltwise1"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -580,6 +610,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -590,6 +621,7 @@ layer {
   top: "Convolution16"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -610,6 +642,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -630,6 +663,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -640,6 +674,7 @@ layer {
   top: "Convolution18"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -714,6 +749,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -724,6 +760,7 @@ layer {
   top: "Convolution19"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -744,6 +781,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -764,6 +802,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -774,6 +813,7 @@ layer {
   top: "Convolution21"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -848,6 +888,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -858,6 +899,7 @@ layer {
   top: "Convolution22"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -878,6 +920,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -898,6 +941,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -908,6 +952,7 @@ layer {
   top: "Convolution24"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -982,6 +1027,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -992,6 +1038,7 @@ layer {
   top: "Convolution25"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -1012,6 +1059,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -1032,6 +1080,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -1042,6 +1091,7 @@ layer {
   top: "Convolution27"
   relu_param {
     negative_slope: 0.2
+    engine: CAFFE
   }
 }
 layer {
@@ -1061,6 +1111,7 @@ layer {
     bias_filler {
       type: "msra"
     }
+    engine: CAFFE
     dilation: 1
   }
 }
@@ -1072,7 +1123,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.4, \"ty\": -1.4}"
+    param_str: "{\"tx\": -1.5525, \"ty\": -1.5525}"
   }
 }
 layer {
@@ -1083,7 +1134,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.4, \"ty\": -0.7}"
+    param_str: "{\"tx\": -1.5525, \"ty\": -0.77625}"
   }
 }
 layer {
@@ -1104,7 +1155,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.4, \"ty\": 0}"
+    param_str: "{\"tx\": -1.5525, \"ty\": 0}"
   }
 }
 layer {
@@ -1125,7 +1176,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.4, \"ty\": 0.7}"
+    param_str: "{\"tx\": -1.5525, \"ty\": 0.77625}"
   }
 }
 layer {
@@ -1146,7 +1197,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.4, \"ty\": 1.4}"
+    param_str: "{\"tx\": -1.5525, \"ty\": 1.5525}"
   }
 }
 layer {
@@ -1167,7 +1218,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.7, \"ty\": -1.4}"
+    param_str: "{\"tx\": -0.77625, \"ty\": -1.5525}"
   }
 }
 layer {
@@ -1188,7 +1239,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.7, \"ty\": -0.7}"
+    param_str: "{\"tx\": -0.77625, \"ty\": -0.77625}"
   }
 }
 layer {
@@ -1209,7 +1260,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.7, \"ty\": 0}"
+    param_str: "{\"tx\": -0.77625, \"ty\": 0}"
   }
 }
 layer {
@@ -1230,7 +1281,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.7, \"ty\": 0.7}"
+    param_str: "{\"tx\": -0.77625, \"ty\": 0.77625}"
   }
 }
 layer {
@@ -1251,7 +1302,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.7, \"ty\": 1.4}"
+    param_str: "{\"tx\": -0.77625, \"ty\": 1.5525}"
   }
 }
 layer {
@@ -1272,7 +1323,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -1.4}"
+    param_str: "{\"tx\": 0, \"ty\": -1.5525}"
   }
 }
 layer {
@@ -1293,7 +1344,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -0.7}"
+    param_str: "{\"tx\": 0, \"ty\": -0.77625}"
   }
 }
 layer {
@@ -1335,7 +1386,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 0.7}"
+    param_str: "{\"tx\": 0, \"ty\": 0.77625}"
   }
 }
 layer {
@@ -1356,7 +1407,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 1.4}"
+    param_str: "{\"tx\": 0, \"ty\": 1.5525}"
   }
 }
 layer {
@@ -1377,7 +1428,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.7, \"ty\": -1.4}"
+    param_str: "{\"tx\": 0.77625, \"ty\": -1.5525}"
   }
 }
 layer {
@@ -1398,7 +1449,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.7, \"ty\": -0.7}"
+    param_str: "{\"tx\": 0.77625, \"ty\": -0.77625}"
   }
 }
 layer {
@@ -1419,7 +1470,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.7, \"ty\": 0}"
+    param_str: "{\"tx\": 0.77625, \"ty\": 0}"
   }
 }
 layer {
@@ -1440,7 +1491,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.7, \"ty\": 0.7}"
+    param_str: "{\"tx\": 0.77625, \"ty\": 0.77625}"
   }
 }
 layer {
@@ -1461,7 +1512,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.7, \"ty\": 1.4}"
+    param_str: "{\"tx\": 0.77625, \"ty\": 1.5525}"
   }
 }
 layer {
@@ -1482,7 +1533,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.4, \"ty\": -1.4}"
+    param_str: "{\"tx\": 1.5525, \"ty\": -1.5525}"
   }
 }
 layer {
@@ -1503,7 +1554,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.4, \"ty\": -0.7}"
+    param_str: "{\"tx\": 1.5525, \"ty\": -0.77625}"
   }
 }
 layer {
@@ -1524,7 +1575,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.4, \"ty\": 0}"
+    param_str: "{\"tx\": 1.5525, \"ty\": 0}"
   }
 }
 layer {
@@ -1545,7 +1596,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.4, \"ty\": 0.7}"
+    param_str: "{\"tx\": 1.5525, \"ty\": 0.77625}"
   }
 }
 layer {
@@ -1566,7 +1617,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.4, \"ty\": 1.4}"
+    param_str: "{\"tx\": 1.5525, \"ty\": 1.5525}"
   }
 }
 layer {
@@ -2831,7 +2882,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source0.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source0.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2848,7 +2899,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source1.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source1.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2875,7 +2926,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source2.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source2.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2902,7 +2953,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source3.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source3.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2929,7 +2980,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source4.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source4.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2956,7 +3007,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source5.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source5.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -2983,7 +3034,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source6.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source6.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3010,7 +3061,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source7.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source7.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3037,7 +3088,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source8.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source8.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3064,7 +3115,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source9.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source9.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3091,7 +3142,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source10.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source10.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3118,7 +3169,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source11.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source11.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3145,7 +3196,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source12.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source12.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3172,7 +3223,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source13.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source13.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3199,7 +3250,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source14.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source14.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3226,7 +3277,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source15.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source15.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3253,7 +3304,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source16.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source16.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3280,7 +3331,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source17.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source17.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3307,7 +3358,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source18.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source18.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3334,7 +3385,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source19.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source19.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3361,7 +3412,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source20.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source20.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3388,7 +3439,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source21.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source21.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3415,7 +3466,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source22.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source22.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3442,7 +3493,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source23.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source23.txt"
     batch_size: 1
     shuffle: false
     new_height: 192
@@ -3469,7 +3520,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_8x8/train_source24.txt"
+    source: "./datas/face_dataset/face_train_9x9/train_source24.txt"
     batch_size: 1
     shuffle: false
     new_height: 192

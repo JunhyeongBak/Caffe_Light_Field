@@ -186,7 +186,7 @@ def shift_value_5x5(i, shift_val):
     return tx, ty
 
 def index_picker_5x5(i):
-    PICK_MODE = '8x8_1'
+    PICK_MODE = '9x9_2'
     if PICK_MODE == '9x9_2':
         id_list = [20, 21, 22, 23, 24,
                     29, 30, 31, 32, 33,
@@ -272,44 +272,46 @@ def slice_warp(shift, flow_h, flow_v, sai):
 def denseUNet(input, batch_size):
     def flow_layer(bottom=None, nout=1):
         conv = L.Convolution(bottom, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), name='flow')
+                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), name='flow', engine=1)
         return conv
 
     def conv_conv_group_layer(bottom=None, nout=1):
         conv = L.Convolution(bottom, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'))
-        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
+                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         conv = L.Convolution(conv, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
-                                group=nout, bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'))
+                                group=nout, bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        #conv = L.ShuffleChannel(conv, group=nout)
         conv = L.Convolution(conv, num_output=nout, kernel_size=1, stride=1, dilation=1, pad=0,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'))
-        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
+                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         return conv
 
     def conv_conv_res_dense_layer(bottom=None, nout=1):
         bottom = L.Convolution(bottom, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'))
-        bottom = L.ReLU(bottom, relu_param=dict(negative_slope=0.2), in_place=True)
+                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        bottom = L.ReLU(bottom, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         conv = L.Convolution(bottom, num_output=nout, kernel_size=3, stride=1, dilation=3, pad=3,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'))
-        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
+                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         conv = L.Convolution(conv, num_output=nout, kernel_size=3, stride=1, dilation=6, pad=6,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'))
+                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         elth = L.Eltwise(conv, bottom, operation=P.Eltwise.SUM)
-        elth = L.ReLU(elth, relu_param=dict(negative_slope=0.2), in_place=True)
+        elth = L.ReLU(elth, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         return elth   
 
     def conv_conv_downsample_group_layer(bottom=None, nout=1):
         conv = L.Convolution(bottom, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'))
-        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
+                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         conv = L.Convolution(conv, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
-                                group=nout, bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'))
+                                group=nout, bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        #conv = L.ShuffleChannel(conv, group=nout)
         conv = L.Convolution(conv, num_output=nout, kernel_size=1, stride=1, dilation=1, pad=0,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'))
-        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True)
+                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         pool = L.Pooling(conv, kernel_size=3, stride=2, pool=P.Pooling.MAX)
-        pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=True)
+        pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         return conv, pool
 
     def upsample_concat_layer(bottom1=None, bottom2=None, nout=1, crop_size=0):
@@ -597,7 +599,7 @@ def denseUNet_tester(script_path=None,
         # Print LF
         sai_GT_list2 = trans_order(sai_GT_list)
         lf_GT = trans_SAIs_to_LF(sai_GT_list2)
-        cv2.imwrite(output_GT_path+'/output_GT/result_lf'+str(i_tot)+'.jpg', lf_GT)
+        cv2.imwrite(output_GT_path+'/result_lf'+str(i_tot)+'.jpg', lf_GT)
         
         # Print Grid and EPI
         sai_GT_uv = np.zeros((192, 192, 3, 5, 5))
@@ -654,9 +656,9 @@ def denseUNet_tester(script_path=None,
 
 if __name__ == "__main__":
     # Constant
-    TRAINSET_PATH = './datas/face_dataset/face_train_8x8'
-    TESTSET_PATH = './datas/face_dataset/face_test_8x8'
-    MODEL_PATH = './models/denseUNet_solver_iter_2000.caffemodel'
+    TRAINSET_PATH = './datas/face_dataset/face_train_9x9'
+    TESTSET_PATH = './datas/face_dataset/face_train_9x9'
+    MODEL_PATH = './models/denseUNet_solver_iter_5000.caffemodel'
     TRAIN_PATH = './scripts/denseUNet_train.prototxt'
     TEST_PATH = './scripts/denseUNet_test.prototxt'
     DEPLOY_PATH = './scripts/denseUNet_deploy.prototxt'
@@ -664,10 +666,10 @@ if __name__ == "__main__":
     OUTPUT_PREDICT = './output/predict'
     OUTPUT_GT = './output/GT'
 
-    TRAIN_TOT = 1207
+    TRAIN_TOT = 100
     SAI = 25
-    SHIFT_VAL = 0.7 #-1.4
-    MOD = 'test'
+    SHIFT_VAL = 0.77625 #-1.4
+    MOD = 'train'
     
     # Generate Network and Solver
     denseUNet_train(script_path=TRAIN_PATH, data_path=TRAINSET_PATH, tot=TRAIN_TOT, sai=SAI, batch_size=1, shift_val=SHIFT_VAL)
@@ -685,7 +687,7 @@ if __name__ == "__main__":
                             dataset_path=TESTSET_PATH,
                             output_predict_path=OUTPUT_PREDICT,
                             output_GT_path=OUTPUT_GT,
-                            test_range=98)
+                            test_range=100)
     elif MOD == 'run':
         test_img = cv2.imread('./test3.png', 1)
         test_img = cv2.resize(test_img, (192, 192), interpolation=cv2.INTER_AREA)
