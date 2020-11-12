@@ -6,8 +6,8 @@ layer {
     shape {
       dim: 1
       dim: 3
-      dim: 192
-      dim: 192
+      dim: 256
+      dim: 256
     }
   }
 }
@@ -19,8 +19,8 @@ layer {
     shape {
       dim: 1
       dim: 1
-      dim: 192
-      dim: 192
+      dim: 256
+      dim: 256
     }
   }
 }
@@ -1009,6 +1009,111 @@ layer {
   convolution_param {
     num_output: 256
     bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 256
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 1
+  }
+}
+layer {
+  name: "Convolution15"
+  type: "Convolution"
+  bottom: "Convolution14"
+  top: "Convolution15"
+  convolution_param {
+    num_output: 256
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 1
+  }
+}
+layer {
+  name: "ReLU14"
+  type: "ReLU"
+  bottom: "Convolution15"
+  top: "Convolution15"
+  relu_param {
+    negative_slope: 0.2
+    engine: CAFFE
+  }
+}
+layer {
+  name: "Pooling5"
+  type: "Pooling"
+  bottom: "Convolution15"
+  top: "Pooling5"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "ReLU15"
+  type: "ReLU"
+  bottom: "Pooling5"
+  top: "Pooling5"
+  relu_param {
+    negative_slope: 0.2
+    engine: CAFFE
+  }
+}
+layer {
+  name: "Convolution16"
+  type: "Convolution"
+  bottom: "Pooling5"
+  top: "Convolution16"
+  convolution_param {
+    num_output: 256
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 1
+  }
+}
+layer {
+  name: "ReLU16"
+  type: "ReLU"
+  bottom: "Convolution16"
+  top: "Convolution16"
+  relu_param {
+    negative_slope: 0.2
+    engine: CAFFE
+  }
+}
+layer {
+  name: "Convolution17"
+  type: "Convolution"
+  bottom: "Convolution16"
+  top: "Convolution17"
+  convolution_param {
+    num_output: 256
+    bias_term: false
     pad: 3
     kernel_size: 3
     stride: 1
@@ -1023,20 +1128,20 @@ layer {
   }
 }
 layer {
-  name: "ReLU14"
+  name: "ReLU17"
   type: "ReLU"
-  bottom: "Convolution14"
-  top: "Convolution14"
+  bottom: "Convolution17"
+  top: "Convolution17"
   relu_param {
     negative_slope: 0.2
     engine: CAFFE
   }
 }
 layer {
-  name: "Convolution15"
+  name: "Convolution18"
   type: "Convolution"
-  bottom: "Convolution14"
-  top: "Convolution15"
+  bottom: "Convolution17"
+  top: "Convolution18"
   convolution_param {
     num_output: 256
     bias_term: false
@@ -1056,15 +1161,15 @@ layer {
 layer {
   name: "Eltwise1"
   type: "Eltwise"
-  bottom: "Convolution15"
-  bottom: "Convolution13"
+  bottom: "Convolution18"
+  bottom: "Convolution16"
   top: "Eltwise1"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
-  name: "ReLU15"
+  name: "ReLU18"
   type: "ReLU"
   bottom: "Eltwise1"
   top: "Eltwise1"
@@ -1079,14 +1184,14 @@ layer {
   bottom: "Eltwise1"
   top: "Deconvolution1"
   convolution_param {
-    num_output: 128
+    num_output: 256
     pad: 0
     kernel_size: 3
     stride: 2
   }
 }
 layer {
-  name: "ReLU16"
+  name: "ReLU19"
   type: "ReLU"
   bottom: "Deconvolution1"
   top: "Deconvolution1"
@@ -1101,9 +1206,9 @@ layer {
   dummy_data_param {
     shape {
       dim: 1
-      dim: 128
-      dim: 24
-      dim: 24
+      dim: 256
+      dim: 16
+      dim: 16
     }
   }
 }
@@ -1114,7 +1219,9 @@ layer {
   bottom: "DummyData1"
   top: "Crop1"
   crop_param {
-    axis: 2
+    axis: 1
+    offset: 0
+    offset: 0
     offset: 0
   }
 }
@@ -1122,147 +1229,8 @@ layer {
   name: "Concat24"
   type: "Concat"
   bottom: "Crop1"
-  bottom: "Convolution12"
+  bottom: "Convolution15"
   top: "Concat24"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Convolution16"
-  type: "Convolution"
-  bottom: "Concat24"
-  top: "Convolution16"
-  convolution_param {
-    num_output: 128
-    bias_term: false
-    pad: 1
-    kernel_size: 3
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-    bias_filler {
-      type: "msra"
-    }
-    engine: CAFFE
-    dilation: 1
-  }
-}
-layer {
-  name: "ReLU17"
-  type: "ReLU"
-  bottom: "Convolution16"
-  top: "Convolution16"
-  relu_param {
-    negative_slope: 0.2
-    engine: CAFFE
-  }
-}
-layer {
-  name: "Convolution17"
-  type: "Convolution"
-  bottom: "Convolution16"
-  top: "Convolution17"
-  convolution_param {
-    num_output: 128
-    bias_term: false
-    pad: 1
-    kernel_size: 3
-    group: 128
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-    bias_filler {
-      type: "msra"
-    }
-    engine: CAFFE
-    dilation: 1
-  }
-}
-layer {
-  name: "Convolution18"
-  type: "Convolution"
-  bottom: "Convolution17"
-  top: "Convolution18"
-  convolution_param {
-    num_output: 128
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-    bias_filler {
-      type: "msra"
-    }
-    engine: CAFFE
-    dilation: 1
-  }
-}
-layer {
-  name: "ReLU18"
-  type: "ReLU"
-  bottom: "Convolution18"
-  top: "Convolution18"
-  relu_param {
-    negative_slope: 0.2
-    engine: CAFFE
-  }
-}
-layer {
-  name: "Deconvolution2"
-  type: "Deconvolution"
-  bottom: "Convolution18"
-  top: "Deconvolution2"
-  convolution_param {
-    num_output: 64
-    pad: 0
-    kernel_size: 3
-    stride: 2
-  }
-}
-layer {
-  name: "ReLU19"
-  type: "ReLU"
-  bottom: "Deconvolution2"
-  top: "Deconvolution2"
-  relu_param {
-    negative_slope: 0.2
-  }
-}
-layer {
-  name: "DummyData2"
-  type: "DummyData"
-  top: "DummyData2"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 64
-      dim: 48
-      dim: 48
-    }
-  }
-}
-layer {
-  name: "Crop2"
-  type: "Crop"
-  bottom: "Deconvolution2"
-  bottom: "DummyData2"
-  top: "Crop2"
-  crop_param {
-    axis: 2
-    offset: 0
-  }
-}
-layer {
-  name: "Concat25"
-  type: "Concat"
-  bottom: "Crop2"
-  bottom: "Convolution9"
-  top: "Concat25"
   concat_param {
     axis: 1
   }
@@ -1270,10 +1238,10 @@ layer {
 layer {
   name: "Convolution19"
   type: "Convolution"
-  bottom: "Concat25"
+  bottom: "Concat24"
   top: "Convolution19"
   convolution_param {
-    num_output: 64
+    num_output: 256
     bias_term: false
     pad: 1
     kernel_size: 3
@@ -1304,11 +1272,11 @@ layer {
   bottom: "Convolution19"
   top: "Convolution20"
   convolution_param {
-    num_output: 64
+    num_output: 256
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 64
+    group: 256
     stride: 1
     weight_filler {
       type: "msra"
@@ -1326,7 +1294,7 @@ layer {
   bottom: "Convolution20"
   top: "Convolution21"
   convolution_param {
-    num_output: 64
+    num_output: 256
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -1352,12 +1320,12 @@ layer {
   }
 }
 layer {
-  name: "Deconvolution3"
+  name: "Deconvolution2"
   type: "Deconvolution"
   bottom: "Convolution21"
-  top: "Deconvolution3"
+  top: "Deconvolution2"
   convolution_param {
-    num_output: 64
+    num_output: 128
     pad: 0
     kernel_size: 3
     stride: 2
@@ -1366,42 +1334,44 @@ layer {
 layer {
   name: "ReLU22"
   type: "ReLU"
-  bottom: "Deconvolution3"
-  top: "Deconvolution3"
+  bottom: "Deconvolution2"
+  top: "Deconvolution2"
   relu_param {
     negative_slope: 0.2
   }
 }
 layer {
-  name: "DummyData3"
+  name: "DummyData2"
   type: "DummyData"
-  top: "DummyData3"
+  top: "DummyData2"
   dummy_data_param {
     shape {
       dim: 1
-      dim: 64
-      dim: 96
-      dim: 96
+      dim: 128
+      dim: 32
+      dim: 32
     }
   }
 }
 layer {
-  name: "Crop3"
+  name: "Crop2"
   type: "Crop"
-  bottom: "Deconvolution3"
-  bottom: "DummyData3"
-  top: "Crop3"
+  bottom: "Deconvolution2"
+  bottom: "DummyData2"
+  top: "Crop2"
   crop_param {
-    axis: 2
+    axis: 1
+    offset: 0
+    offset: 0
     offset: 0
   }
 }
 layer {
-  name: "Concat26"
+  name: "Concat25"
   type: "Concat"
-  bottom: "Crop3"
-  bottom: "Convolution6"
-  top: "Concat26"
+  bottom: "Crop2"
+  bottom: "Convolution12"
+  top: "Concat25"
   concat_param {
     axis: 1
   }
@@ -1409,10 +1379,10 @@ layer {
 layer {
   name: "Convolution22"
   type: "Convolution"
-  bottom: "Concat26"
+  bottom: "Concat25"
   top: "Convolution22"
   convolution_param {
-    num_output: 64
+    num_output: 128
     bias_term: false
     pad: 1
     kernel_size: 3
@@ -1443,11 +1413,11 @@ layer {
   bottom: "Convolution22"
   top: "Convolution23"
   convolution_param {
-    num_output: 64
+    num_output: 128
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 64
+    group: 128
     stride: 1
     weight_filler {
       type: "msra"
@@ -1465,7 +1435,7 @@ layer {
   bottom: "Convolution23"
   top: "Convolution24"
   convolution_param {
-    num_output: 64
+    num_output: 128
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -1491,10 +1461,10 @@ layer {
   }
 }
 layer {
-  name: "Deconvolution4"
+  name: "Deconvolution3"
   type: "Deconvolution"
   bottom: "Convolution24"
-  top: "Deconvolution4"
+  top: "Deconvolution3"
   convolution_param {
     num_output: 64
     pad: 0
@@ -1505,42 +1475,44 @@ layer {
 layer {
   name: "ReLU25"
   type: "ReLU"
-  bottom: "Deconvolution4"
-  top: "Deconvolution4"
+  bottom: "Deconvolution3"
+  top: "Deconvolution3"
   relu_param {
     negative_slope: 0.2
   }
 }
 layer {
-  name: "DummyData4"
+  name: "DummyData3"
   type: "DummyData"
-  top: "DummyData4"
+  top: "DummyData3"
   dummy_data_param {
     shape {
       dim: 1
       dim: 64
-      dim: 192
-      dim: 192
+      dim: 64
+      dim: 64
     }
   }
 }
 layer {
-  name: "Crop4"
+  name: "Crop3"
   type: "Crop"
-  bottom: "Deconvolution4"
-  bottom: "DummyData4"
-  top: "Crop4"
+  bottom: "Deconvolution3"
+  bottom: "DummyData3"
+  top: "Crop3"
   crop_param {
-    axis: 2
+    axis: 1
+    offset: 0
+    offset: 0
     offset: 0
   }
 }
 layer {
-  name: "Concat27"
+  name: "Concat26"
   type: "Concat"
-  bottom: "Crop4"
-  bottom: "Convolution3"
-  top: "Concat27"
+  bottom: "Crop3"
+  bottom: "Convolution9"
+  top: "Concat26"
   concat_param {
     axis: 1
   }
@@ -1548,7 +1520,7 @@ layer {
 layer {
   name: "Convolution25"
   type: "Convolution"
-  bottom: "Concat27"
+  bottom: "Concat26"
   top: "Convolution25"
   convolution_param {
     num_output: 64
@@ -1630,12 +1602,69 @@ layer {
   }
 }
 layer {
-  name: "flow"
-  type: "Convolution"
+  name: "Deconvolution4"
+  type: "Deconvolution"
   bottom: "Convolution27"
-  top: "flow"
+  top: "Deconvolution4"
   convolution_param {
-    num_output: 50
+    num_output: 32
+    pad: 0
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "ReLU28"
+  type: "ReLU"
+  bottom: "Deconvolution4"
+  top: "Deconvolution4"
+  relu_param {
+    negative_slope: 0.2
+  }
+}
+layer {
+  name: "DummyData4"
+  type: "DummyData"
+  top: "DummyData4"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 32
+      dim: 128
+      dim: 128
+    }
+  }
+}
+layer {
+  name: "Crop4"
+  type: "Crop"
+  bottom: "Deconvolution4"
+  bottom: "DummyData4"
+  top: "Crop4"
+  crop_param {
+    axis: 1
+    offset: 0
+    offset: 0
+    offset: 0
+  }
+}
+layer {
+  name: "Concat27"
+  type: "Concat"
+  bottom: "Crop4"
+  bottom: "Convolution6"
+  top: "Concat27"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "Convolution28"
+  type: "Convolution"
+  bottom: "Concat27"
+  top: "Convolution28"
+  convolution_param {
+    num_output: 32
     bias_term: false
     pad: 1
     kernel_size: 3
@@ -1649,6 +1678,268 @@ layer {
     engine: CAFFE
     dilation: 1
   }
+}
+layer {
+  name: "ReLU29"
+  type: "ReLU"
+  bottom: "Convolution28"
+  top: "Convolution28"
+  relu_param {
+    negative_slope: 0.2
+    engine: CAFFE
+  }
+}
+layer {
+  name: "Convolution29"
+  type: "Convolution"
+  bottom: "Convolution28"
+  top: "Convolution29"
+  convolution_param {
+    num_output: 32
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 32
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 1
+  }
+}
+layer {
+  name: "Convolution30"
+  type: "Convolution"
+  bottom: "Convolution29"
+  top: "Convolution30"
+  convolution_param {
+    num_output: 32
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 1
+  }
+}
+layer {
+  name: "ReLU30"
+  type: "ReLU"
+  bottom: "Convolution30"
+  top: "Convolution30"
+  relu_param {
+    negative_slope: 0.2
+    engine: CAFFE
+  }
+}
+layer {
+  name: "Deconvolution5"
+  type: "Deconvolution"
+  bottom: "Convolution30"
+  top: "Deconvolution5"
+  convolution_param {
+    num_output: 16
+    pad: 0
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "ReLU31"
+  type: "ReLU"
+  bottom: "Deconvolution5"
+  top: "Deconvolution5"
+  relu_param {
+    negative_slope: 0.2
+  }
+}
+layer {
+  name: "DummyData5"
+  type: "DummyData"
+  top: "DummyData5"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 16
+      dim: 256
+      dim: 256
+    }
+  }
+}
+layer {
+  name: "Crop5"
+  type: "Crop"
+  bottom: "Deconvolution5"
+  bottom: "DummyData5"
+  top: "Crop5"
+  crop_param {
+    axis: 1
+    offset: 0
+    offset: 0
+    offset: 0
+  }
+}
+layer {
+  name: "Concat28"
+  type: "Concat"
+  bottom: "Crop5"
+  bottom: "Convolution3"
+  top: "Concat28"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "Convolution31"
+  type: "Convolution"
+  bottom: "Concat28"
+  top: "Convolution31"
+  convolution_param {
+    num_output: 16
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 1
+  }
+}
+layer {
+  name: "ReLU32"
+  type: "ReLU"
+  bottom: "Convolution31"
+  top: "Convolution31"
+  relu_param {
+    negative_slope: 0.2
+    engine: CAFFE
+  }
+}
+layer {
+  name: "Convolution32"
+  type: "Convolution"
+  bottom: "Convolution31"
+  top: "Convolution32"
+  convolution_param {
+    num_output: 16
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 16
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 1
+  }
+}
+layer {
+  name: "Convolution33"
+  type: "Convolution"
+  bottom: "Convolution32"
+  top: "Convolution33"
+  convolution_param {
+    num_output: 16
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 1
+  }
+}
+layer {
+  name: "ReLU33"
+  type: "ReLU"
+  bottom: "Convolution33"
+  top: "Convolution33"
+  relu_param {
+    negative_slope: 0.2
+    engine: CAFFE
+  }
+}
+layer {
+  name: "ReLU34"
+  type: "ReLU"
+  bottom: "Convolution33"
+  top: "Convolution33"
+  relu_param {
+    engine: CAFFE
+  }
+}
+layer {
+  name: "flow_init"
+  type: "Convolution"
+  bottom: "Convolution33"
+  top: "flow_init"
+  convolution_param {
+    num_output: 1
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 1
+  }
+}
+layer {
+  name: "flow"
+  type: "Convolution"
+  bottom: "flow_init"
+  top: "flow"
+  convolution_param {
+    num_output: 50
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 1
+  }
+}
+layer {
+  name: "silence"
+  type: "Silence"
+  bottom: "flow_init"
 }
 layer {
   name: "flow_h"

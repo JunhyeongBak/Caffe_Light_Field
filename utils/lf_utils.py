@@ -8,7 +8,7 @@ from multiprocessing import Process
 from threading import Thread
 
 def index_5x5_picker(i):
-    '''
+
     list_5x5 = [20, 21, 22, 23, 24,
                 29, 30, 31, 32, 33,
                 38, 39, 40, 41, 42,
@@ -20,7 +20,7 @@ def index_5x5_picker(i):
                 25, 26, 27, 28, 29,
                 33, 34, 35, 36, 37,
                 41, 42, 43, 44, 45]
-    
+    '''
     i_dst = list_5x5[i]
     return i_dst
 
@@ -110,13 +110,13 @@ def lf_to_sais(i_start, i_finish):
 def gif_maker():
     TOT = 1
     SAI = 25
-    for i_tot in tqdm(range(0, 3)):
+    for i_tot in tqdm(range(0, 100)):
         img_list = []
         for i_sai in range(SAI):
-            #i_pick = index_5x5_picker(i_sai)
-            img_src = cv2.imread('./utils/gif/sai'+str(i_tot)+'_'+str(i_sai)+'.png', cv2.IMREAD_COLOR)
+            i_pick = index_5x5_picker(i_sai)
+            img_src = cv2.imread('./utils/gif/sai'+str(i_tot)+'_'+str(i_pick)+'.png', cv2.IMREAD_COLOR)
             print(img_src.shape)
-            img_src = cv2.resize(img_src, dsize=(192, 192), interpolation=cv2.INTER_AREA)
+            img_src = cv2.resize(img_src, dsize=(256, 256), interpolation=cv2.INTER_AREA)
             cv2.imwrite('./utils/test'+str(i_sai)+'.png', img_src)
             img_src = cv2.cvtColor(img_src, cv2.COLOR_BGR2RGB)
             img_list.append(img_src)

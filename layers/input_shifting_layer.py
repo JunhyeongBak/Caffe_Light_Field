@@ -28,6 +28,4 @@ class InputShiftingLayer(caffe.Layer):
                                                             flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
     def backward(self, top, propagate_down, bottom):
-        # Transfer gradient
-        #top[0].diff = bottom[0].diff
         pass
