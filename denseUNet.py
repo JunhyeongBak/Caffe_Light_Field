@@ -59,14 +59,11 @@ from caffe import layers as L
 from caffe import params as P
 import time
 import math
+import argparse
 
 np.set_printoptions(threshold=sys.maxsize) # Numpy maximum print
 
-if os.cpu_count() > 2: # For PC
-    caffe.set_mode_gpu() 
-    import skimage
-else: # For RK3399
-    caffe.set_mode_cpu() 
+caffe.set_mode_gpu() 
 
 ####################################################################################################
 ##########                               Public Function                                  ##########
@@ -202,15 +199,14 @@ def shift_value_5x5(i, shift_val):
         ty = 3*shift_val
     return tx, ty
 
-def index_picker_5x5(i):
-    PICK_MODE = '9x9'
-    if PICK_MODE == '9x9':
+def index_picker_5x5(i, pick_mode='9x9'):
+    if pick_mode == '9x9':
         id_list = [20, 21, 22, 23, 24,
                     29, 30, 31, 32, 33,
                     38, 39, 40, 41, 42,
                     47, 48, 49, 50, 51,
                     56, 57, 58, 59, 60]
-    elif PICK_MODE == '8x8':
+    elif pick_mode == '8x8':
         id_list = [9, 10, 11, 12, 13,
                     17, 18, 19, 20, 21,
                     25, 26, 27, 28, 29,
@@ -218,23 +214,21 @@ def index_picker_5x5(i):
                     41, 42, 43, 44, 45]
     return id_list[i]
 
-def image_data_center(batch_size=1, data_path=None, source='train_source'):
-    CENTER_ID = 12
+def image_data_center(batch_size, data_path, center_id):
     center, trash = L.ImageData(batch_size=batch_size,
-                        source=data_path+'/'+source+str(CENTER_ID)+'.txt',
+                        source=data_path+'/dataset_list'+str(center_id)+'.txt',
                         transform_param=dict(scale=1./256.),
                         shuffle=False,
                         ntop=2,
                         new_height=256,
                         new_width=256,
                         is_color=False)
-    silence = L.Silence(trash, ntop=0)
     return center
 
-def image_data(batch_size=1, data_path=None, source='train_source', sai=25):
-    for i_sai in range(sai):
+def image_data(batch_size, data_path, n_sai):
+    for i_sai in range(n_sai):
         label, trash = L.ImageData(batch_size=batch_size,
-                                source=data_path+'/'+source+str(i_sai)+'.txt',
+                                source=data_path+'/dataset_list'+str(i_sai)+'.txt',
                                 transform_param=dict(scale=1./256.),
                                 shuffle=False,
                                 ntop=2,
@@ -245,53 +239,51 @@ def image_data(batch_size=1, data_path=None, source='train_source', sai=25):
             con = label
         else:   
             con = L.Concat(*[con, label], concat_param={'axis': 1})
-        silence = L.Silence(trash, ntop=0)
     return con
 
-def input_shifting(center=None, batch_size=1, sai=27, shift_val=0.7):
-    con = None
-    for i_sai in range(sai):
+def input_shifting(src, n_sai, shift_val):
+    for i_sai in range(25):
         tx, ty = shift_value_5x5(i_sai, shift_val)
         param_str = json.dumps({'tx': tx, 'ty': ty})
-        shift = L.Python(center, module = 'input_shifting_layer', layer = 'InputShiftingLayer', ntop = 1, param_str = param_str)
+        shift = L.Python(src, module = 'input_shifting_layer', layer = 'InputShiftingLayer', ntop = 1, param_str = param_str)
         if i_sai == 0:
             con = shift
         else:   
             con = L.Concat(*[con, shift], concat_param={'axis': 1})
     return con
 
-def slice_warp(shift, flow_h, flow_v, sai):
-    for i in range(sai):
-        if i < sai-1:
-            shift_slice, shift = L.Slice(shift, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+def slice_warp(src, flow_h, flow_v, n_sai):
+    for i in range(n_sai):
+        if i < n_sai-1:
+            src_slice, src = L.Slice(src, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
             flow_h_slice, flow_h = L.Slice(flow_h, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
             flow_v_slice, flow_v = L.Slice(flow_v, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
-            predict_slice = L.Warping(shift_slice, flow_h_slice, flow_v_slice)
+            predict_slice = L.Warping(src_slice, flow_h_slice, flow_v_slice)
         else:
-            shift_slice = shift
+            src_slice = src
             flow_h_slice = flow_h
             flow_v_slice = flow_v
-            predict_slice = L.Warping(shift_slice, flow_h_slice, flow_v_slice)
+            predict_slice = L.Warping(src_slice, flow_h_slice, flow_v_slice)
         if i == 0:
             con = predict_slice
         else:
             con = L.Concat(*[con, predict_slice], concat_param={'axis': 1})
     return con
 
-def slice_warp2(shift, flow_h, flow_v, sai):
-    for i in range(sai):
-        if i < sai-1:
-            shift_slice, shift = L.Slice(shift, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
+def slice_warp2(src, flow_h, flow_v, n_sai):
+    for i in range(n_sai):
+        if i < n_sai-1:
+            src_slice, src = L.Slice(src, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
             flow_h_slice, flow_h = L.Slice(flow_h, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
             flow_v_slice, flow_v = L.Slice(flow_v, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
             flow_hv_slice = L.Concat(*[flow_h_slice, flow_v_slice], concat_param={'axis': 1})
-            predict_slice = L.FlowWarp(shift_slice, flow_hv_slice)
+            predict_slice = L.FlowWarp(src_slice, flow_hv_slice)
         else:
-            shift_slice = shift
+            src_slice = src
             flow_h_slice = flow_h
             flow_v_slice = flow_v
             flow_hv_slice = L.Concat(*[flow_h_slice, flow_v_slice], concat_param={'axis': 1})
-            predict_slice = L.FlowWarp(shift_slice, flow_hv_slice)
+            predict_slice = L.FlowWarp(src_slice, flow_hv_slice)
         if i == 0:
             con = predict_slice
         else:
@@ -346,7 +338,23 @@ def l_loss(imgs, lables, batch_size):
 
     return loss, loss2
 
+def flat(imgs, batch_size):
+    imgs_vector = None
+    imgs_matrix = None
+    for j in range(5):
+        for i in range(5):
+            dum = L.DummyData(shape=dict(dim=[batch_size, 3, 256, 256]))
+            temp = L.Crop(imgs, dum, crop_param=dict(axis=1, offset=[3*(5*i+j),0,0]))
 
+            if i==0:
+                imgs_vector = temp
+            else:
+                imgs_vector = L.Concat(*[imgs_vector, temp], concat_param={'axis': 3})
+        if j==0:
+            imgs_matrix = imgs_vector
+        else:
+            imgs_matrix = L.Concat(*[imgs_matrix, imgs_vector], concat_param={'axis': 2})
+    return imgs_matrix
 
 ####################################################################################################
 ##########                             Fundamental Network                                ##########
@@ -399,11 +407,11 @@ def denseUNet(input, batch_size):
         return conv, pool
 
     def upsample_concat_layer(bottom1=None, bottom2=None, nout=1, crop_size=0):
-        deconv = L.Deconvolution(bottom1, convolution_param=dict(num_output=nout, kernel_size=3, stride=2, pad=0))
+        deconv = L.Deconvolution(bottom1, convolution_param=dict(num_output=nout, kernel_size=4, stride=2, pad=1))
         deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=True)
-        dum = L.DummyData(shape=dict(dim=[batch_size, nout, crop_size, crop_size]))
-        deconv_crop = L.Crop(deconv, dum, crop_param=dict(axis=1, offset=[0, 0, 0]))
-        conc = L.Concat(*[deconv_crop, bottom2], concat_param={'axis': 1})
+        #dum = L.DummyData(shape=dict(dim=[batch_size, nout, crop_size, crop_size]))
+        #deconv_crop = L.Crop(deconv, dum, crop_param=dict(axis=1, offset=[0, 0, 0]))
+        conc = L.Concat(*[deconv, bottom2], concat_param={'axis': 1})
         return conc
 
     conv1, poo1 = conv_conv_downsample_group_layer(input, 16)
@@ -433,86 +441,69 @@ def denseUNet(input, batch_size):
 ##########                               Network Generator                                ##########
 ####################################################################################################
 
-def denseUNet_train(script_path=None, data_path=None, tot=1, sai=25, shift_val=0.7, batch_size=1):
-    # Data list txt generating
-    for i_sai in range(sai):
-        i_pick = index_picker_5x5(i_sai)
-        f = open(data_path+'/train_source'+str(i_sai)+'.txt', 'w')
-        for i_tot in range(tot):
-            data = data_path+'/sai'+str(i_tot)+'_'+str(i_pick)+'.png 0'+'\n'
+def denseUNet_train(args):
+    # Generate dataset list
+    for i_sai in range(args.n_sai):
+        i_pick = index_picker_5x5(i_sai, args.pick_mode)
+        f = open(args.trainset_path+'/dataset_list'+str(i_sai)+'.txt', 'w')
+        for i_tot in range(args.train_size):
+            data = args.trainset_path+'/sai'+str(i_tot)+'_'+str(i_pick)+'.png 0'+'\n'
             f.write(data)
         f.close()
 
-    i_sai = 12
-    i_pick = index_picker_5x5(i_sai)
-    f = open(data_path+'_depth'+'/train_depth_source'+str(i_sai)+'.txt', 'w')
-    for i_tot in range(tot):
-        data = data_path+'_depth'+'/sai'+str(i_tot)+'_'+str(i_pick)+'.png 0'+'\n'
-        f.write(data)
-    f.close()
-
-    # Starting Net    
+    # Init network   
     n = caffe.NetSpec()
 
-    # Data loading
-    n.input = image_data_center(batch_size=batch_size, data_path=data_path, source='train_source')
-    n.depth_label = image_data_center(batch_size=batch_size, data_path=data_path+"_depth", source='train_depth_source')
-    n.label = image_data(batch_size=batch_size, data_path=data_path, source='train_source', sai=sai)
+    # Input
+    n.input = image_data_center(batch_size=args.batch_size, data_path=args.trainset_path, center_id=args.center_id)
+    n.label = image_data(batch_size=args.batch_size, data_path=args.trainset_path, n_sai=args.n_sai)
 
-    # Fundamental Network
-    n.flow, n.flow_init = denseUNet(n.input, batch_size)
+    # Fundamental
+    n.flow, n.flow_init = denseUNet(n.input, args.batch_size)
 
     # Translation
-    n.shift = input_shifting(center=n.input, batch_size=batch_size, sai=sai, shift_val=shift_val)
-    n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
-    n.predict = slice_warp2(n.shift, n.flow_h, n.flow_v, sai)
-    n.depth_predict = L.Convolution(n.flow_init, num_output=1, kernel_size=1, stride=1, dilation=1, pad=0,
-                            bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+    n.shift = input_shifting(src=n.input, n_sai=args.n_sai, shift_val=args.shift_val)
+    n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[args.n_sai]))
+    n.predict = slice_warp2(n.shift, n.flow_h, n.flow_v, args.n_sai)
 
     # Loss   
     n.lossA = L.AbsLoss(n.predict, n.label)
-    n.lossA = L.Power(n.lossA, power=1.0, scale=1.0, shift=0.0, in_place=True, loss_weight=1)
-    #n.lossB = L.AbsLoss(n.depth_predict, n.depth_label)
-    #n.lossB = L.Power(n.lossB, power=1.0, scale=0.0, shift=0.0, in_place=True, loss_weight=1)
+    n.lossA = L.Power(n.lossA, power=1.0, scale=1.0, shift=0.0, in_place=True, loss_weight=1)    
+    #n.loss, n.loss2 = l_loss(n.predict, n.label, args.batch_size)
+    #n.loss = L.Power(n.loss, power=1.0, scale=1.0, shift=0.0, in_place=True, loss_weight=1)
+    #n.loss2 = L.Power(n.loss2, power=1.0, scale=1.0, shift=0.0, in_place=True, loss_weight=1)
 
-    n.loss, n.loss2 = l_loss(n.predict, n.label, batch_size)
-    n.loss = L.Power(n.loss, power=1.0, scale=1.0, shift=0.0, in_place=True, loss_weight=1)
-    n.loss2 = L.Power(n.loss2, power=1.0, scale=1.0, shift=0.0, in_place=True, loss_weight=1)
-
-    # Generating Prototxt
-    with open(script_path, 'w') as f:
+    # Generate Prototxt
+    with open(args.train_path, 'w') as f:
         f.write(str(n.to_proto()))    
 
-def denseUNet_test(script_path=None, data_path=None, tot=1, sai=25, shift_val=0.7, batch_size=1):
-    # Data list txt generating
-    for i_sai in range(sai):
-        i_pick = index_picker_5x5(i_sai)
-        f = open(data_path+'/test_source'+str(i_sai)+'.txt', 'w')
-        for i_tot in range(tot):
-            data = data_path+'/sai'+str(i_tot)+'_'+str(i_pick)+'.png 0'+'\n'
+def denseUNet_test(args):
+    # Generate dataset list
+    for i_sai in range(args.n_sai):
+        i_pick = index_picker_5x5(i_sai, args.pick_mode)
+        f = open(args.testset_path+'/dataset_list'+str(i_sai)+'.txt', 'w')
+        for i_tot in range(args.test_size):
+            data = args.testset_path+'/sai'+str(i_tot)+'_'+str(i_pick)+'.png 0'+'\n'
             f.write(data)
         f.close()
 
-    # Starting Net     
+    # Init network       
     n = caffe.NetSpec()
 
-    # Data Loading
-    n.input = image_data_center(batch_size=batch_size, data_path=data_path, source='test_source')
-    n.label = image_data(batch_size=batch_size, data_path=data_path, source='test_source', sai=sai)
+    # Input
+    n.input = image_data_center(batch_size=args.batch_size, data_path=args.testset_path, center_id=args.center_id)
+    n.label = image_data(batch_size=args.batch_size, data_path=args.testset_path, n_sai=args.n_sai)
 
-    # Fundamental Network
-    n.flow, n.flow_init = denseUNet(n.input, batch_size)   
+    # Fundamental
+    n.flow, n.flow_init = denseUNet(n.input, args.batch_size)   
 
     # Translation
-    n.shift = input_shifting(center=n.input, batch_size=batch_size, sai=sai, shift_val=shift_val)
-    n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+    n.shift = input_shifting(src=n.input, n_sai=args.n_sai, shift_val=args.shift_val)
+    n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[args.n_sai]))
     n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
-    param_str = json.dumps({'flow_size': 25, 'color_size': 1})
+    param_str = json.dumps({'flow_size': args.n_sai, 'color_size': 1})
     n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
-    n.depth_predict = L.Convolution(n.flow_init, num_output=1, kernel_size=1, stride=1, dilation=1, pad=0,
-                            bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
 
-    n.label_order = change_order(n.label, batch_size)
     # Visualization
     n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                     param_str=str(dict(path='./datas/face_dataset', name='flow_h', mult=20)))
@@ -529,58 +520,98 @@ def denseUNet_test(script_path=None, data_path=None, tot=1, sai=25, shift_val=0.
     n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                     param_str=str(dict(path='./datas/face_dataset', name='predict', mult=1*256)))
     n.silence5 = L.Silence(n.trash5, ntop=0)
-    n.trash6 = L.Python(n.depth_predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset', name='depth_predict', mult=1*256)))
-    n.silence6 = L.Silence(n.trash6, ntop=0)
-    n.trash7 = L.Python(n.label_order, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset', name='label_order', mult=1*256)))
-    n.silence7 = L.Silence(n.trash7, ntop=0)
 
-    # Generating Prototxt
-    with open(script_path, 'w') as f:
+    # Generate Prototxt
+    with open(args.test_path, 'w') as f:
         f.write(str(n.to_proto()))
 
-def denseUNet_deploy(script_path=None, batch_size=1, sai=25, shift_val=0.7):
+def denseUNet_deploy(args):
+    # Init network  
     n = caffe.NetSpec()
 
-    # Data loading
+    # Input
     n.input = L.Input(input_param=dict(shape=dict(dim=[1, 3, 256, 256])))
     n.input_luma = L.Input(input_param=dict(shape=dict(dim=[1, 1, 256, 256])))
-    n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0, in_place=False)
-    n.shift = input_shifting(center=n.input, batch_size=batch_size, sai=sai, shift_val=shift_val)
+    n.input_luma = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0, in_place=True)
 
-    # Network
-    n.flow, n.flow_init = denseUNet(n.input_luma_down, batch_size)
+    # Fundamental
+    n.flow, n.flow_init = denseUNet(n.input_luma, batch_size)
     n.silence = L.Silence(n.flow_init, ntop=0)  
 
     # Translation
+    n.shift = input_shifting(center=n.input, batch_size=batch_size, sai=sai, shift_val=shift_val)
     n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
     n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
     param_str = json.dumps({'flow_size': 25, 'color_size': 3})
     n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
 
+    # Generate Prototxt
     with open(script_path, 'w') as f:
+        f.write(str(n.to_proto()))
+
+def denseUNet_deploy2(args):
+    # Init network  
+    n = caffe.NetSpec()
+
+    # Input
+    n.input, n.trash = L.ImageData(batch_size=1,
+                        source='./input_list.txt',
+                        transform_param=dict(scale=1./256.),
+                        shuffle=False,
+                        ntop=2,
+                        new_height=256,
+                        new_width=256,
+                        is_color=True)
+
+    n.input_luma, n.trash = L.ImageData(batch_size=1,
+                        source='./input_list.txt',
+                        transform_param=dict(scale=1./256.),
+                        shuffle=False,
+                        ntop=2,
+                        new_height=256,
+                        new_width=256,
+                        is_color=False)
+
+    # Fundamental
+    n.flow, n.flow_init = denseUNet(n.input_luma, batch_size=1)
+    n.silence = L.Silence(n.flow_init, ntop=0)  
+
+    # Translation
+    n.shift = input_shifting(src=n.input, n_sai=args.n_sai, shift_val=args.shift_val)   
+    n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[args.n_sai]))
+    n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
+    param_str = json.dumps({'flow_size': args.n_sai, 'color_size': 3})
+    n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
+
+    # Visualization
+    n.result = flat(n.predict, batch_size=1)
+    n.trash1 = L.Python(n.result, module='print_layer', layer='PrintLayer', ntop=1,
+                    param_str=str(dict(path='./', name='mv_result', mult=256)))
+
+    # Generate Prototxt
+    with open('./deploy.prototxt', 'w') as f:
         f.write(str(n.to_proto()))
 
 ####################################################################################################
 ##########                                Solver Generator                                ##########
 ####################################################################################################
     
-def denseUNet_solver(script_train_path=None, script_test_path=None, solver_path=None, snapshot_path=None):
+def denseUNet_solver(args):
     s = caffe_pb2.SolverParameter()
 
-    s.train_net = script_train_path
-    if script_test_path is not None:
-        s.test_net.append(script_test_path)
+    s.train_net = args.train_path
+
+    if args.test_path is not None:
+        s.test_net.append(args.test_path)
         s.test_interval = 20
         s.test_iter.append(1)
     else:
         s.test_initialization = False
     
     s.iter_size = 1
-    s.max_iter = 500000
+    s.max_iter = args.epoch*args.train_size
     s.type = 'Adam'
-    s.base_lr = 0.001 # 0.0005,  0.0000001 # 0.000005(basic), 0.0000001
+    s.base_lr = args.lr # 0.0005,  0.0000001 # 0.000005(basic), 0.0000001
     s.lr_policy = 'step'
     s.gamma = 0.75
     s.power = 0.75
@@ -593,71 +624,19 @@ def denseUNet_solver(script_train_path=None, script_test_path=None, solver_path=
 
     s.snapshot = 1000
 
-    if snapshot_path is not None:
-        s.snapshot_prefix = snapshot_path
+    if args.model_path is not None:
+        s.snapshot_prefix = args.model_path
 
     s.solver_mode = caffe_pb2.SolverParameter.GPU
 
-    with open(solver_path, 'w') as f:
+    with open(args.solver_path, 'w') as f:
         f.write(str(s))
-
-####################################################################################################
-##########                                      Runner                                    ##########
-####################################################################################################
-
-def denseUNet_runner(script_path=None, model_path=None, src_color=None, n=None):
-    # Set a model
-    if n == None:
-        n = caffe.Net(script_path, model_path, caffe.TEST)
-
-    # Input images    
-    src_color = cv2.resize(src_color, dsize=(256, 256), interpolation=cv2.INTER_AREA)
-    src_luma = cv2.cvtColor(src_color, cv2.COLOR_BGR2GRAY)
-    src_blob_color = np.zeros((1, 3, 256, 256))
-    src_blob_luma = np.zeros((1, 1, 256, 256))
-    for i in range(3):
-        src_blob_color[0, i, :, :] = src_color[:, :, i]
-    src_blob_luma[0, 0, :, :] = src_luma[:, :]
-    n.blobs['input'].data[...] = src_blob_color
-    n.blobs['input_luma'].data[...] = src_blob_luma
-
-    # Net forward        
-    n.forward()
-
-    # Get and print sai
-    sai = np.zeros((256, 256, 3))
-    sai_list =  np.zeros((256, 256, 3, 5*5))
-    flow = np.zeros((256, 256, 2))
-    flow_color_list = np.zeros((256, 256, 3, 5*5))
-    dst_blob = n.blobs['predict'].data[...]
-    flow_v_blob = n.blobs['flow_v'].data[...]
-    flow_h_blob = n.blobs['flow_h'].data[...]
-    for i in range(25):
-        dst_blob_slice = dst_blob[:, 3*i:3*i+3, :, :]
-        flow_v_blob_slice = flow_v_blob[0, i, :, :]
-        flow_h_blob_slice = flow_h_blob[0, i, :, :]
-        flow[:, :, 0] = (flow_v_blob_slice-(np.mean(flow_v_blob_slice)/2))*2
-        flow[:, :, 1] = (flow_h_blob_slice-(np.mean(flow_h_blob_slice)/2))*2
-
-        flow_color = flow_to_color(flow, convert_to_bgr=False)
-        for c in range(3):
-            sai[:, :, c] = cv2.resize(dst_blob_slice[0, c, :, :], dsize=(256, 256), interpolation=cv2.INTER_AREA)
-        sai_list[:, :, :, i] = sai
-        flow_color_list[:, :, :, i] = flow_color
-        #cv2.imwrite(PATH+'/output/sai'+str(i_tot)+'_'+str(i)+'.png', sai)
-
-    return sai_list, flow_color_list
 
 ####################################################################################################
 ##########                                    Tester                                      ##########
 ####################################################################################################
 
-def denseUNet_tester(script_path=None,
-                        model_path=None,
-                        dataset_path=None,
-                        output_predict_path=None,
-                        output_GT_path=None,
-                        test_range=1):
+def denseUNet_tester(args):
     SIZE = 256
 
     # Set a model
@@ -779,48 +758,41 @@ def denseUNet_tester(script_path=None,
 ####################################################################################################
 
 if __name__ == "__main__":
-    # Constant
-    TRAINSET_PATH = './datas/face_dataset/face_train_9x9'
-    TESTSET_PATH = './datas/face_dataset/face_test_9x9'
-    MODEL_PATH = './models/denseUNet_solver_iter_69000.caffemodel'
-    TRAIN_PATH = './scripts/denseUNet_train.prototxt'
-    TEST_PATH = './scripts/denseUNet_test.prototxt'
-    DEPLOY_PATH = './scripts/denseUNet_deploy.prototxt'
-    SOLVER_PATH = './scripts/denseUNet_solver.prototxt'
-    OUTPUT_PREDICT = './output/predict'
-    OUTPUT_GT = './output/GT'
+    parser = argparse.ArgumentParser(description='Light field')
 
-    TRAIN_TOT = 1207
-    SAI = 25
-    SHIFT_VAL = 0.77625 #-1.4
-    MOD = 'test'
+    parser.add_argument('--trainset_path', required=False, default='./datas/face_dataset/face_train_9x9', help='trainset path')
+    parser.add_argument('--testset_path', required=False, default='./datas/face_dataset/face_train_9x9', help='testset path')
+    parser.add_argument('--train_path', required=False, default='./scripts/denseUNet_train.prototxt', help='train path')
+    parser.add_argument('--test_path', required=False, default='./scripts/denseUNet_test.prototxt', help='test path')
+    parser.add_argument('--solver_path', required=False, default='./scripts/denseUNet_solver.prototxt', help='solver path')
+    parser.add_argument('--model_path', required=False, default= './models/denseUNet', help='model path')
+    parser.add_argument('--result_path', required=False, default='./output', help='result path')
+    parser.add_argument('--train_size', required=False, default=1207, help='train size')
+    parser.add_argument('--test_size', required=False, default=98, help='test size')
+    parser.add_argument('--n_sai', required=False, default=25, help='num of sai')
+    parser.add_argument('--shift_val', required=False, default=0.77625, help='shift value')
+    parser.add_argument('--batch_size', required=False, default=1, help='batch size')
+    parser.add_argument('--pick_mode', required=False, default='9x9', help='pick mode')
+    parser.add_argument('--center_id', required=False, default=12, help='center id')
+    parser.add_argument('--epoch', required=False, default=100, help='epoch')
+    parser.add_argument('--lr', required=False, default=0.001, help='learning rate')
+    parser.add_argument('--mode', required=False, default='train', help='mode')
+    
+    args = parser.parse_args()
     
     # Generate Network and Solver
-    denseUNet_train(script_path=TRAIN_PATH, data_path=TRAINSET_PATH, tot=TRAIN_TOT, sai=SAI, batch_size=4, shift_val=SHIFT_VAL)
-    denseUNet_test(script_path=TEST_PATH, data_path=TESTSET_PATH, tot=TRAIN_TOT, sai=SAI, batch_size=1, shift_val=SHIFT_VAL)
-    denseUNet_deploy(script_path=DEPLOY_PATH, batch_size=1, sai=SAI, shift_val=SHIFT_VAL)
-    denseUNet_solver(script_train_path=TRAIN_PATH, script_test_path=TEST_PATH, solver_path=SOLVER_PATH, snapshot_path='./models')
+    denseUNet_train(args)
+    denseUNet_test(args)
+    denseUNet_solver(args)
 
-    if MOD == 'train': 
-        solver = caffe.get_solver(SOLVER_PATH)
-        solver.net.copy_from(MODEL_PATH)
+    if args.mode == 'train': 
+        solver = caffe.get_solver(args.solver_path)
+        #solver.net.copy_from(args.model_path)
         solver.solve()
-    elif MOD == 'test':
-        denseUNet_tester(script_path=DEPLOY_PATH,
-                            model_path=MODEL_PATH,
-                            dataset_path=TESTSET_PATH,
-                            output_predict_path=OUTPUT_PREDICT,
-                            output_GT_path=OUTPUT_GT,
-                            test_range=100)
-    elif MOD == 'run':
-        test_img = cv2.imread('./test3.png', 1)
-        test_img = cv2.resize(test_img, (192, 192), interpolation=cv2.INTER_AREA)
-        test_list, flow_color_list = denseUNet_runner(script_path=DEPLOY_PATH, model_path=MODEL_PATH, src_color=test_img, n=None)
-        for i in range(25):
-            cv2.imwrite('./sai2_'+str(i)+'.png', test_list[:, :, :, i])
-            cv2.imwrite('./flow2_'+str(i)+'.png', flow_color_list[:, :, :, i])
-    else:
-        print('Network Generated!!!')
+    elif args.mode == 'test':
+        denseUNet_tester(args)
+    elif args.mode == 'deploy':
+        denseUNet_deploy2(args)
 
 """
 Memo

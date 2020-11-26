@@ -1,10 +1,10 @@
-train_net: "./scripts/denseUNet_train.prototxt"
-test_net: "./scripts/denseUNet_test.prototxt"
+train_net: "./scripts/stereoDepth_train.prototxt"
+test_net: "./scripts/stereoDepth_test.prototxt"
 test_iter: 1
-test_interval: 20
-base_lr: 0.001
+test_interval: 25
+base_lr: 5e-05
 display: 25
-max_iter: 120700
+max_iter: 500000
 lr_policy: "step"
 gamma: 0.75
 power: 0.75
@@ -12,7 +12,7 @@ momentum: 0.999
 weight_decay: 0.0005
 stepsize: 1000
 snapshot: 1000
-snapshot_prefix: "./models/denseUNet"
+snapshot_prefix: "./models"
 solver_mode: GPU
 clip_gradients: 1
 iter_size: 1

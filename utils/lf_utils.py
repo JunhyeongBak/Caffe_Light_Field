@@ -7,22 +7,22 @@ import warnings
 from multiprocessing import Process
 from threading import Thread
 
-def index_5x5_picker(i):
 
-    list_5x5 = [20, 21, 22, 23, 24,
-                29, 30, 31, 32, 33,
-                38, 39, 40, 41, 42,
-                47, 48, 49, 50, 51,
-                56, 57, 58, 59, 60]
-    '''
-    list_5x5 = [9, 10, 11, 12, 13,
-                17, 18, 19, 20, 21,
-                25, 26, 27, 28, 29,
-                33, 34, 35, 36, 37,
-                41, 42, 43, 44, 45]
-    '''
-    i_dst = list_5x5[i]
-    return i_dst
+def index_picker_5x5(i):
+    PICK_MODE = '9x9'
+    if PICK_MODE == '9x9':
+        id_list = [20, 21, 22, 23, 24,
+                    29, 30, 31, 32, 33,
+                    38, 39, 40, 41, 42,
+                    47, 48, 49, 50, 51,
+                    56, 57, 58, 59, 60]
+    elif PICK_MODE == '8x8':
+        id_list = [9, 10, 11, 12, 13,
+                    17, 18, 19, 20, 21,
+                    25, 26, 27, 28, 29,
+                    33, 34, 35, 36, 37,
+                    41, 42, 43, 44, 45]
+    return id_list[i]
 
 
 def dataset_resize():
@@ -188,6 +188,13 @@ def flower_cropper2(a, b, c):
             #print('none flip', crop_point)
             cv2.imwrite('./SAIs_Crop2/sai'+str(i_tot+3343*c)+'_'+str(i_sai)+'.png', img_dst)
 
+def data_loader():
+    for i_tot in tqdm(range(500)):
+        for i_sai in tqdm(range(25)):
+            i_pick = index_picker_5x5(i_sai)
+            img_src = cv2.imread('/media/junhyeong/DriveX/result2/sai'+str(i_tot)+'_'+str(i_pick)+'.png', 0)
+            cv2.imwrite('./datas/face_dataset/face_train_5x5/sai'+str(i_tot)+'_'+str(i_pick)+'.png', img_src)
+
 if __name__ == '__main__':
     #dataset_resize()
     #sais_to_lf()
@@ -210,4 +217,5 @@ if __name__ == '__main__':
     p3.join()
     p4.join()
     '''
-    gif_maker()
+    #gif_maker()
+    data_loader()

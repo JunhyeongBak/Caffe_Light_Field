@@ -1,559 +1,39 @@
 layer {
-  name: "input"
-  type: "Input"
-  top: "input"
-  input_param {
-    shape {
-      dim: 1
-      dim: 3
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "input_luma"
-  type: "Input"
-  top: "input_luma"
-  input_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "input_luma_down"
-  type: "Power"
-  bottom: "input_luma"
-  top: "input_luma_down"
-  power_param {
-    power: 1.0
+  name: "imL"
+  type: "ImageData"
+  top: "imL"
+  top: "trash_imL"
+  transform_param {
     scale: 0.00390625
-    shift: 0
+  }
+  image_data_param {
+    source: "./test_right.txt"
+    batch_size: 1
+    new_height: 160
+    new_width: 608
+    is_color: false
   }
 }
 layer {
-  name: "Python1"
-  type: "Python"
-  bottom: "input"
-  top: "Python1"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.5525, \"ty\": -1.5525}"
+  name: "imR"
+  type: "ImageData"
+  top: "imR"
+  top: "trash_imR"
+  transform_param {
+    scale: 0.00390625
   }
-}
-layer {
-  name: "Python2"
-  type: "Python"
-  bottom: "input"
-  top: "Python2"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.5525, \"ty\": -0.77625}"
-  }
-}
-layer {
-  name: "Concat1"
-  type: "Concat"
-  bottom: "Python1"
-  bottom: "Python2"
-  top: "Concat1"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python3"
-  type: "Python"
-  bottom: "input"
-  top: "Python3"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.5525, \"ty\": 0}"
-  }
-}
-layer {
-  name: "Concat2"
-  type: "Concat"
-  bottom: "Concat1"
-  bottom: "Python3"
-  top: "Concat2"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python4"
-  type: "Python"
-  bottom: "input"
-  top: "Python4"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.5525, \"ty\": 0.77625}"
-  }
-}
-layer {
-  name: "Concat3"
-  type: "Concat"
-  bottom: "Concat2"
-  bottom: "Python4"
-  top: "Concat3"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python5"
-  type: "Python"
-  bottom: "input"
-  top: "Python5"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.5525, \"ty\": 1.5525}"
-  }
-}
-layer {
-  name: "Concat4"
-  type: "Concat"
-  bottom: "Concat3"
-  bottom: "Python5"
-  top: "Concat4"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python6"
-  type: "Python"
-  bottom: "input"
-  top: "Python6"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.77625, \"ty\": -1.5525}"
-  }
-}
-layer {
-  name: "Concat5"
-  type: "Concat"
-  bottom: "Concat4"
-  bottom: "Python6"
-  top: "Concat5"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python7"
-  type: "Python"
-  bottom: "input"
-  top: "Python7"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.77625, \"ty\": -0.77625}"
-  }
-}
-layer {
-  name: "Concat6"
-  type: "Concat"
-  bottom: "Concat5"
-  bottom: "Python7"
-  top: "Concat6"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python8"
-  type: "Python"
-  bottom: "input"
-  top: "Python8"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.77625, \"ty\": 0}"
-  }
-}
-layer {
-  name: "Concat7"
-  type: "Concat"
-  bottom: "Concat6"
-  bottom: "Python8"
-  top: "Concat7"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python9"
-  type: "Python"
-  bottom: "input"
-  top: "Python9"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.77625, \"ty\": 0.77625}"
-  }
-}
-layer {
-  name: "Concat8"
-  type: "Concat"
-  bottom: "Concat7"
-  bottom: "Python9"
-  top: "Concat8"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python10"
-  type: "Python"
-  bottom: "input"
-  top: "Python10"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.77625, \"ty\": 1.5525}"
-  }
-}
-layer {
-  name: "Concat9"
-  type: "Concat"
-  bottom: "Concat8"
-  bottom: "Python10"
-  top: "Concat9"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python11"
-  type: "Python"
-  bottom: "input"
-  top: "Python11"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -1.5525}"
-  }
-}
-layer {
-  name: "Concat10"
-  type: "Concat"
-  bottom: "Concat9"
-  bottom: "Python11"
-  top: "Concat10"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python12"
-  type: "Python"
-  bottom: "input"
-  top: "Python12"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -0.77625}"
-  }
-}
-layer {
-  name: "Concat11"
-  type: "Concat"
-  bottom: "Concat10"
-  bottom: "Python12"
-  top: "Concat11"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python13"
-  type: "Python"
-  bottom: "input"
-  top: "Python13"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 0}"
-  }
-}
-layer {
-  name: "Concat12"
-  type: "Concat"
-  bottom: "Concat11"
-  bottom: "Python13"
-  top: "Concat12"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python14"
-  type: "Python"
-  bottom: "input"
-  top: "Python14"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 0.77625}"
-  }
-}
-layer {
-  name: "Concat13"
-  type: "Concat"
-  bottom: "Concat12"
-  bottom: "Python14"
-  top: "Concat13"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python15"
-  type: "Python"
-  bottom: "input"
-  top: "Python15"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 1.5525}"
-  }
-}
-layer {
-  name: "Concat14"
-  type: "Concat"
-  bottom: "Concat13"
-  bottom: "Python15"
-  top: "Concat14"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python16"
-  type: "Python"
-  bottom: "input"
-  top: "Python16"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.77625, \"ty\": -1.5525}"
-  }
-}
-layer {
-  name: "Concat15"
-  type: "Concat"
-  bottom: "Concat14"
-  bottom: "Python16"
-  top: "Concat15"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python17"
-  type: "Python"
-  bottom: "input"
-  top: "Python17"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.77625, \"ty\": -0.77625}"
-  }
-}
-layer {
-  name: "Concat16"
-  type: "Concat"
-  bottom: "Concat15"
-  bottom: "Python17"
-  top: "Concat16"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python18"
-  type: "Python"
-  bottom: "input"
-  top: "Python18"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.77625, \"ty\": 0}"
-  }
-}
-layer {
-  name: "Concat17"
-  type: "Concat"
-  bottom: "Concat16"
-  bottom: "Python18"
-  top: "Concat17"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python19"
-  type: "Python"
-  bottom: "input"
-  top: "Python19"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.77625, \"ty\": 0.77625}"
-  }
-}
-layer {
-  name: "Concat18"
-  type: "Concat"
-  bottom: "Concat17"
-  bottom: "Python19"
-  top: "Concat18"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python20"
-  type: "Python"
-  bottom: "input"
-  top: "Python20"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.77625, \"ty\": 1.5525}"
-  }
-}
-layer {
-  name: "Concat19"
-  type: "Concat"
-  bottom: "Concat18"
-  bottom: "Python20"
-  top: "Concat19"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python21"
-  type: "Python"
-  bottom: "input"
-  top: "Python21"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.5525, \"ty\": -1.5525}"
-  }
-}
-layer {
-  name: "Concat20"
-  type: "Concat"
-  bottom: "Concat19"
-  bottom: "Python21"
-  top: "Concat20"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python22"
-  type: "Python"
-  bottom: "input"
-  top: "Python22"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.5525, \"ty\": -0.77625}"
-  }
-}
-layer {
-  name: "Concat21"
-  type: "Concat"
-  bottom: "Concat20"
-  bottom: "Python22"
-  top: "Concat21"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python23"
-  type: "Python"
-  bottom: "input"
-  top: "Python23"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.5525, \"ty\": 0}"
-  }
-}
-layer {
-  name: "Concat22"
-  type: "Concat"
-  bottom: "Concat21"
-  bottom: "Python23"
-  top: "Concat22"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python24"
-  type: "Python"
-  bottom: "input"
-  top: "Python24"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.5525, \"ty\": 0.77625}"
-  }
-}
-layer {
-  name: "Concat23"
-  type: "Concat"
-  bottom: "Concat22"
-  bottom: "Python24"
-  top: "Concat23"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "Python25"
-  type: "Python"
-  bottom: "input"
-  top: "Python25"
-  python_param {
-    module: "input_shifting_layer"
-    layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.5525, \"ty\": 1.5525}"
-  }
-}
-layer {
-  name: "shift"
-  type: "Concat"
-  bottom: "Concat23"
-  bottom: "Python25"
-  top: "shift"
-  concat_param {
-    axis: 1
+  image_data_param {
+    source: "./test_left.txt"
+    batch_size: 1
+    new_height: 160
+    new_width: 608
+    is_color: false
   }
 }
 layer {
   name: "Convolution1"
   type: "Convolution"
-  bottom: "input_luma_down"
+  bottom: "imL"
   top: "Convolution1"
   convolution_param {
     num_output: 16
@@ -577,7 +57,6 @@ layer {
   bottom: "Convolution1"
   top: "Convolution1"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -625,12 +104,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU2"
+  name: "conv1"
   type: "ReLU"
   bottom: "Convolution3"
   top: "Convolution3"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -646,12 +124,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU3"
+  name: "poo1"
   type: "ReLU"
   bottom: "Pooling1"
   top: "Pooling1"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -677,12 +154,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU4"
+  name: "ReLU2"
   type: "ReLU"
   bottom: "Convolution4"
   top: "Convolution4"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -730,12 +206,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU5"
+  name: "conv2"
   type: "ReLU"
   bottom: "Convolution6"
   top: "Convolution6"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -751,12 +226,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU6"
+  name: "poo2"
   type: "ReLU"
   bottom: "Pooling2"
   top: "Pooling2"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -782,12 +256,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU7"
+  name: "ReLU3"
   type: "ReLU"
   bottom: "Convolution7"
   top: "Convolution7"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -835,12 +308,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU8"
+  name: "conv3"
   type: "ReLU"
   bottom: "Convolution9"
   top: "Convolution9"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -856,12 +328,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU9"
+  name: "poo3"
   type: "ReLU"
   bottom: "Pooling3"
   top: "Pooling3"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -887,12 +358,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU10"
+  name: "ReLU4"
   type: "ReLU"
   bottom: "Convolution10"
   top: "Convolution10"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -940,12 +410,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU11"
+  name: "conv4"
   type: "ReLU"
   bottom: "Convolution12"
   top: "Convolution12"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -961,12 +430,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU12"
+  name: "poo4"
   type: "ReLU"
   bottom: "Pooling4"
   top: "Pooling4"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -992,12 +460,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU13"
+  name: "ReLU5"
   type: "ReLU"
   bottom: "Convolution13"
   top: "Convolution13"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1045,12 +512,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU14"
+  name: "conv5"
   type: "ReLU"
   bottom: "Convolution15"
   top: "Convolution15"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1066,12 +532,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU15"
+  name: "poo5"
   type: "ReLU"
   bottom: "Pooling5"
   top: "Pooling5"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1097,12 +562,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU16"
+  name: "ReLU6"
   type: "ReLU"
   bottom: "Convolution16"
   top: "Convolution16"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1128,12 +592,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU17"
+  name: "ReLU7"
   type: "ReLU"
   bottom: "Convolution17"
   top: "Convolution17"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1169,12 +632,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU18"
+  name: "feature"
   type: "ReLU"
   bottom: "Eltwise1"
   top: "Eltwise1"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1191,20 +653,17 @@ layer {
   }
 }
 layer {
-  name: "ReLU19"
+  name: "ReLU8"
   type: "ReLU"
   bottom: "Deconvolution1"
   top: "Deconvolution1"
-  relu_param {
-    negative_slope: 0.2
-  }
 }
 layer {
-  name: "Concat24"
+  name: "Concat1"
   type: "Concat"
   bottom: "Deconvolution1"
   bottom: "Convolution15"
-  top: "Concat24"
+  top: "Concat1"
   concat_param {
     axis: 1
   }
@@ -1212,7 +671,7 @@ layer {
 layer {
   name: "Convolution19"
   type: "Convolution"
-  bottom: "Concat24"
+  bottom: "Concat1"
   top: "Convolution19"
   convolution_param {
     num_output: 256
@@ -1231,12 +690,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU20"
+  name: "ReLU9"
   type: "ReLU"
   bottom: "Convolution19"
   top: "Convolution19"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1284,12 +742,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU21"
+  name: "deconv1"
   type: "ReLU"
   bottom: "Convolution21"
   top: "Convolution21"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1306,20 +763,17 @@ layer {
   }
 }
 layer {
-  name: "ReLU22"
+  name: "ReLU10"
   type: "ReLU"
   bottom: "Deconvolution2"
   top: "Deconvolution2"
-  relu_param {
-    negative_slope: 0.2
-  }
 }
 layer {
-  name: "Concat25"
+  name: "Concat2"
   type: "Concat"
   bottom: "Deconvolution2"
   bottom: "Convolution12"
-  top: "Concat25"
+  top: "Concat2"
   concat_param {
     axis: 1
   }
@@ -1327,7 +781,7 @@ layer {
 layer {
   name: "Convolution22"
   type: "Convolution"
-  bottom: "Concat25"
+  bottom: "Concat2"
   top: "Convolution22"
   convolution_param {
     num_output: 128
@@ -1346,12 +800,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU23"
+  name: "ReLU11"
   type: "ReLU"
   bottom: "Convolution22"
   top: "Convolution22"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1399,12 +852,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU24"
+  name: "deconv2"
   type: "ReLU"
   bottom: "Convolution24"
   top: "Convolution24"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1421,20 +873,17 @@ layer {
   }
 }
 layer {
-  name: "ReLU25"
+  name: "ReLU12"
   type: "ReLU"
   bottom: "Deconvolution3"
   top: "Deconvolution3"
-  relu_param {
-    negative_slope: 0.2
-  }
 }
 layer {
-  name: "Concat26"
+  name: "Concat3"
   type: "Concat"
   bottom: "Deconvolution3"
   bottom: "Convolution9"
-  top: "Concat26"
+  top: "Concat3"
   concat_param {
     axis: 1
   }
@@ -1442,7 +891,7 @@ layer {
 layer {
   name: "Convolution25"
   type: "Convolution"
-  bottom: "Concat26"
+  bottom: "Concat3"
   top: "Convolution25"
   convolution_param {
     num_output: 64
@@ -1461,12 +910,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU26"
+  name: "ReLU13"
   type: "ReLU"
   bottom: "Convolution25"
   top: "Convolution25"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1514,12 +962,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU27"
+  name: "deconv3"
   type: "ReLU"
   bottom: "Convolution27"
   top: "Convolution27"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1536,20 +983,17 @@ layer {
   }
 }
 layer {
-  name: "ReLU28"
+  name: "ReLU14"
   type: "ReLU"
   bottom: "Deconvolution4"
   top: "Deconvolution4"
-  relu_param {
-    negative_slope: 0.2
-  }
 }
 layer {
-  name: "Concat27"
+  name: "Concat4"
   type: "Concat"
   bottom: "Deconvolution4"
   bottom: "Convolution6"
-  top: "Concat27"
+  top: "Concat4"
   concat_param {
     axis: 1
   }
@@ -1557,7 +1001,7 @@ layer {
 layer {
   name: "Convolution28"
   type: "Convolution"
-  bottom: "Concat27"
+  bottom: "Concat4"
   top: "Convolution28"
   convolution_param {
     num_output: 32
@@ -1576,12 +1020,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU29"
+  name: "ReLU15"
   type: "ReLU"
   bottom: "Convolution28"
   top: "Convolution28"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1629,12 +1072,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU30"
+  name: "deconv4"
   type: "ReLU"
   bottom: "Convolution30"
   top: "Convolution30"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1651,20 +1093,17 @@ layer {
   }
 }
 layer {
-  name: "ReLU31"
+  name: "ReLU16"
   type: "ReLU"
   bottom: "Deconvolution5"
   top: "Deconvolution5"
-  relu_param {
-    negative_slope: 0.2
-  }
 }
 layer {
-  name: "Concat28"
+  name: "Concat5"
   type: "Concat"
   bottom: "Deconvolution5"
   bottom: "Convolution3"
-  top: "Concat28"
+  top: "Concat5"
   concat_param {
     axis: 1
   }
@@ -1672,7 +1111,7 @@ layer {
 layer {
   name: "Convolution31"
   type: "Convolution"
-  bottom: "Concat28"
+  bottom: "Concat5"
   top: "Convolution31"
   convolution_param {
     num_output: 16
@@ -1691,12 +1130,11 @@ layer {
   }
 }
 layer {
-  name: "ReLU32"
+  name: "ReLU17"
   type: "ReLU"
   bottom: "Convolution31"
   top: "Convolution31"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
@@ -1744,17 +1182,16 @@ layer {
   }
 }
 layer {
-  name: "ReLU33"
+  name: "deconv5"
   type: "ReLU"
   bottom: "Convolution33"
   top: "Convolution33"
   relu_param {
-    negative_slope: 0.2
     engine: CAFFE
   }
 }
 layer {
-  name: "ReLU34"
+  name: "ReLU18"
   type: "ReLU"
   bottom: "Convolution33"
   top: "Convolution33"
@@ -1790,10 +1227,10 @@ layer {
   bottom: "flow_init"
   top: "flow"
   convolution_param {
-    num_output: 50
+    num_output: 2
     bias_term: false
-    pad: 1
-    kernel_size: 3
+    pad: 4
+    kernel_size: 9
     group: 1
     stride: 1
     weight_filler {
@@ -1807,40 +1244,17 @@ layer {
   }
 }
 layer {
-  name: "silence"
-  type: "Silence"
-  bottom: "flow_init"
-}
-layer {
-  name: "flow_h"
-  type: "Slice"
+  name: "backwarp"
+  type: "FlowWarp"
+  bottom: "imR"
   bottom: "flow"
-  top: "flow_h"
-  top: "flow_v"
-  slice_param {
-    slice_dim: 1
-    slice_point: 25
-  }
+  top: "backwarp"
 }
 layer {
-  name: "flow_con"
-  type: "Concat"
-  bottom: "flow_v"
-  bottom: "flow_h"
-  top: "flow_con"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "predict"
-  type: "Python"
-  bottom: "shift"
-  bottom: "flow_con"
-  top: "predict"
-  python_param {
-    module: "bilinear_sampler_layer_3ch"
-    layer: "BilinearSamplerLayer3ch"
-    param_str: "{\"flow_size\": 25, \"color_size\": 3}"
-  }
+  name: "warp_error"
+  type: "AbsLoss"
+  bottom: "imL"
+  bottom: "backwarp"
+  top: "warp_error"
+  loss_weight: 1
 }

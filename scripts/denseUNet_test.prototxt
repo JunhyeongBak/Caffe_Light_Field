@@ -7,7 +7,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source12.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list12.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -24,7 +24,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source0.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list0.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -41,7 +41,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source1.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list1.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -68,7 +68,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source2.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list2.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -95,7 +95,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source3.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list3.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -122,7 +122,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source4.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list4.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -149,7 +149,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source5.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list5.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -176,7 +176,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source6.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list6.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -203,7 +203,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source7.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list7.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -230,7 +230,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source8.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list8.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -257,7 +257,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source9.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list9.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -284,7 +284,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source10.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list10.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -311,7 +311,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source11.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list11.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -338,7 +338,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source12.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list12.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -365,7 +365,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source13.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list13.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -392,7 +392,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source14.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list14.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -419,7 +419,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source15.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list15.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -446,7 +446,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source16.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list16.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -473,7 +473,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source17.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list17.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -500,7 +500,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source18.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list18.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -527,7 +527,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source19.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list19.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -554,7 +554,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source20.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list20.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -581,7 +581,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source21.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list21.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -608,7 +608,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source22.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list22.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -635,7 +635,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source23.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list23.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -662,7 +662,7 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_test_9x9/test_source24.txt"
+    source: "./datas/face_dataset/face_train_9x9/dataset_list24.txt"
     batch_size: 1
     shuffle: false
     new_height: 256
@@ -1315,8 +1315,8 @@ layer {
   top: "Deconvolution1"
   convolution_param {
     num_output: 256
-    pad: 0
-    kernel_size: 3
+    pad: 1
+    kernel_size: 4
     stride: 2
   }
 }
@@ -1330,35 +1330,9 @@ layer {
   }
 }
 layer {
-  name: "DummyData1"
-  type: "DummyData"
-  top: "DummyData1"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 256
-      dim: 16
-      dim: 16
-    }
-  }
-}
-layer {
-  name: "Crop1"
-  type: "Crop"
-  bottom: "Deconvolution1"
-  bottom: "DummyData1"
-  top: "Crop1"
-  crop_param {
-    axis: 1
-    offset: 0
-    offset: 0
-    offset: 0
-  }
-}
-layer {
   name: "Concat24"
   type: "Concat"
-  bottom: "Crop1"
+  bottom: "Deconvolution1"
   bottom: "Convolution15"
   top: "Concat24"
   concat_param {
@@ -1456,8 +1430,8 @@ layer {
   top: "Deconvolution2"
   convolution_param {
     num_output: 128
-    pad: 0
-    kernel_size: 3
+    pad: 1
+    kernel_size: 4
     stride: 2
   }
 }
@@ -1471,35 +1445,9 @@ layer {
   }
 }
 layer {
-  name: "DummyData2"
-  type: "DummyData"
-  top: "DummyData2"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 128
-      dim: 32
-      dim: 32
-    }
-  }
-}
-layer {
-  name: "Crop2"
-  type: "Crop"
-  bottom: "Deconvolution2"
-  bottom: "DummyData2"
-  top: "Crop2"
-  crop_param {
-    axis: 1
-    offset: 0
-    offset: 0
-    offset: 0
-  }
-}
-layer {
   name: "Concat25"
   type: "Concat"
-  bottom: "Crop2"
+  bottom: "Deconvolution2"
   bottom: "Convolution12"
   top: "Concat25"
   concat_param {
@@ -1597,8 +1545,8 @@ layer {
   top: "Deconvolution3"
   convolution_param {
     num_output: 64
-    pad: 0
-    kernel_size: 3
+    pad: 1
+    kernel_size: 4
     stride: 2
   }
 }
@@ -1612,35 +1560,9 @@ layer {
   }
 }
 layer {
-  name: "DummyData3"
-  type: "DummyData"
-  top: "DummyData3"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 64
-      dim: 64
-      dim: 64
-    }
-  }
-}
-layer {
-  name: "Crop3"
-  type: "Crop"
-  bottom: "Deconvolution3"
-  bottom: "DummyData3"
-  top: "Crop3"
-  crop_param {
-    axis: 1
-    offset: 0
-    offset: 0
-    offset: 0
-  }
-}
-layer {
   name: "Concat26"
   type: "Concat"
-  bottom: "Crop3"
+  bottom: "Deconvolution3"
   bottom: "Convolution9"
   top: "Concat26"
   concat_param {
@@ -1738,8 +1660,8 @@ layer {
   top: "Deconvolution4"
   convolution_param {
     num_output: 32
-    pad: 0
-    kernel_size: 3
+    pad: 1
+    kernel_size: 4
     stride: 2
   }
 }
@@ -1753,35 +1675,9 @@ layer {
   }
 }
 layer {
-  name: "DummyData4"
-  type: "DummyData"
-  top: "DummyData4"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 32
-      dim: 128
-      dim: 128
-    }
-  }
-}
-layer {
-  name: "Crop4"
-  type: "Crop"
-  bottom: "Deconvolution4"
-  bottom: "DummyData4"
-  top: "Crop4"
-  crop_param {
-    axis: 1
-    offset: 0
-    offset: 0
-    offset: 0
-  }
-}
-layer {
   name: "Concat27"
   type: "Concat"
-  bottom: "Crop4"
+  bottom: "Deconvolution4"
   bottom: "Convolution6"
   top: "Concat27"
   concat_param {
@@ -1879,8 +1775,8 @@ layer {
   top: "Deconvolution5"
   convolution_param {
     num_output: 16
-    pad: 0
-    kernel_size: 3
+    pad: 1
+    kernel_size: 4
     stride: 2
   }
 }
@@ -1894,35 +1790,9 @@ layer {
   }
 }
 layer {
-  name: "DummyData5"
-  type: "DummyData"
-  top: "DummyData5"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 16
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop5"
-  type: "Crop"
-  bottom: "Deconvolution5"
-  bottom: "DummyData5"
-  top: "Crop5"
-  crop_param {
-    axis: 1
-    offset: 0
-    offset: 0
-    offset: 0
-  }
-}
-layer {
   name: "Concat28"
   type: "Concat"
-  bottom: "Crop5"
+  bottom: "Deconvolution5"
   bottom: "Convolution3"
   top: "Concat28"
   concat_param {
@@ -2615,917 +2485,6 @@ layer {
   }
 }
 layer {
-  name: "depth_predict"
-  type: "Convolution"
-  bottom: "flow_init"
-  top: "depth_predict"
-  convolution_param {
-    num_output: 1
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-    bias_filler {
-      type: "msra"
-    }
-    engine: CAFFE
-    dilation: 1
-  }
-}
-layer {
-  name: "DummyData6"
-  type: "DummyData"
-  top: "DummyData6"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop6"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData6"
-  top: "Crop6"
-  crop_param {
-    axis: 1
-    offset: 0
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "DummyData7"
-  type: "DummyData"
-  top: "DummyData7"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop7"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData7"
-  top: "Crop7"
-  crop_param {
-    axis: 1
-    offset: 5
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat52"
-  type: "Concat"
-  bottom: "Crop6"
-  bottom: "Crop7"
-  top: "Concat52"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData8"
-  type: "DummyData"
-  top: "DummyData8"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop8"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData8"
-  top: "Crop8"
-  crop_param {
-    axis: 1
-    offset: 10
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat53"
-  type: "Concat"
-  bottom: "Concat52"
-  bottom: "Crop8"
-  top: "Concat53"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData9"
-  type: "DummyData"
-  top: "DummyData9"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop9"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData9"
-  top: "Crop9"
-  crop_param {
-    axis: 1
-    offset: 15
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat54"
-  type: "Concat"
-  bottom: "Concat53"
-  bottom: "Crop9"
-  top: "Concat54"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData10"
-  type: "DummyData"
-  top: "DummyData10"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop10"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData10"
-  top: "Crop10"
-  crop_param {
-    axis: 1
-    offset: 20
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat55"
-  type: "Concat"
-  bottom: "Concat54"
-  bottom: "Crop10"
-  top: "Concat55"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData11"
-  type: "DummyData"
-  top: "DummyData11"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop11"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData11"
-  top: "Crop11"
-  crop_param {
-    axis: 1
-    offset: 1
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat56"
-  type: "Concat"
-  bottom: "Concat55"
-  bottom: "Crop11"
-  top: "Concat56"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData12"
-  type: "DummyData"
-  top: "DummyData12"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop12"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData12"
-  top: "Crop12"
-  crop_param {
-    axis: 1
-    offset: 6
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat57"
-  type: "Concat"
-  bottom: "Concat56"
-  bottom: "Crop12"
-  top: "Concat57"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData13"
-  type: "DummyData"
-  top: "DummyData13"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop13"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData13"
-  top: "Crop13"
-  crop_param {
-    axis: 1
-    offset: 11
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat58"
-  type: "Concat"
-  bottom: "Concat57"
-  bottom: "Crop13"
-  top: "Concat58"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData14"
-  type: "DummyData"
-  top: "DummyData14"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop14"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData14"
-  top: "Crop14"
-  crop_param {
-    axis: 1
-    offset: 16
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat59"
-  type: "Concat"
-  bottom: "Concat58"
-  bottom: "Crop14"
-  top: "Concat59"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData15"
-  type: "DummyData"
-  top: "DummyData15"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop15"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData15"
-  top: "Crop15"
-  crop_param {
-    axis: 1
-    offset: 21
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat60"
-  type: "Concat"
-  bottom: "Concat59"
-  bottom: "Crop15"
-  top: "Concat60"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData16"
-  type: "DummyData"
-  top: "DummyData16"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop16"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData16"
-  top: "Crop16"
-  crop_param {
-    axis: 1
-    offset: 2
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat61"
-  type: "Concat"
-  bottom: "Concat60"
-  bottom: "Crop16"
-  top: "Concat61"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData17"
-  type: "DummyData"
-  top: "DummyData17"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop17"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData17"
-  top: "Crop17"
-  crop_param {
-    axis: 1
-    offset: 7
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat62"
-  type: "Concat"
-  bottom: "Concat61"
-  bottom: "Crop17"
-  top: "Concat62"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData18"
-  type: "DummyData"
-  top: "DummyData18"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop18"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData18"
-  top: "Crop18"
-  crop_param {
-    axis: 1
-    offset: 12
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat63"
-  type: "Concat"
-  bottom: "Concat62"
-  bottom: "Crop18"
-  top: "Concat63"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData19"
-  type: "DummyData"
-  top: "DummyData19"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop19"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData19"
-  top: "Crop19"
-  crop_param {
-    axis: 1
-    offset: 17
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat64"
-  type: "Concat"
-  bottom: "Concat63"
-  bottom: "Crop19"
-  top: "Concat64"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData20"
-  type: "DummyData"
-  top: "DummyData20"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop20"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData20"
-  top: "Crop20"
-  crop_param {
-    axis: 1
-    offset: 22
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat65"
-  type: "Concat"
-  bottom: "Concat64"
-  bottom: "Crop20"
-  top: "Concat65"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData21"
-  type: "DummyData"
-  top: "DummyData21"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop21"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData21"
-  top: "Crop21"
-  crop_param {
-    axis: 1
-    offset: 3
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat66"
-  type: "Concat"
-  bottom: "Concat65"
-  bottom: "Crop21"
-  top: "Concat66"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData22"
-  type: "DummyData"
-  top: "DummyData22"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop22"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData22"
-  top: "Crop22"
-  crop_param {
-    axis: 1
-    offset: 8
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat67"
-  type: "Concat"
-  bottom: "Concat66"
-  bottom: "Crop22"
-  top: "Concat67"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData23"
-  type: "DummyData"
-  top: "DummyData23"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop23"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData23"
-  top: "Crop23"
-  crop_param {
-    axis: 1
-    offset: 13
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat68"
-  type: "Concat"
-  bottom: "Concat67"
-  bottom: "Crop23"
-  top: "Concat68"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData24"
-  type: "DummyData"
-  top: "DummyData24"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop24"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData24"
-  top: "Crop24"
-  crop_param {
-    axis: 1
-    offset: 18
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat69"
-  type: "Concat"
-  bottom: "Concat68"
-  bottom: "Crop24"
-  top: "Concat69"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData25"
-  type: "DummyData"
-  top: "DummyData25"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop25"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData25"
-  top: "Crop25"
-  crop_param {
-    axis: 1
-    offset: 23
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat70"
-  type: "Concat"
-  bottom: "Concat69"
-  bottom: "Crop25"
-  top: "Concat70"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData26"
-  type: "DummyData"
-  top: "DummyData26"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop26"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData26"
-  top: "Crop26"
-  crop_param {
-    axis: 1
-    offset: 4
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat71"
-  type: "Concat"
-  bottom: "Concat70"
-  bottom: "Crop26"
-  top: "Concat71"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData27"
-  type: "DummyData"
-  top: "DummyData27"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop27"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData27"
-  top: "Crop27"
-  crop_param {
-    axis: 1
-    offset: 9
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat72"
-  type: "Concat"
-  bottom: "Concat71"
-  bottom: "Crop27"
-  top: "Concat72"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData28"
-  type: "DummyData"
-  top: "DummyData28"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop28"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData28"
-  top: "Crop28"
-  crop_param {
-    axis: 1
-    offset: 14
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat73"
-  type: "Concat"
-  bottom: "Concat72"
-  bottom: "Crop28"
-  top: "Concat73"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData29"
-  type: "DummyData"
-  top: "DummyData29"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop29"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData29"
-  top: "Crop29"
-  crop_param {
-    axis: 1
-    offset: 19
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "Concat74"
-  type: "Concat"
-  bottom: "Concat73"
-  bottom: "Crop29"
-  top: "Concat74"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "DummyData30"
-  type: "DummyData"
-  top: "DummyData30"
-  dummy_data_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
-  }
-}
-layer {
-  name: "Crop30"
-  type: "Crop"
-  bottom: "label"
-  bottom: "DummyData30"
-  top: "Crop30"
-  crop_param {
-    axis: 1
-    offset: 24
-    offset: 0
-    offset: 0
-  }
-}
-layer {
-  name: "label_order"
-  type: "Concat"
-  bottom: "Concat74"
-  bottom: "Crop30"
-  top: "label_order"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
   name: "trash1"
   type: "Python"
   bottom: "flow_h"
@@ -3604,36 +2563,4 @@ layer {
   name: "silence5"
   type: "Silence"
   bottom: "trash5"
-}
-layer {
-  name: "trash6"
-  type: "Python"
-  bottom: "depth_predict"
-  top: "trash6"
-  python_param {
-    module: "visualization_layer"
-    layer: "VisualizationLayer"
-    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'depth_predict\', \'mult\': 256}"
-  }
-}
-layer {
-  name: "silence6"
-  type: "Silence"
-  bottom: "trash6"
-}
-layer {
-  name: "trash7"
-  type: "Python"
-  bottom: "label_order"
-  top: "trash7"
-  python_param {
-    module: "visualization_layer"
-    layer: "VisualizationLayer"
-    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'label_order\', \'mult\': 256}"
-  }
-}
-layer {
-  name: "silence7"
-  type: "Silence"
-  bottom: "trash7"
 }
