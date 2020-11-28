@@ -1,1 +1,1 @@
-./input_img.png 0
+./datas/face_dataset/face_test_9x9/sai97_40.png 0

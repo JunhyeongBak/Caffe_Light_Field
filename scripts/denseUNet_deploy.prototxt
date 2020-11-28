@@ -1185,8 +1185,8 @@ layer {
   top: "Deconvolution1"
   convolution_param {
     num_output: 256
-    pad: 1
-    kernel_size: 4
+    pad: 0
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1200,9 +1200,35 @@ layer {
   }
 }
 layer {
+  name: "DummyData1"
+  type: "DummyData"
+  top: "DummyData1"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 256
+      dim: 16
+      dim: 16
+    }
+  }
+}
+layer {
+  name: "Crop1"
+  type: "Crop"
+  bottom: "Deconvolution1"
+  bottom: "DummyData1"
+  top: "Crop1"
+  crop_param {
+    axis: 1
+    offset: 0
+    offset: 0
+    offset: 0
+  }
+}
+layer {
   name: "Concat24"
   type: "Concat"
-  bottom: "Deconvolution1"
+  bottom: "Crop1"
   bottom: "Convolution15"
   top: "Concat24"
   concat_param {
@@ -1300,8 +1326,8 @@ layer {
   top: "Deconvolution2"
   convolution_param {
     num_output: 128
-    pad: 1
-    kernel_size: 4
+    pad: 0
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1315,9 +1341,35 @@ layer {
   }
 }
 layer {
+  name: "DummyData2"
+  type: "DummyData"
+  top: "DummyData2"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 128
+      dim: 32
+      dim: 32
+    }
+  }
+}
+layer {
+  name: "Crop2"
+  type: "Crop"
+  bottom: "Deconvolution2"
+  bottom: "DummyData2"
+  top: "Crop2"
+  crop_param {
+    axis: 1
+    offset: 0
+    offset: 0
+    offset: 0
+  }
+}
+layer {
   name: "Concat25"
   type: "Concat"
-  bottom: "Deconvolution2"
+  bottom: "Crop2"
   bottom: "Convolution12"
   top: "Concat25"
   concat_param {
@@ -1415,8 +1467,8 @@ layer {
   top: "Deconvolution3"
   convolution_param {
     num_output: 64
-    pad: 1
-    kernel_size: 4
+    pad: 0
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1430,9 +1482,35 @@ layer {
   }
 }
 layer {
+  name: "DummyData3"
+  type: "DummyData"
+  top: "DummyData3"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 64
+      dim: 64
+      dim: 64
+    }
+  }
+}
+layer {
+  name: "Crop3"
+  type: "Crop"
+  bottom: "Deconvolution3"
+  bottom: "DummyData3"
+  top: "Crop3"
+  crop_param {
+    axis: 1
+    offset: 0
+    offset: 0
+    offset: 0
+  }
+}
+layer {
   name: "Concat26"
   type: "Concat"
-  bottom: "Deconvolution3"
+  bottom: "Crop3"
   bottom: "Convolution9"
   top: "Concat26"
   concat_param {
@@ -1530,8 +1608,8 @@ layer {
   top: "Deconvolution4"
   convolution_param {
     num_output: 32
-    pad: 1
-    kernel_size: 4
+    pad: 0
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1545,9 +1623,35 @@ layer {
   }
 }
 layer {
+  name: "DummyData4"
+  type: "DummyData"
+  top: "DummyData4"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 32
+      dim: 128
+      dim: 128
+    }
+  }
+}
+layer {
+  name: "Crop4"
+  type: "Crop"
+  bottom: "Deconvolution4"
+  bottom: "DummyData4"
+  top: "Crop4"
+  crop_param {
+    axis: 1
+    offset: 0
+    offset: 0
+    offset: 0
+  }
+}
+layer {
   name: "Concat27"
   type: "Concat"
-  bottom: "Deconvolution4"
+  bottom: "Crop4"
   bottom: "Convolution6"
   top: "Concat27"
   concat_param {
@@ -1645,8 +1749,8 @@ layer {
   top: "Deconvolution5"
   convolution_param {
     num_output: 16
-    pad: 1
-    kernel_size: 4
+    pad: 0
+    kernel_size: 3
     stride: 2
   }
 }
@@ -1660,9 +1764,35 @@ layer {
   }
 }
 layer {
+  name: "DummyData5"
+  type: "DummyData"
+  top: "DummyData5"
+  dummy_data_param {
+    shape {
+      dim: 1
+      dim: 16
+      dim: 256
+      dim: 256
+    }
+  }
+}
+layer {
+  name: "Crop5"
+  type: "Crop"
+  bottom: "Deconvolution5"
+  bottom: "DummyData5"
+  top: "Crop5"
+  crop_param {
+    axis: 1
+    offset: 0
+    offset: 0
+    offset: 0
+  }
+}
+layer {
   name: "Concat28"
   type: "Concat"
-  bottom: "Deconvolution5"
+  bottom: "Crop5"
   bottom: "Convolution3"
   top: "Concat28"
   concat_param {

@@ -15,11 +15,20 @@ class PrintLayer(caffe.Layer):
     def forward(self, bottom, top):
         im_org = bottom[0].data[0, :, :, :]*self.mult
         im_color = np.zeros((256*5, 256*5, 3))
-        for i in range(3):
-            im_color[:, :, i] = im_org[i, :, :]
-        im_color = im_color.astype('uint8')
-        full_path = self.path+'/'+self.name+'.png'
-        cv2.imwrite(full_path, im_color)
+
+        if bottom[0].data[...].shape[1] == 1:
+            im_color[:, :, 0] = im_org[0, :, :]
+            im_color[:, :, 1] = im_org[0, :, :]
+            im_color[:, :, 2] = im_org[0, :, :]
+            im_color = im_color.astype('uint8')
+            full_path = self.path+'/'+self.name+'.png'
+            cv2.imwrite(full_path, im_color)
+        else:
+            for i in range(3):
+                im_color[:, :, i] = im_org[i, :, :]
+            im_color = im_color.astype('uint8')
+            full_path = self.path+'/'+self.name+'.png'
+            cv2.imwrite(full_path, im_color)
         '''
         for b in range(bottom[0].data.shape[0]):
             for c in range(bottom[0].data.shape[1]):
