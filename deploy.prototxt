@@ -1,27 +1,29 @@
 layer {
   name: "input"
-  type: "Input"
+  type: "ImageData"
   top: "input"
-  input_param {
-    shape {
-      dim: 1
-      dim: 3
-      dim: 256
-      dim: 256
-    }
+  top: "ImageData1"
+  image_data_param {
+    source: "./input_list.txt"
+    batch_size: 1
+    shuffle: false
+    new_height: 256
+    new_width: 256
+    is_color: true
   }
 }
 layer {
   name: "input_luma"
-  type: "Input"
+  type: "ImageData"
   top: "input_luma"
-  input_param {
-    shape {
-      dim: 1
-      dim: 1
-      dim: 256
-      dim: 256
-    }
+  top: "trash"
+  image_data_param {
+    source: "./input_list.txt"
+    batch_size: 1
+    shuffle: false
+    new_height: 256
+    new_width: 256
+    is_color: false
   }
 }
 layer {
@@ -1239,15 +1241,6 @@ layer {
   }
 }
 layer {
-  name: "ReLU34"
-  type: "ReLU"
-  bottom: "Convolution33"
-  top: "Convolution33"
-  relu_param {
-    engine: CAFFE
-  }
-}
-layer {
   name: "flow_init"
   type: "Convolution"
   bottom: "Convolution33"
@@ -1812,14 +1805,36 @@ layer {
   }
 }
 layer {
-  name: "flow_h"
+  name: "Slice1"
   type: "Slice"
   bottom: "flow"
-  top: "flow_h"
-  top: "flow_v"
+  top: "Slice1"
+  top: "Slice2"
   slice_param {
     slice_dim: 1
     slice_point: 25
+  }
+}
+layer {
+  name: "flow_h"
+  type: "Power"
+  bottom: "Slice1"
+  top: "flow_h"
+  power_param {
+    power: 1.0
+    scale: 1
+    shift: 0.0
+  }
+}
+layer {
+  name: "flow_v"
+  type: "Power"
+  bottom: "Slice2"
+  top: "flow_v"
+  power_param {
+    power: 1.0
+    scale: 1
+    shift: 0.0
   }
 }
 layer {
@@ -2742,6 +2757,27 @@ layer {
   python_param {
     module: "print_layer"
     layer: "PrintLayer"
-    param_str: "{\'path\': \'./\', \'name\': \'flow_result\', \'mult\': 1}"
+    param_str: "{\'path\': \'./\', \'name\': \'mv_result\', \'mult\': 1}"
   }
+}
+layer {
+  name: "silence1"
+  type: "Silence"
+  bottom: "trash1"
+}
+layer {
+  name: "trash2"
+  type: "Python"
+  bottom: "flow_init"
+  top: "trash2"
+  python_param {
+    module: "print_scaled"
+    layer: "PrintScaledLayer"
+    param_str: "{\'path\': \'./disparity.png\'}"
+  }
+}
+layer {
+  name: "silence2"
+  type: "Silence"
+  bottom: "trash2"
 }

@@ -1,3 +1,53 @@
+# +---+----+----+----+----+----+----+----+----+
+# | 0 | 9  | 18 | 27 | 36 | 45 | 54 | 63 | 72 |
+# +---+----+----+----+----+----+----+----+----+
+# | 1 | 10 | 19 | 28 | 37 | 46 | 55 | 64 | 73 |
+# +---+----+----+----+----+----+----+----+----+
+# | 2 | 11 | 20 | 29 | 38 | 47 | 56 | 65 | 74 |
+# +---+----+----+----+----+----+----+----+----+
+# | 3 | 12 | 21 | 30 | 39 | 48 | 57 | 66 | 75 |
+# +---+----+----+----+----+----+----+----+----+
+# | 4 | 13 | 22 | 31 | 40 | 49 | 58 | 67 | 76 |
+# +---+----+----+----+----+----+----+----+----+
+# | 5 | 14 | 23 | 32 | 41 | 50 | 59 | 68 | 77 |
+# +---+----+----+----+----+----+----+----+----+
+# | 6 | 15 | 24 | 33 | 42 | 51 | 60 | 69 | 78 |
+# +---+----+----+----+----+----+----+----+----+
+# | 7 | 16 | 25 | 34 | 43 | 52 | 61 | 70 | 79 |
+# +---+----+----+----+----+----+----+----+----+
+# | 8 | 17 | 26 | 35 | 44 | 53 | 62 | 71 | 80 |
+# +---+----+----+----+----+----+----+----+----+
+
+# +---+----+----+----+----+----+----+----+
+# | 0 | 8  | 16 | 24 | 32 | 40 | 48 | 56 |
+# +---+----+----+----+----+----+----+----+
+# | 1 | 9  | 17 | 25 | 33 | 41 | 49 | 57 |
+# +---+----+----+----+----+----+----+----+
+# | 2 | 10 | 18 | 26 | 34 | 42 | 50 | 58 |
+# +---+----+----+----+----+----+----+----+
+# | 3 | 11 | 19 | 27 | 35 | 43 | 51 | 59 |
+# +---+----+----+----+----+----+----+----+
+# | 4 | 12 | 20 | 28 | 36 | 44 | 52 | 60 |
+# +---+----+----+----+----+----+----+----+
+# | 5 | 13 | 21 | 29 | 37 | 45 | 53 | 61 |
+# +---+----+----+----+----+----+----+----+
+# | 6 | 14 | 22 | 30 | 38 | 46 | 54 | 62 |
+# +---+----+----+----+----+----+----+----+
+# | 7 | 15 | 23 | 31 | 39 | 47 | 55 | 63 |
+# +---+----+----+----+----+----+----+----+
+
+# +---+----+----+----+----+
+# | 0 |  5 | 10 | 15 | 20 |
+# +---+----+----+----+----+
+# | 1 |  6 | 11 | 16 | 21 |
+# +---+----+----+----+----+
+# | 2 |  7 | 12 | 17 | 22 |
+# +---+----+----+----+----+
+# | 3 |  8 | 13 | 18 | 23 |
+# +---+----+----+----+----+
+# | 4 |  9 | 14 | 19 | 24 |
+# +---+----+----+----+----+
+
 import os
 import sys
 import cv2
@@ -19,6 +69,109 @@ caffe.set_mode_gpu()
 ####################################################################################################
 ##########                               Public Function                                  ##########
 ####################################################################################################
+
+def make_colorwheel():
+    RY = 15
+    YG = 6
+    GC = 4
+    CB = 11
+    BM = 13
+    MR = 6
+
+    ncols = RY + YG + GC + CB + BM + MR
+    colorwheel = np.zeros((ncols, 3))
+    col = 0
+
+    # RY
+    colorwheel[0:RY, 0] = 255
+    colorwheel[0:RY, 1] = np.floor(255*np.arange(0,RY)/RY)
+    col = col+RY
+    # YG
+    colorwheel[col:col+YG, 0] = 255 - np.floor(255*np.arange(0,YG)/YG)
+    colorwheel[col:col+YG, 1] = 255
+    col = col+YG
+    # GC
+    colorwheel[col:col+GC, 1] = 255
+    colorwheel[col:col+GC, 2] = np.floor(255*np.arange(0,GC)/GC)
+    col = col+GC
+    # CB
+    colorwheel[col:col+CB, 1] = 255 - np.floor(255*np.arange(CB)/CB)
+    colorwheel[col:col+CB, 2] = 255
+    col = col+CB
+    # BM
+    colorwheel[col:col+BM, 2] = 255
+    colorwheel[col:col+BM, 0] = np.floor(255*np.arange(0,BM)/BM)
+    col = col+BM
+    # MR
+    colorwheel[col:col+MR, 2] = 255 - np.floor(255*np.arange(MR)/MR)
+    colorwheel[col:col+MR, 0] = 255
+    return colorwheel
+
+def flow_uv_to_colors(u, v, convert_to_bgr=False):
+    flow_image = np.zeros((u.shape[0], u.shape[1], 3), np.uint8)
+    colorwheel = make_colorwheel()  # shape [55x3]
+    ncols = colorwheel.shape[0]
+    rad = np.sqrt(np.square(u) + np.square(v))
+    a = np.arctan2(-v, -u)/np.pi
+    fk = (a+1) / 2*(ncols-1)
+    k0 = np.floor(fk).astype(np.int32)
+    k1 = k0 + 1
+    k1[k1 == ncols] = 0
+    f = fk - k0
+    for i in range(colorwheel.shape[1]):
+        tmp = colorwheel[:,i]
+        col0 = tmp[k0] / 255.0
+        col1 = tmp[k1] / 255.0
+        col = (1-f)*col0 + f*col1
+        idx = (rad <= 1)
+        col[idx]  = 1 - rad[idx] * (1-col[idx])
+        col[~idx] = col[~idx] * 0.75   # out of range
+        # Note the 2-i => BGR instead of RGB
+        ch_idx = 2-i if convert_to_bgr else i
+        flow_image[:,:,ch_idx] = np.floor(255 * col)
+    return flow_image
+
+def flow_to_color(flow_uv, clip_flow=None, convert_to_bgr=False):
+    assert flow_uv.ndim == 3, 'input flow must have three dimensions'
+    assert flow_uv.shape[2] == 2, 'input flow must have shape [H,W,2]'
+    if clip_flow is not None:
+        flow_uv = np.clip(flow_uv, 0, clip_flow)
+    u = flow_uv[:,:,0]
+    v = flow_uv[:,:,1]
+    rad = np.sqrt(np.square(u) + np.square(v))
+    rad_max = np.max(rad)
+    epsilon = 1e-5
+    u = u / (rad_max + epsilon)
+    v = v / (rad_max + epsilon)
+    return flow_uv_to_colors(u, v, convert_to_bgr)
+
+def trans_SAIs_to_LF(imgSAIs):
+    imgLF = np.zeros((256*1*5, 256*1*5, 3))
+    full_LF_crop = np.zeros((256, 256, 3, 5, 5))
+    for ax in range(5):
+        for ay in range(5):
+            full_LF_crop[:, :, :, ax, ay] = imgSAIs[:, :, :, 5*ax+ay]
+    for ax in range(5):
+        for ay in range(5):
+            resized2 = full_LF_crop[:, :, :, ay, ax]
+            resized2 = cv2.resize(resized2, dsize=(256*1, 256*1), interpolation=cv2.INTER_CUBIC) 
+            imgLF[ay::5, ax::5, :] = resized2
+    return imgLF
+
+def trans_order(imgSAIs):
+    imgSAIs2 = np.zeros((imgSAIs.shape))
+    for i in range(25):
+        if i == 0 or (i)%5==0:
+            imgSAIs2[:, :, :, i//5] = imgSAIs[:, :, :, i]
+        elif i == 1 or (i-1)%5==0:
+            imgSAIs2[:, :, :, (i-1)//5+5] = imgSAIs[:, :, :, i]
+        elif i == 2 or (i-2)%5==0:
+            imgSAIs2[:, :, :, (i-2)//5+5*2] = imgSAIs[:, :, :, i]
+        elif i == 3 or (i-3)%5==0:
+            imgSAIs2[:, :, :, (i-3)//5+5*3] = imgSAIs[:, :, :, i]
+        elif i == 4 or (i-4)%5==0:
+            imgSAIs2[:, :, :, (i-4)//5+5*4] = imgSAIs[:, :, :, i]
+    return imgSAIs2
 
 def shift_value_5x5(i, shift_val):
     if i<=4:
@@ -149,6 +302,54 @@ def slice_warp2(src, flow_h, flow_v, n_sai):
             con = L.Concat(*[con, predict_slice], concat_param={'axis': 1})
     return con
 
+def change_order(imgs, batch_size):
+    imgs_result = None
+    for j in range(5):
+        for i in range(5):
+            dum = L.DummyData(shape=dict(dim=[batch_size, 1, 256, 256]))
+            temp = L.Crop(imgs, dum, crop_param=dict(axis=1, offset=[5*i+j,0,0]))
+
+            if i==0 and j==0:
+                imgs_result = temp
+            else:
+                imgs_result = L.Concat(*[imgs_result, temp], concat_param={'axis': 1})
+    return imgs_result
+
+def l_loss(imgs, lables, batch_size):
+    loss = None
+    loss2 = None
+
+    imgs2 = change_order(imgs, batch_size)
+    lables2 = change_order(lables, batch_size)
+    
+    for i in range(5):
+        if i < 4:
+            imgs_slice, imgs = L.Slice(imgs, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
+            imgs2_slice, imgs2 = L.Slice(imgs2, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
+            lables_slice, lables = L.Slice(lables, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
+            lables2_slice, lables2 = L.Slice(lables2, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
+        else:
+            imgs_slice = imgs
+            imgs2_slice = imgs2
+            lables_slice = lables
+            lables2_slice = lables2
+
+        imgs_redu = L.Reduction(imgs_slice, axis=1, operation=P.Reduction.MEAN)
+        imgs2_redu = L.Reduction(imgs2_slice, axis=1, operation=P.Reduction.MEAN)
+        lables_redu = L.Reduction(lables_slice, axis=1, operation=P.Reduction.MEAN)
+        lables2_redu = L.Reduction(lables2_slice, axis=1, operation=P.Reduction.MEAN)
+        
+        if i == 0:
+            loss = L.AbsLoss(imgs_redu, lables_redu)
+            loss2 = L.AbsLoss(imgs2_redu, lables2_redu)
+        else:
+            temp_loss = L.AbsLoss(imgs_redu, lables_redu)
+            temp_loss2 = L.AbsLoss(imgs2_redu, lables2_redu)
+            loss = L.Eltwise(loss, temp_loss, operation=P.Eltwise.SUM)
+            loss2 = L.Eltwise(loss2, temp_loss2, operation=P.Eltwise.SUM)
+
+    return loss, loss2
+
 def flat(imgs, batch_size, ch=3):
     imgs_vector = None
     imgs_matrix = None
@@ -175,6 +376,7 @@ def denseUNet(input, batch_size):
     def flow_layer(bottom=None, nout=1):
         flow_init = L.Convolution(bottom, num_output=1, kernel_size=3, stride=1, dilation=1, pad=1,
                                 group=1, bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        #flow_init = L.ReLU(flow_init, in_place=True, engine=1)
         flow = L.Convolution(flow_init, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
                                 group=1, bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         return flow, flow_init
@@ -251,6 +453,14 @@ def denseUNet(input, batch_size):
 ##########                               Network Generator                                ##########
 ####################################################################################################
 
+'''
+    f = open(args.trainset_path+'/depthset_list.txt', 'w')
+    for i_tot in range(args.train_size):
+        data = args.trainset_path+'_depth/sai'+str(i_tot)+'_'+str(40)+'.png 0'+'\n'
+        f.write(data)
+    f.close()
+'''
+
 def denseUNet_train(args):
     # Make data list
     for i_sai in range(args.n_sai):
@@ -261,22 +471,12 @@ def denseUNet_train(args):
             f.write(data)
         f.close()
 
-    '''
-    f = open(args.trainset_path+'/depthset_list.txt', 'w')
-    i_pick = index_picker_5x5(args.center_id, args.pick_mode)
-    for i_tot in range(args.train_size):
-        data = args.trainset_path+'_depth/sai'+str(i_tot)+'_'+str(i_pick)+'.png 0'+'\n' # !!! depth center id = 40 !!!
-        f.write(data)
-    f.close()
-    '''
-
     # Init network   
     n = caffe.NetSpec()
 
     # Input
     n.input = image_data_center(batch_size=args.batch_size, data_path=args.trainset_path, center_id=args.center_id)
     n.label = image_data(batch_size=args.batch_size, data_path=args.trainset_path, n_sai=args.n_sai)
-    #n.label_depth = image_data_depth(batch_size=args.batch_size, data_path=args.trainset_path)
 
     # Fundamental
     n.flow, n.flow_init = denseUNet(n.input, args.batch_size)
@@ -288,9 +488,7 @@ def denseUNet_train(args):
 
     # Loss   
     n.lossA = L.AbsLoss(n.predict, n.label)
-    n.lossA = L.Power(n.lossA, power=1.0, scale=1.0, shift=0.0, loss_weight=1)
-    #n.lossB = L.AbsLoss(n.flow_init, n.label_depth)
-    #n.lossB = L.Power(n.lossB, power=1.0, scale=0.5, shift=0.0, loss_weight=1) 
+    n.lossA = L.Power(n.lossA, power=1.0, scale=1.0, shift=0.0, loss_weight=1)    
 
     # Generate Prototxt
     with open(args.train_path, 'w') as f:
@@ -298,18 +496,23 @@ def denseUNet_train(args):
 
 def denseUNet_test(args):
     # Generate dataset list
-    # Same as train
+    for i_sai in range(args.n_sai):
+        i_pick = index_picker_5x5(i_sai, args.pick_mode)
+        f = open(args.testset_path+'/dataset_list'+str(i_sai)+'.txt', 'w')
+        for i_tot in range(args.test_size):
+            data = args.testset_path+'/sai'+str(i_tot)+'_'+str(i_pick)+'.png 0'+'\n'
+            f.write(data)
+        f.close()
 
     # Init network       
     n = caffe.NetSpec()
 
     # Input
-    n.input = image_data_center(batch_size=1, data_path=args.trainset_path, center_id=args.center_id)
-    n.label = image_data(batch_size=1, data_path=args.trainset_path, n_sai=args.n_sai)
-    n.label_depth = image_data_depth(batch_size=1, data_path=args.trainset_path)
+    n.input = image_data_center(batch_size=args.batch_size, data_path=args.testset_path, center_id=args.center_id)
+    n.label = image_data(batch_size=args.batch_size, data_path=args.testset_path, n_sai=args.n_sai)
 
     # Fundamental
-    n.flow, n.flow_init = denseUNet(n.input, 1)   
+    n.flow, n.flow_init = denseUNet(n.input, args.batch_size)   
 
     # Translation
     n.shift = input_shifting(src=n.input, n_sai=args.n_sai, shift_val=args.shift_val)
@@ -317,7 +520,7 @@ def denseUNet_test(args):
     n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
     param_str = json.dumps({'flow_size': args.n_sai, 'color_size': 1})
     n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
-    
+
     # Visualization
     n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                     param_str=str(dict(path='./datas/face_dataset', name='flow_h', mult=20)))
@@ -325,27 +528,45 @@ def denseUNet_test(args):
     n.trash2 = L.Python(n.flow_v, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                     param_str=str(dict(path='./datas/face_dataset', name='flow_v', mult=20)))
     n.silence2 = L.Silence(n.trash2, ntop=0)
-    n.trash3 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset', name='label', mult=1*256)))
+    n.trash3 = L.Python(n.shift, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./datas/face_dataset', name='input', mult=1*256)))
     n.silence3 = L.Silence(n.trash3, ntop=0)
-    n.trash4 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset', name='predict', mult=1*256)))
+    n.trash4 = L.Python(n.label, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./datas/face_dataset', name='label', mult=1*256)))
     n.silence4 = L.Silence(n.trash4, ntop=0)
-    n.trash5 = L.Python(n.flow_init, module='print_scaled', layer='PrintScaledLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset/depth_predict.png')))
+    n.trash5 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
+                    param_str=str(dict(path='./datas/face_dataset', name='predict', mult=1*256)))
     n.silence5 = L.Silence(n.trash5, ntop=0)
-
-    '''
-    n.trash5 = L.Python(n.flow_init, module='print_scaled', layer='PrintScaledLayer', ntop=1,
+    n.trash6 = L.Python(n.flow_init, module='print_scaled', layer='PrintScaledLayer', ntop=1,
                     param_str=str(dict(path='./datas/face_dataset/depth_predict.png')))
-    n.silence5 = L.Silence(n.trash5, ntop=0)
-    n.trash6 = L.Python(n.label_depth, module='print_scaled', layer='PrintScaledLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset/depth_gt.png')))
     n.silence6 = L.Silence(n.trash6, ntop=0)
-    '''
 
     # Generate Prototxt
     with open(args.test_path, 'w') as f:
+        f.write(str(n.to_proto()))
+
+def denseUNet_deploy(args):
+    # Init network  
+    n = caffe.NetSpec()
+
+    # Input
+    n.input = L.Input(input_param=dict(shape=dict(dim=[1, 3, 256, 256])))
+    n.input_luma = L.Input(input_param=dict(shape=dict(dim=[1, 1, 256, 256])))
+    n.input_luma = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0, in_place=True)
+
+    # Fundamental
+    n.flow, n.flow_init = denseUNet(n.input_luma, batch_size)
+    n.silence = L.Silence(n.flow_init, ntop=0)  
+
+    # Translation
+    n.shift = input_shifting(center=n.input, batch_size=batch_size, sai=sai, shift_val=shift_val)
+    n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+    n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
+    param_str = json.dumps({'flow_size': 25, 'color_size': 3})
+    n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
+
+    # Generate Prototxt
+    with open(script_path, 'w') as f:
         f.write(str(n.to_proto()))
 
 def denseUNet_deploy2(args):
@@ -356,6 +577,7 @@ def denseUNet_deploy2(args):
     if args.mode == 'deploy':
         n.input, n.trash = L.ImageData(batch_size=1,
                             source='./input_list.txt',
+                            transform_param=dict(scale=1./256.),
                             shuffle=False,
                             ntop=2,
                             new_height=256,
@@ -363,26 +585,24 @@ def denseUNet_deploy2(args):
                             is_color=True)
         n.input_luma, n.trash = L.ImageData(batch_size=1,
                             source='./input_list.txt',
+                            transform_param=dict(scale=1./256.),
                             shuffle=False,
                             ntop=2,
                             new_height=256,
                             new_width=256,
                             is_color=False)
-        n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0)
-    else:
+    elif args.mode == 'test':
         n.input = L.Input(input_param=dict(shape=dict(dim=[1, 3, 256, 256])))
         n.input_luma = L.Input(input_param=dict(shape=dict(dim=[1, 1, 256, 256])))
-        n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0)
+        n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0, in_place=False)
 
     # Fundamental
     n.flow, n.flow_init = denseUNet(n.input_luma_down, batch_size=1)
     n.silence = L.Silence(n.flow_init, ntop=0)  
 
     # Translation
-    n.shift = input_shifting(src=n.input, n_sai=args.n_sai, shift_val=args.shift_val*1)
+    n.shift = input_shifting(src=n.input, n_sai=args.n_sai, shift_val=args.shift_val)
     n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[args.n_sai]))
-    n.flow_h = L.Power(n.flow_h, power=1.0, scale=1, shift=0.0) 
-    n.flow_v = L.Power(n.flow_v, power=1.0, scale=1, shift=0.0) 
     n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
     param_str = json.dumps({'flow_size': args.n_sai, 'color_size': 3})
     n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
@@ -391,10 +611,10 @@ def denseUNet_deploy2(args):
     n.result = flat(n.predict, batch_size=1, ch=3)
 
     n.trash1 = L.Python(n.result, module='print_layer', layer='PrintLayer', ntop=1,
-                    param_str=str(dict(path='./', name='mv_result', mult=1)))
+                    param_str=str(dict(path='./', name='flow_result', mult=1)))
     n.silence1 = L.Silence(n.trash1, ntop=0)
     n.trash2 = L.Python(n.flow_init, module='print_scaled', layer='PrintScaledLayer', ntop=1,
-                    param_str=str(dict(path='./disparity.png')))
+                    param_str=str(dict(path='./datas/face_dataset/depth_predict.png')))
     n.silence2 = L.Silence(n.trash2, ntop=0)
 
     # Generate Prototxt
@@ -445,34 +665,6 @@ def denseUNet_solver(args):
 ##########                                    Tester                                      ##########
 ####################################################################################################
 
-def denseUNet_infer():
-    n = caffe.Net('./deploy.prototxt', './models/denseUNet_iter_10000.caffemodel', caffe.TEST)
-
-    # Load image
-    src_img = cv2.imread('infer_input.png', 1)
-    if src_img.all() == None:
-        src_img = cv2.imread('infer_input.jpg', 1)
-    src_img = cv2.resize(src_img, (256, 256), interpolation=cv2.INTER_AREA)
-    luma_img = cv2.cvtColor(src_img, cv2.COLOR_BGR2GRAY)
-
-    # Input image
-    src_blob = lf_func.img_to_blob(src_img)
-    luma_blob = lf_func.img_to_blob(luma_img)
-    n.blobs['input'].data[...] = src_blob
-    n.blobs['input_luma'].data[...] = luma_blob
-
-    # Run model
-    n.forward()
-
-    sai_img_list =  np.zeros((256, 256, 3, 25))
-    dst_blob = n.blobs['predict'].data[...]
-    dst_blob = np.clip(dst_blob, 0, 255)
-    for i in range(25):
-        dst_blob_slice = dst_blob[:, 3*i:3*i+3, :, :]
-        sai_img_list[:, :, :, i] = lf_func.blob_to_img(dst_blob_slice)
-
-    lf_func.make_gif2(sai_img_list, './infer_result2.gif', 0.1)
-
 def denseUNet_tester(args):
     import skimage
 
@@ -482,8 +674,7 @@ def denseUNet_tester(args):
     ang_w = 5
     ang_h = 5
     sai_amount = 25
-    id_center = 12
-
+    sai_i_center = math.floor(math.sqrt(sai_amount))
     pr_path = './output/predict'
     gt_path = './output/GT'
     pick_mode = '9x9'
@@ -499,48 +690,52 @@ def denseUNet_tester(args):
         start = time.time()
 
         # Load image
-        id_pick = index_picker_5x5(id_center, pick_mode)
-        src_img = cv2.imread(args.testset_path+'/sai'+str(i_tot)+'_'+str(id_pick)+'.png', 1)
+        sai_i_center2 = index_picker_5x5(sai_i_center, pick_mode)
+        src_img = cv2.imread(args.testset_path+'/sai'+str(i_tot)+'_'+str(40)+'.png', 1)
         src_img = cv2.resize(src_img, (sai_w, sai_h), interpolation=cv2.INTER_AREA)
         luma_img = cv2.cvtColor(src_img, cv2.COLOR_BGR2GRAY)
 
         # Input image
-        src_blob = lf_func.img_to_blob(src_img)
-        luma_blob = lf_func.img_to_blob(luma_img)
+        src_blob = np.zeros((1, 3, sai_h, sai_w))
+        luma_blob = np.zeros((1, 1, sai_h, sai_w))
+        for i in range(3):
+            src_blob[0, i, :, :] = src_img[:, :, i]
+        luma_blob[0, 0, :, :] = luma_img[:, :]
         n.blobs['input'].data[...] = src_blob
         n.blobs['input_luma'].data[...] = luma_blob
 
         # Run model
         n.forward()
 
-        ### Print predict ###
+        ### Print predict ####
         # Get SAI, flow list
+        sai_img = np.zeros((sai_h, sai_w, 3))
+        flow_img = np.zeros((sai_h, sai_w, 2))
         sai_img_list =  np.zeros((sai_h, sai_w, 3, sai_amount))
         flow_img_list = np.zeros((sai_h, sai_w, 3, sai_amount))
-        flow_img = np.zeros((sai_h, sai_w, 2))
-
         dst_blob = n.blobs['predict'].data[...]
         flow_v_blob = n.blobs['flow_v'].data[...]
         flow_h_blob = n.blobs['flow_h'].data[...]
         for i in range(sai_amount):
             dst_blob_slice = dst_blob[:, 3*i:3*i+3, :, :]
-            sai_img = lf_func.blob_to_img(dst_blob_slice)
-            sai_img = cv2.resize(sai_img, dsize=(sai_w, sai_h), interpolation=cv2.INTER_AREA)
-            sai_img_list[:, :, :, i] = sai_img
-
             flow_v_blob_slice = flow_v_blob[0, i, :, :]
             flow_h_blob_slice = flow_h_blob[0, i, :, :]
             flow_img[:, :, 0] = (flow_v_blob_slice-(np.mean(flow_v_blob_slice)/2))*2
             flow_img[:, :, 1] = (flow_h_blob_slice-(np.mean(flow_h_blob_slice)/2))*2
-            flow_color_img = lf_func.flow_to_color(flow_img, convert_to_bgr=False)
+            flow_color_img = flow_to_color(flow_img, convert_to_bgr=False) # Change flow as color flow
+            for c in range(3):
+                sai_img[:, :, c] = cv2.resize(dst_blob_slice[0, c, :, :], dsize=(sai_w, sai_h), interpolation=cv2.INTER_AREA)
+            sai_img_list[:, :, :, i] = sai_img
             flow_img_list[:, :, :, i] = flow_color_img
+
+        # Print SAIs and flows
         for i in range(sai_amount):
             cv2.imwrite(pr_path+'/sai'+str(i_tot)+'_'+str(i)+'.png', sai_img_list[:, :, :, i])
             cv2.imwrite(pr_path+'/flow'+str(i_tot)+'_'+str(i)+'.png', flow_img_list[:, :, :, i])
 
         # Print LF
-        sai_img_list2 = lf_func.trans_order(sai_img_list)
-        lf_img = lf_func.trans_SAIs_to_LF(sai_img_list2)
+        sai_img_list2 = trans_order(sai_img_list)
+        lf_img = trans_SAIs_to_LF(sai_img_list2)
         cv2.imwrite(pr_path+'/result_lf'+str(i_tot)+'.jpg', lf_img)
         
         # Print Grid and EPI
@@ -559,7 +754,7 @@ def denseUNet_tester(args):
         lf_func.make_gird(sai_img_list, (ang_h, ang_w), pr_path+'/sai_grid'+str(i_tot)+'.png')
         
         # Print SAI gif
-        lf_func.make_gif2(sai_img_list, pr_path+'/sai_gif'+str(i_tot)+'.gif', 0.1)
+        lf_func.make_gif(sai_img_list, pr_path+'/sai_gif'+str(i_tot)+'.gif', 0.1)
 
         SIZE = 256
         OUTPUT_GT = gt_path
@@ -578,8 +773,8 @@ def denseUNet_tester(args):
             cv2.imwrite(OUTPUT_GT+'/sai'+str(i_tot)+'_'+str(i_pick)+'.png', sai_GT_list[:, :, :, i])
 
         # Print LF
-        sai_GT_list2 = lf_func.trans_order(sai_GT_list)
-        lf_GT = lf_func.trans_SAIs_to_LF(sai_GT_list2)
+        sai_GT_list2 = trans_order(sai_GT_list)
+        lf_GT = trans_SAIs_to_LF(sai_GT_list2)
         cv2.imwrite(OUTPUT_GT+'/result_lf'+str(i_tot)+'.jpg', lf_GT)
         
         # Print Grid and EPI
@@ -626,7 +821,7 @@ def denseUNet_tester(args):
         ssim_noise = ssim_noise_tot / 25
 
         # Print error map
-        lf_func.make_err_map(sai_img_list, sai_GT_list, OUTPUT_GT+'/error_map'+str(i_tot)+'.gif', 0.5, 0.1)
+        lf_func.make_err_map(sai_img_list, sai_GT_list, OUTPUT_GT+'/error_map'+str(i_tot)+'.gif', 0.1, 0.1)
 
         # Processing Time
         end = time.time()
@@ -650,7 +845,7 @@ def denseUNet_tester(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Light field')
 
-    parser.add_argument('--trainset_path', required=False, default='./datas/face_dataset/face_train_9x9', help='trainset path')
+    parser.add_argument('--trainset_path', required=False, default='./datas/face_dataset/face_test_9x9', help='trainset path')
     parser.add_argument('--testset_path', required=False, default='./datas/face_dataset/face_test_9x9', help='testset path')
     parser.add_argument('--train_path', required=False, default='./scripts/denseUNet_train.prototxt', help='train path')
     parser.add_argument('--test_path', required=False, default='./scripts/denseUNet_test.prototxt', help='test path')
@@ -667,7 +862,7 @@ if __name__ == "__main__":
     parser.add_argument('--center_id', required=False, default=12, help='center id')
     parser.add_argument('--epoch', required=False, default=100, help='epoch')
     parser.add_argument('--lr', required=False, default=0.0001, help='learning rate')
-    parser.add_argument('--mode', required=False, default='deploy', help='mode')
+    parser.add_argument('--mode', required=False, default='test', help='mode')
     
     args = parser.parse_args()
     
@@ -677,16 +872,13 @@ if __name__ == "__main__":
         denseUNet_test(args)
         denseUNet_solver(args)
         solver = caffe.get_solver(args.solver_path)
-        solver.net.copy_from('./models/denseUNet_iter_10000.caffemodel')
+        solver.net.copy_from('./models/denseUNet_iter_9800.caffemodel')
         solver.solve()
     elif args.mode == 'test':
         denseUNet_deploy2(args)
         denseUNet_tester(args)
     elif args.mode == 'deploy':
         denseUNet_deploy2(args)
-    elif args.mode == 'infer':
-        denseUNet_deploy2(args)
-        denseUNet_infer()
 
         
 
@@ -696,40 +888,3 @@ Memo
 2. ./tools/extra/plot_training_log.py.example 6 /home/junhyeong/docker/Caffe_LF_Syn/plot.png /home/junhyeong/docker/Caffe_LF_Syn/train.log
 /opt/caffe/build/tools/caffe train --solver=/docker/Caffe_LF_Syn/scripts/denseUNet_solver.prototxt 2>&1 | tee train.log
 """
-
-'''
-def l_loss(imgs, lables, batch_size):
-    loss = None
-    loss2 = None
-
-    imgs2 = change_order(imgs, batch_size)
-    lables2 = change_order(lables, batch_size)
-    
-    for i in range(5):
-        if i < 4:
-            imgs_slice, imgs = L.Slice(imgs, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
-            imgs2_slice, imgs2 = L.Slice(imgs2, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
-            lables_slice, lables = L.Slice(lables, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
-            lables2_slice, lables2 = L.Slice(lables2, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
-        else:
-            imgs_slice = imgs
-            imgs2_slice = imgs2
-            lables_slice = lables
-            lables2_slice = lables2
-
-        imgs_redu = L.Reduction(imgs_slice, axis=1, operation=P.Reduction.MEAN)
-        imgs2_redu = L.Reduction(imgs2_slice, axis=1, operation=P.Reduction.MEAN)
-        lables_redu = L.Reduction(lables_slice, axis=1, operation=P.Reduction.MEAN)
-        lables2_redu = L.Reduction(lables2_slice, axis=1, operation=P.Reduction.MEAN)
-        
-        if i == 0:
-            loss = L.AbsLoss(imgs_redu, lables_redu)
-            loss2 = L.AbsLoss(imgs2_redu, lables2_redu)
-        else:
-            temp_loss = L.AbsLoss(imgs_redu, lables_redu)
-            temp_loss2 = L.AbsLoss(imgs2_redu, lables2_redu)
-            loss = L.Eltwise(loss, temp_loss, operation=P.Eltwise.SUM)
-            loss2 = L.Eltwise(loss2, temp_loss2, operation=P.Eltwise.SUM)
-
-    return loss, loss2
-'''

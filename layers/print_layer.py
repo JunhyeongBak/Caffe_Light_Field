@@ -20,12 +20,14 @@ class PrintLayer(caffe.Layer):
             im_color[:, :, 0] = im_org[0, :, :]
             im_color[:, :, 1] = im_org[0, :, :]
             im_color[:, :, 2] = im_org[0, :, :]
+            im_color = np.clip(im_color, 0, 255)
             im_color = im_color.astype('uint8')
             full_path = self.path+'/'+self.name+'.png'
             cv2.imwrite(full_path, im_color)
         else:
             for i in range(3):
                 im_color[:, :, i] = im_org[i, :, :]
+            im_color = np.clip(im_color, 0, 255)
             im_color = im_color.astype('uint8')
             full_path = self.path+'/'+self.name+'.png'
             cv2.imwrite(full_path, im_color)
