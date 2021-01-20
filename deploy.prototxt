@@ -1,29 +1,27 @@
 layer {
   name: "input"
-  type: "ImageData"
+  type: "Input"
   top: "input"
-  top: "ImageData1"
-  image_data_param {
-    source: "./input_list.txt"
-    batch_size: 1
-    shuffle: false
-    new_height: 256
-    new_width: 256
-    is_color: true
+  input_param {
+    shape {
+      dim: 1
+      dim: 3
+      dim: 256
+      dim: 256
+    }
   }
 }
 layer {
   name: "input_luma"
-  type: "ImageData"
+  type: "Input"
   top: "input_luma"
-  top: "trash"
-  image_data_param {
-    source: "./input_list.txt"
-    batch_size: 1
-    shuffle: false
-    new_height: 256
-    new_width: 256
-    is_color: false
+  input_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 256
+      dim: 256
+    }
   }
 }
 layer {
@@ -43,8 +41,8 @@ layer {
   bottom: "input_luma_down"
   top: "Convolution1"
   convolution_param {
-    num_output: 16
-    bias_term: false
+    num_output: 50
+    bias_term: true
     pad: 1
     kernel_size: 3
     stride: 1
@@ -74,11 +72,11 @@ layer {
   bottom: "Convolution1"
   top: "Convolution2"
   convolution_param {
-    num_output: 16
-    bias_term: false
+    num_output: 50
+    bias_term: true
     pad: 1
     kernel_size: 3
-    group: 16
+    group: 50
     stride: 1
     weight_filler {
       type: "msra"
@@ -96,8 +94,8 @@ layer {
   bottom: "Convolution2"
   top: "Convolution3"
   convolution_param {
-    num_output: 16
-    bias_term: false
+    num_output: 50
+    bias_term: true
     pad: 0
     kernel_size: 1
     stride: 1
@@ -148,8 +146,8 @@ layer {
   bottom: "Pooling1"
   top: "Convolution4"
   convolution_param {
-    num_output: 32
-    bias_term: false
+    num_output: 64
+    bias_term: true
     pad: 1
     kernel_size: 3
     stride: 1
@@ -179,11 +177,11 @@ layer {
   bottom: "Convolution4"
   top: "Convolution5"
   convolution_param {
-    num_output: 32
-    bias_term: false
+    num_output: 64
+    bias_term: true
     pad: 1
     kernel_size: 3
-    group: 32
+    group: 64
     stride: 1
     weight_filler {
       type: "msra"
@@ -201,8 +199,8 @@ layer {
   bottom: "Convolution5"
   top: "Convolution6"
   convolution_param {
-    num_output: 32
-    bias_term: false
+    num_output: 64
+    bias_term: true
     pad: 0
     kernel_size: 1
     stride: 1
@@ -254,7 +252,7 @@ layer {
   top: "Convolution7"
   convolution_param {
     num_output: 64
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     stride: 1
@@ -285,7 +283,7 @@ layer {
   top: "Convolution8"
   convolution_param {
     num_output: 64
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     group: 64
@@ -307,7 +305,7 @@ layer {
   top: "Convolution9"
   convolution_param {
     num_output: 64
-    bias_term: false
+    bias_term: true
     pad: 0
     kernel_size: 1
     stride: 1
@@ -359,7 +357,7 @@ layer {
   top: "Convolution10"
   convolution_param {
     num_output: 128
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     stride: 1
@@ -390,7 +388,7 @@ layer {
   top: "Convolution11"
   convolution_param {
     num_output: 128
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     group: 128
@@ -412,7 +410,7 @@ layer {
   top: "Convolution12"
   convolution_param {
     num_output: 128
-    bias_term: false
+    bias_term: true
     pad: 0
     kernel_size: 1
     stride: 1
@@ -464,7 +462,7 @@ layer {
   top: "Convolution13"
   convolution_param {
     num_output: 256
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     stride: 1
@@ -495,7 +493,7 @@ layer {
   top: "Convolution14"
   convolution_param {
     num_output: 256
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     group: 256
@@ -517,7 +515,7 @@ layer {
   top: "Convolution15"
   convolution_param {
     num_output: 256
-    bias_term: false
+    bias_term: true
     pad: 0
     kernel_size: 1
     stride: 1
@@ -568,8 +566,8 @@ layer {
   bottom: "Pooling5"
   top: "Convolution16"
   convolution_param {
-    num_output: 256
-    bias_term: false
+    num_output: 512
+    bias_term: true
     pad: 1
     kernel_size: 3
     stride: 1
@@ -599,8 +597,8 @@ layer {
   bottom: "Convolution16"
   top: "Convolution17"
   convolution_param {
-    num_output: 256
-    bias_term: false
+    num_output: 512
+    bias_term: true
     pad: 3
     kernel_size: 3
     stride: 1
@@ -630,8 +628,8 @@ layer {
   bottom: "Convolution17"
   top: "Convolution18"
   convolution_param {
-    num_output: 256
-    bias_term: false
+    num_output: 512
+    bias_term: true
     pad: 6
     kernel_size: 3
     stride: 1
@@ -703,7 +701,7 @@ layer {
   top: "Convolution19"
   convolution_param {
     num_output: 256
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     stride: 1
@@ -734,7 +732,7 @@ layer {
   top: "Convolution20"
   convolution_param {
     num_output: 256
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     group: 256
@@ -756,7 +754,7 @@ layer {
   top: "Convolution21"
   convolution_param {
     num_output: 256
-    bias_term: false
+    bias_term: true
     pad: 0
     kernel_size: 1
     stride: 1
@@ -818,7 +816,7 @@ layer {
   top: "Convolution22"
   convolution_param {
     num_output: 128
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     stride: 1
@@ -849,7 +847,7 @@ layer {
   top: "Convolution23"
   convolution_param {
     num_output: 128
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     group: 128
@@ -871,7 +869,7 @@ layer {
   top: "Convolution24"
   convolution_param {
     num_output: 128
-    bias_term: false
+    bias_term: true
     pad: 0
     kernel_size: 1
     stride: 1
@@ -933,7 +931,7 @@ layer {
   top: "Convolution25"
   convolution_param {
     num_output: 64
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     stride: 1
@@ -964,7 +962,7 @@ layer {
   top: "Convolution26"
   convolution_param {
     num_output: 64
-    bias_term: false
+    bias_term: true
     pad: 1
     kernel_size: 3
     group: 64
@@ -986,7 +984,7 @@ layer {
   top: "Convolution27"
   convolution_param {
     num_output: 64
-    bias_term: false
+    bias_term: true
     pad: 0
     kernel_size: 1
     stride: 1
@@ -1016,7 +1014,7 @@ layer {
   bottom: "Convolution27"
   top: "Deconvolution4"
   convolution_param {
-    num_output: 32
+    num_output: 64
     pad: 1
     kernel_size: 4
     stride: 2
@@ -1047,8 +1045,8 @@ layer {
   bottom: "Concat4"
   top: "Convolution28"
   convolution_param {
-    num_output: 32
-    bias_term: false
+    num_output: 64
+    bias_term: true
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1078,11 +1076,11 @@ layer {
   bottom: "Convolution28"
   top: "Convolution29"
   convolution_param {
-    num_output: 32
-    bias_term: false
+    num_output: 64
+    bias_term: true
     pad: 1
     kernel_size: 3
-    group: 32
+    group: 64
     stride: 1
     weight_filler {
       type: "msra"
@@ -1100,8 +1098,8 @@ layer {
   bottom: "Convolution29"
   top: "Convolution30"
   convolution_param {
-    num_output: 32
-    bias_term: false
+    num_output: 64
+    bias_term: true
     pad: 0
     kernel_size: 1
     stride: 1
@@ -1131,7 +1129,7 @@ layer {
   bottom: "Convolution30"
   top: "Deconvolution5"
   convolution_param {
-    num_output: 16
+    num_output: 50
     pad: 1
     kernel_size: 4
     stride: 2
@@ -1162,8 +1160,8 @@ layer {
   bottom: "Concat5"
   top: "Convolution31"
   convolution_param {
-    num_output: 16
-    bias_term: false
+    num_output: 50
+    bias_term: true
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1193,11 +1191,11 @@ layer {
   bottom: "Convolution31"
   top: "Convolution32"
   convolution_param {
-    num_output: 16
-    bias_term: false
+    num_output: 50
+    bias_term: true
     pad: 1
     kernel_size: 3
-    group: 16
+    group: 50
     stride: 1
     weight_filler {
       type: "msra"
@@ -1215,8 +1213,8 @@ layer {
   bottom: "Convolution32"
   top: "Convolution33"
   convolution_param {
-    num_output: 16
-    bias_term: false
+    num_output: 50
+    bias_term: true
     pad: 0
     kernel_size: 1
     stride: 1
@@ -1231,7 +1229,7 @@ layer {
   }
 }
 layer {
-  name: "ReLU33"
+  name: "flow"
   type: "ReLU"
   bottom: "Convolution33"
   top: "Convolution33"
@@ -1241,55 +1239,6 @@ layer {
   }
 }
 layer {
-  name: "flow_init"
-  type: "Convolution"
-  bottom: "Convolution33"
-  top: "flow_init"
-  convolution_param {
-    num_output: 1
-    bias_term: false
-    pad: 1
-    kernel_size: 3
-    group: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-    bias_filler {
-      type: "msra"
-    }
-    engine: CAFFE
-    dilation: 1
-  }
-}
-layer {
-  name: "flow"
-  type: "Convolution"
-  bottom: "flow_init"
-  top: "flow"
-  convolution_param {
-    num_output: 50
-    bias_term: false
-    pad: 1
-    kernel_size: 3
-    group: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-    bias_filler {
-      type: "msra"
-    }
-    engine: CAFFE
-    dilation: 1
-  }
-}
-layer {
-  name: "silence"
-  type: "Silence"
-  bottom: "flow_init"
-}
-layer {
   name: "Python1"
   type: "Python"
   bottom: "input"
@@ -1297,7 +1246,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.5525, \"ty\": -1.5525}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1308,7 +1257,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.5525, \"ty\": -0.77625}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1329,7 +1278,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.5525, \"ty\": 0}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1350,7 +1299,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.5525, \"ty\": 0.77625}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1371,7 +1320,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -1.5525, \"ty\": 1.5525}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1392,7 +1341,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.77625, \"ty\": -1.5525}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1413,7 +1362,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.77625, \"ty\": -0.77625}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1434,7 +1383,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.77625, \"ty\": 0}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1455,7 +1404,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.77625, \"ty\": 0.77625}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1476,7 +1425,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": -0.77625, \"ty\": 1.5525}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1497,7 +1446,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -1.5525}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1518,7 +1467,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": -0.77625}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1560,7 +1509,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 0.77625}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1581,7 +1530,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0, \"ty\": 1.5525}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1602,7 +1551,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.77625, \"ty\": -1.5525}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1623,7 +1572,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.77625, \"ty\": -0.77625}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1644,7 +1593,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.77625, \"ty\": 0}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1665,7 +1614,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.77625, \"ty\": 0.77625}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1686,7 +1635,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 0.77625, \"ty\": 1.5525}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1707,7 +1656,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.5525, \"ty\": -1.5525}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1728,7 +1677,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.5525, \"ty\": -0.77625}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1749,7 +1698,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.5525, \"ty\": 0}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1770,7 +1719,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.5525, \"ty\": 0.77625}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1791,7 +1740,7 @@ layer {
   python_param {
     module: "input_shifting_layer"
     layer: "InputShiftingLayer"
-    param_str: "{\"tx\": 1.5525, \"ty\": 1.5525}"
+    param_str: "{\"tx\": 0, \"ty\": 0}"
   }
 }
 layer {
@@ -1807,7 +1756,7 @@ layer {
 layer {
   name: "Slice1"
   type: "Slice"
-  bottom: "flow"
+  bottom: "Convolution33"
   top: "Slice1"
   top: "Slice2"
   slice_param {
@@ -2764,20 +2713,4 @@ layer {
   name: "silence1"
   type: "Silence"
   bottom: "trash1"
-}
-layer {
-  name: "trash2"
-  type: "Python"
-  bottom: "flow_init"
-  top: "trash2"
-  python_param {
-    module: "print_scaled"
-    layer: "PrintScaledLayer"
-    param_str: "{\'path\': \'./disparity.png\'}"
-  }
-}
-layer {
-  name: "silence2"
-  type: "Silence"
-  bottom: "trash2"
 }

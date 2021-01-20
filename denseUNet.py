@@ -76,12 +76,12 @@ def image_data_center(batch_size, data_path, center_id):
 def image_data_depth(batch_size, data_path):
     depth, trash = L.ImageData(batch_size=batch_size,
                         source=data_path+'/depthset_list.txt',
-                        transform_param=dict(scale=1./256.),
+                        transform_param=dict(scale=1.),
                         shuffle=False,
                         ntop=2,
                         new_height=256,
                         new_width=256,
-                        is_color=False)
+                        is_color=True)
     return depth
 
 def image_data(batch_size, data_path, n_sai):
@@ -132,17 +132,15 @@ def slice_warp(src, flow_h, flow_v, n_sai):
 def slice_warp2(src, flow_h, flow_v, n_sai):
     for i in range(n_sai):
         if i < n_sai-1:
-            src_slice, src = L.Slice(src, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
             flow_h_slice, flow_h = L.Slice(flow_h, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
             flow_v_slice, flow_v = L.Slice(flow_v, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
             flow_hv_slice = L.Concat(*[flow_h_slice, flow_v_slice], concat_param={'axis': 1})
-            predict_slice = L.FlowWarp(src_slice, flow_hv_slice)
+            predict_slice = L.FlowWarp(src, flow_hv_slice)
         else:
-            src_slice = src
             flow_h_slice = flow_h
             flow_v_slice = flow_v
             flow_hv_slice = L.Concat(*[flow_h_slice, flow_v_slice], concat_param={'axis': 1})
-            predict_slice = L.FlowWarp(src_slice, flow_hv_slice)
+            predict_slice = L.FlowWarp(src, flow_hv_slice)
         if i == 0:
             con = predict_slice
         else:
@@ -167,13 +165,73 @@ def flat(imgs, batch_size, ch=3):
             imgs_matrix = L.Concat(*[imgs_matrix, imgs_vector], concat_param={'axis': 2})
     return imgs_matrix
 
+def change_order(imgs, batch_size):
+    imgs_result = None
+    for j in range(5):
+        for i in range(5):
+            dum = L.DummyData(shape=dict(dim=[batch_size, 1, 256, 256]))
+            temp = L.Crop(imgs, dum, crop_param=dict(axis=1, offset=[5*i+j,0,0]))
+
+            if i==0 and j==0:
+                imgs_result = temp
+            else:
+                imgs_result = L.Concat(*[imgs_result, temp], concat_param={'axis': 1})
+    return imgs_result
+
+def l_loss(imgs, lables, batch_size=1):
+    loss = None
+    loss2 = None
+
+    imgs2 = change_order(imgs, batch_size)
+    lables2 = change_order(lables, batch_size)
+    
+    for i in range(5):
+        if i < 4:
+            imgs_slice, imgs = L.Slice(imgs, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
+            imgs2_slice, imgs2 = L.Slice(imgs2, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
+            lables_slice, lables = L.Slice(lables, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
+            lables2_slice, lables2 = L.Slice(lables2, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
+        else:
+            imgs_slice = imgs
+            #imgs2_slice = imgs2
+            lables_slice = lables
+            #lables2_slice = lables2
+
+        imgs_redu = L.Reduction(imgs_slice, axis=1, operation=P.Reduction.MEAN)
+        #imgs2_redu = L.Reduction(imgs2_slice, axis=1, operation=P.Reduction.MEAN)
+        lables_redu = L.Reduction(lables_slice, axis=1, operation=P.Reduction.MEAN)
+        #lables2_redu = L.Reduction(lables2_slice, axis=1, operation=P.Reduction.MEAN)
+        
+        if i == 0:
+            loss = L.AbsLoss(imgs_redu, lables_redu)
+            loss2 = L.AbsLoss(imgs2_redu, lables2_redu)
+        else:
+            temp_loss = L.AbsLoss(imgs_redu, lables_redu)
+            temp_loss2 = L.AbsLoss(imgs2_redu, lables2_redu)
+            loss = L.Eltwise(loss, temp_loss, operation=P.Eltwise.SUM)
+            loss2 = L.Eltwise(loss2, temp_loss2, operation=P.Eltwise.SUM)
+
+    return loss
+
+def org_loss(imgs):
+    row1, row2, row3, row4, row5 = L.Slice(imgs, ntop=5, slice_param=dict(slice_dim=1, slice_point=[5, 10, 15, 20]))
+   
+    row_mean1 = L.Reduction(row1, axis=1, operation=P.Reduction.MEAN)
+    row_mean2 = L.Reduction(row2, axis=1, operation=P.Reduction.MEAN)
+    row_mean3 = L.Reduction(row3, axis=1, operation=P.Reduction.MEAN)
+    row_mean4 = L.Reduction(row4, axis=1, operation=P.Reduction.MEAN)
+    row_mean5 = L.Reduction(row5, axis=1, operation=P.Reduction.MEAN)
+
+    return row_mean1, row_mean2, row_mean3, row_mean4, row_mean5
+
 ####################################################################################################
 ##########                             Fundamental Network                                ##########
 ####################################################################################################
 
 def denseUNet(input, batch_size):
     def flow_layer(bottom=None, nout=1):
-        flow_init = L.Convolution(bottom, num_output=1, kernel_size=3, stride=1, dilation=1, pad=1,
+        bottom = L.ReLU(bottom, in_place=True, engine=1)
+        flow_init = L.Convolution(bottom, num_output=1, kernel_size=1, stride=1, dilation=1, pad=0,
                                 group=1, bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         flow = L.Convolution(flow_init, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
                                 group=1, bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
@@ -181,36 +239,36 @@ def denseUNet(input, batch_size):
 
     def conv_conv_group_layer(bottom=None, nout=1):
         conv = L.Convolution(bottom, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+                                bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         conv = L.Convolution(conv, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
-                                group=nout, bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+                                group=nout, bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         conv = L.Convolution(conv, num_output=nout, kernel_size=1, stride=1, dilation=1, pad=0,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+                                bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         return conv
 
     def conv_conv_res_dense_layer(bottom=None, nout=1):
         bottom = L.Convolution(bottom, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+                                bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         bottom = L.ReLU(bottom, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         conv = L.Convolution(bottom, num_output=nout, kernel_size=3, stride=1, dilation=3, pad=3,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+                                bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         conv = L.Convolution(conv, num_output=nout, kernel_size=3, stride=1, dilation=6, pad=6,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+                                bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         elth = L.Eltwise(conv, bottom, operation=P.Eltwise.SUM)
         elth = L.ReLU(elth, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         return elth   
 
     def conv_conv_downsample_group_layer(bottom=None, nout=1):
         conv = L.Convolution(bottom, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+                                bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         conv = L.Convolution(conv, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
-                                group=nout, bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+                                group=nout, bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         conv = L.Convolution(conv, num_output=nout, kernel_size=1, stride=1, dilation=1, pad=0,
-                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+                                bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         pool = L.Pooling(conv, kernel_size=3, stride=2, pool=P.Pooling.MAX)
         pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
@@ -224,13 +282,13 @@ def denseUNet(input, batch_size):
         conc = L.Concat(*[deconv, bottom2], concat_param={'axis': 1})
         return conc
 
-    conv1, poo1 = conv_conv_downsample_group_layer(input, 16)
-    conv2, poo2 = conv_conv_downsample_group_layer(poo1, 32)
+    conv1, poo1 = conv_conv_downsample_group_layer(input, 50)
+    conv2, poo2 = conv_conv_downsample_group_layer(poo1, 64)
     conv3, poo3 = conv_conv_downsample_group_layer(poo2, 64)
     conv4, poo4 = conv_conv_downsample_group_layer(poo3, 128)
     conv5, poo5 = conv_conv_downsample_group_layer(poo4, 256)
     
-    feature = conv_conv_res_dense_layer(poo5, 256)
+    feature = conv_conv_res_dense_layer(poo5, 512)
 
     deconv1 = upsample_concat_layer(feature, conv5, 256, 16)
     deconv1 = conv_conv_group_layer(deconv1, 256)
@@ -238,14 +296,14 @@ def denseUNet(input, batch_size):
     deconv2 = conv_conv_group_layer(deconv2, 128)
     deconv3 = upsample_concat_layer(deconv2, conv3, 64, 64)
     deconv3 = conv_conv_group_layer(deconv3, 64)
-    deconv4 = upsample_concat_layer(deconv3, conv2, 32, 128)
-    deconv4 = conv_conv_group_layer(deconv4, 32)
-    deconv5 = upsample_concat_layer(deconv4, conv1, 16, 256)
-    deconv5 = conv_conv_group_layer(deconv5, 16)
+    deconv4 = upsample_concat_layer(deconv3, conv2, 64, 128)
+    deconv4 = conv_conv_group_layer(deconv4, 64)
+    deconv5 = upsample_concat_layer(deconv4, conv1, 50, 256)
+    deconv5 = conv_conv_group_layer(deconv5, 50)
 
-    flow, flow_init = flow_layer(deconv5, 25*2)
+    # flow, flow_init = flow_layer(deconv5, 25*2)
 
-    return flow, flow_init
+    return deconv5
 
 ####################################################################################################
 ##########                               Network Generator                                ##########
@@ -261,14 +319,11 @@ def denseUNet_train(args):
             f.write(data)
         f.close()
 
-    '''
     f = open(args.trainset_path+'/depthset_list.txt', 'w')
-    i_pick = index_picker_5x5(args.center_id, args.pick_mode)
     for i_tot in range(args.train_size):
-        data = args.trainset_path+'_depth/sai'+str(i_tot)+'_'+str(i_pick)+'.png 0'+'\n' # !!! depth center id = 40 !!!
+        data = args.trainset_path+'/sai'+str(i_tot)+'_dep.png 0'+'\n' # !!! depth center id = 40 !!!
         f.write(data)
     f.close()
-    '''
 
     # Init network   
     n = caffe.NetSpec()
@@ -276,21 +331,40 @@ def denseUNet_train(args):
     # Input
     n.input = image_data_center(batch_size=args.batch_size, data_path=args.trainset_path, center_id=args.center_id)
     n.label = image_data(batch_size=args.batch_size, data_path=args.trainset_path, n_sai=args.n_sai)
-    #n.label_depth = image_data_depth(batch_size=args.batch_size, data_path=args.trainset_path)
+    #n.label_depth_org = image_data_depth(batch_size=args.batch_size, data_path=args.trainset_path)
+
+    #n.label_depth_1ch, n.label_depth_2ch, n.depth_trash = L.Slice(n.label_depth_org, ntop=3, slice_param=dict(slice_dim=1, slice_point=[1, 2]))
+    #n.label_depth_1ch = L.Power(n.label_depth_1ch, power=1.0, scale=256.0, shift=0.0)
+    #n.label_depth = L.Eltwise(n.label_depth_1ch, n.label_depth_2ch, operation=P.Eltwise.SUM)
+    #n.label_depth = L.Power(n.label_depth, power=1.0, scale=1/(256.0*256.0), shift=0.0)
+    #n.depth_trash = L.Silence(n.depth_trash, ntop=0)
 
     # Fundamental
-    n.flow, n.flow_init = denseUNet(n.input, args.batch_size)
+    n.flow = denseUNet(n.input, args.batch_size)
 
     # Translation
-    n.shift = input_shifting(src=n.input, n_sai=args.n_sai, shift_val=args.shift_val)
-    n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[args.n_sai]))
-    n.predict = slice_warp2(n.shift, n.flow_h, n.flow_v, args.n_sai)
+    n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+    n.predict = slice_warp2(n.input, n.flow_h, n.flow_v, args.n_sai)
 
-    # Loss   
-    n.lossA = L.AbsLoss(n.predict, n.label)
-    n.lossA = L.Power(n.lossA, power=1.0, scale=1.0, shift=0.0, loss_weight=1)
-    #n.lossB = L.AbsLoss(n.flow_init, n.label_depth)
-    #n.lossB = L.Power(n.lossB, power=1.0, scale=0.5, shift=0.0, loss_weight=1) 
+    n.loss1 = L.AbsLoss(n.predict, n.label, loss_weight=1)
+    #n.loss1 = L.Power(n.loss1, power=1.0, scale=1.0, shift=0.0, loss_weight=1)
+
+    #n.dep = L.Convolution(n.flow, num_output=1, kernel_size=3, stride=1, dilation=1, pad=1,
+    #                        group=1, bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+    #n.dep = L.Sigmoid(n.dep, in_place=True)
+    #n.dep = L.Convolution(n.dep, num_output=1, kernel_size=1, stride=1, dilation=1, pad=0,
+    #                        group=1, bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+    #n.dep = L.Sigmoid(n.dep, in_place=True)
+    #n.loss2 = L.AbsLoss(n.dep, n.label_depth, loss_weight=1)
+    
+    #n.loss2 = L.AbsLoss(n.label_depth, n.flow_init)
+    #n.loss2 = L.EuclideanLoss(n.label_depth, n.flow_init)
+    #n.loss2 = L.Power(n.loss2, power=1.0, scale=0.3, shift=0.0, loss_weight=1)
+
+    #n.ex_prdict = L.Convolution(n.flow_init, num_output=1, kernel_size=3, stride=1, weight_filler=dict(type='EdgeX'), engine=1)
+    #n.ex_label = L.Convolution(n.label_depth, num_output=1, kernel_size=3, stride=1, weight_filler=dict(type='EdgeY'), engine=1)
+    #n.loss3 = L.AbsLoss(n.ex_prdict, n.ex_label)
+    #n.loss3 = L.Power(n.loss3, power=1.0, scale=1.5, shift=0.0, loss_weight=1)
 
     # Generate Prototxt
     with open(args.train_path, 'w') as f:
@@ -306,17 +380,14 @@ def denseUNet_test(args):
     # Input
     n.input = image_data_center(batch_size=1, data_path=args.trainset_path, center_id=args.center_id)
     n.label = image_data(batch_size=1, data_path=args.trainset_path, n_sai=args.n_sai)
-    n.label_depth = image_data_depth(batch_size=1, data_path=args.trainset_path)
+    #n.label_depth = image_data_depth(batch_size=1, data_path=args.trainset_path)
 
     # Fundamental
-    n.flow, n.flow_init = denseUNet(n.input, 1)   
+    n.flow = denseUNet(n.input, 1)   
 
     # Translation
-    n.shift = input_shifting(src=n.input, n_sai=args.n_sai, shift_val=args.shift_val)
-    n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[args.n_sai]))
-    n.flow_con = L.Concat(*[n.flow_v, n.flow_h], concat_param={'axis': 1})
-    param_str = json.dumps({'flow_size': args.n_sai, 'color_size': 1})
-    n.predict = L.Python(*[n.shift, n.flow_con], module = 'bilinear_sampler_layer_3ch', layer = 'BilinearSamplerLayer3ch', ntop = 1, param_str = param_str)
+    n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[25]))
+    n.predict = slice_warp2(n.input, n.flow_h, n.flow_v, args.n_sai)
     
     # Visualization
     n.trash1 = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
@@ -331,18 +402,13 @@ def denseUNet_test(args):
     n.trash4 = L.Python(n.predict, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                     param_str=str(dict(path='./datas/face_dataset', name='predict', mult=1*256)))
     n.silence4 = L.Silence(n.trash4, ntop=0)
-    n.trash5 = L.Python(n.flow_init, module='print_scaled', layer='PrintScaledLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset/depth_predict.png')))
-    n.silence5 = L.Silence(n.trash5, ntop=0)
-
-    '''
-    n.trash5 = L.Python(n.flow_init, module='print_scaled', layer='PrintScaledLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset/depth_predict.png')))
-    n.silence5 = L.Silence(n.trash5, ntop=0)
-    n.trash6 = L.Python(n.label_depth, module='print_scaled', layer='PrintScaledLayer', ntop=1,
-                    param_str=str(dict(path='./datas/face_dataset/depth_gt.png')))
-    n.silence6 = L.Silence(n.trash6, ntop=0)
-    '''
+    #n.trash5 = L.Python(n.flow_init, module='print_scaled', layer='PrintScaledLayer', ntop=1,
+    #                param_str=str(dict(path='./datas/face_dataset/depth_predict.png')))
+    #n.silence5 = L.Silence(n.trash5, ntop=0)
+    #n.flow_init2 = L.Power(n.flow_init, power=1.0, scale=256*256, shift=0.0)
+    #n.trash6 = L.Python(n.flow_init2, module='depth_layer', layer='DepthLayer', ntop=1,
+    #                param_str=str(dict(path='./datas/face_dataset/depth_predict_3ch.png')))
+    #n.silence6 = L.Silence(n.trash6, ntop=0)
 
     # Generate Prototxt
     with open(args.test_path, 'w') as f:
@@ -375,8 +441,8 @@ def denseUNet_deploy2(args):
         n.input_luma_down = L.Power(n.input_luma, power=1.0, scale=1./256., shift=0)
 
     # Fundamental
-    n.flow, n.flow_init = denseUNet(n.input_luma_down, batch_size=1)
-    n.silence = L.Silence(n.flow_init, ntop=0)  
+    n.flow = denseUNet(n.input_luma_down, batch_size=1)
+    #n.silence = L.Silence(n.flow_init, ntop=0)  
 
     # Translation
     n.shift = input_shifting(src=n.input, n_sai=args.n_sai, shift_val=args.shift_val*1)
@@ -393,13 +459,27 @@ def denseUNet_deploy2(args):
     n.trash1 = L.Python(n.result, module='print_layer', layer='PrintLayer', ntop=1,
                     param_str=str(dict(path='./', name='mv_result', mult=1)))
     n.silence1 = L.Silence(n.trash1, ntop=0)
-    n.trash2 = L.Python(n.flow_init, module='print_scaled', layer='PrintScaledLayer', ntop=1,
-                    param_str=str(dict(path='./disparity.png')))
-    n.silence2 = L.Silence(n.trash2, ntop=0)
+    #n.trash2 = L.Python(n.flow_init, module='print_scaled', layer='PrintScaledLayer', ntop=1,
+    #                param_str=str(dict(path='./disparity.png')))
+    #n.silence2 = L.Silence(n.trash2, ntop=0)
 
     # Generate Prototxt
     with open('./deploy.prototxt', 'w') as f:
         f.write(str(n.to_proto()))
+
+def sandbox():
+    n = caffe.NetSpec()
+
+    n.image, n.trash = L.ImageData(batch_size=1,
+                                source='./sandbox.txt',
+                                shuffle=False,
+                                ntop=2,
+                                new_height=256,
+                                new_width=256,
+                                is_color=True)
+
+    with open('./sandbox.prototxt', 'w') as f:
+        f.write(str(n.to_proto()))    
 
 ####################################################################################################
 ##########                                Solver Generator                                ##########
@@ -424,7 +504,7 @@ def denseUNet_solver(args):
     s.lr_policy = 'step'
     s.gamma = 0.75
     s.power = 0.75
-    s.stepsize = 1000
+    s.stepsize = 50000
     s.momentum = 0.999
     s.momentum2 = 0.999
     s.weight_decay = 0.0005
@@ -446,7 +526,7 @@ def denseUNet_solver(args):
 ####################################################################################################
 
 def denseUNet_infer():
-    n = caffe.Net('./deploy.prototxt', './models/denseUNet_iter_10000.caffemodel', caffe.TEST)
+    n = caffe.Net('./deploy.prototxt', './models/denseUNet_iter_21000.caffemodel', caffe.TEST)
 
     # Load image
     src_img = cv2.imread('infer_input.png', 1)
@@ -651,23 +731,23 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Light field')
 
     parser.add_argument('--trainset_path', required=False, default='./datas/face_dataset/face_train_9x9', help='trainset path')
-    parser.add_argument('--testset_path', required=False, default='./datas/face_dataset/face_test_9x9', help='testset path')
+    parser.add_argument('--testset_path', required=False, default='./datas/face_dataset/face_train_9x9', help='testset path')
     parser.add_argument('--train_path', required=False, default='./scripts/denseUNet_train.prototxt', help='train path')
     parser.add_argument('--test_path', required=False, default='./scripts/denseUNet_test.prototxt', help='test path')
     parser.add_argument('--solver_path', required=False, default='./scripts/denseUNet_solver.prototxt', help='solver path')
     parser.add_argument('--model_path', required=False, default= './models/denseUNet', help='model path')
-    parser.add_argument('--model_name', required=False, default= './models/denseUNet_iter_10000.caffemodel', help='model name')
+    parser.add_argument('--model_name', required=False, default= './models/denseUNet_iter_21000.caffemodel', help='model name')
     parser.add_argument('--result_path', required=False, default='./output', help='result path')
-    parser.add_argument('--train_size', required=False, default=1207, help='train size')
-    parser.add_argument('--test_size', required=False, default=98, help='test size')
+    parser.add_argument('--train_size', required=False, default=190, help='train size')
+    parser.add_argument('--test_size', required=False, default=190, help='test size')
     parser.add_argument('--n_sai', required=False, default=25, help='num of sai')
-    parser.add_argument('--shift_val', required=False, default=0.77625, help='shift value')
+    parser.add_argument('--shift_val', required=False, default=0, help='shift value')
     parser.add_argument('--batch_size', required=False, default=4, help='batch size')
     parser.add_argument('--pick_mode', required=False, default='9x9', help='pick mode')
     parser.add_argument('--center_id', required=False, default=12, help='center id')
-    parser.add_argument('--epoch', required=False, default=100, help='epoch')
-    parser.add_argument('--lr', required=False, default=0.0001, help='learning rate')
-    parser.add_argument('--mode', required=False, default='deploy', help='mode')
+    parser.add_argument('--epoch', required=False, default=100000, help='epoch')
+    parser.add_argument('--lr', required=False, default=0.0005, help='learning rate')
+    parser.add_argument('--mode', required=False, default='train', help='mode')
     
     args = parser.parse_args()
     
@@ -677,7 +757,7 @@ if __name__ == "__main__":
         denseUNet_test(args)
         denseUNet_solver(args)
         solver = caffe.get_solver(args.solver_path)
-        solver.net.copy_from('./models/denseUNet_iter_10000.caffemodel')
+        solver.net.copy_from('./models/denseUNet_iter_21000.caffemodel')
         solver.solve()
     elif args.mode == 'test':
         denseUNet_deploy2(args)
@@ -687,49 +767,8 @@ if __name__ == "__main__":
     elif args.mode == 'infer':
         denseUNet_deploy2(args)
         denseUNet_infer()
-
-        
-
-"""
-Memo
-1. su root
-2. ./tools/extra/plot_training_log.py.example 6 /home/junhyeong/docker/Caffe_LF_Syn/plot.png /home/junhyeong/docker/Caffe_LF_Syn/train.log
-/opt/caffe/build/tools/caffe train --solver=/docker/Caffe_LF_Syn/scripts/denseUNet_solver.prototxt 2>&1 | tee train.log
-"""
-
-'''
-def l_loss(imgs, lables, batch_size):
-    loss = None
-    loss2 = None
-
-    imgs2 = change_order(imgs, batch_size)
-    lables2 = change_order(lables, batch_size)
-    
-    for i in range(5):
-        if i < 4:
-            imgs_slice, imgs = L.Slice(imgs, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
-            imgs2_slice, imgs2 = L.Slice(imgs2, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
-            lables_slice, lables = L.Slice(lables, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
-            lables2_slice, lables2 = L.Slice(lables2, ntop=2, slice_param=dict(slice_dim=1, slice_point=[5]))
-        else:
-            imgs_slice = imgs
-            imgs2_slice = imgs2
-            lables_slice = lables
-            lables2_slice = lables2
-
-        imgs_redu = L.Reduction(imgs_slice, axis=1, operation=P.Reduction.MEAN)
-        imgs2_redu = L.Reduction(imgs2_slice, axis=1, operation=P.Reduction.MEAN)
-        lables_redu = L.Reduction(lables_slice, axis=1, operation=P.Reduction.MEAN)
-        lables2_redu = L.Reduction(lables2_slice, axis=1, operation=P.Reduction.MEAN)
-        
-        if i == 0:
-            loss = L.AbsLoss(imgs_redu, lables_redu)
-            loss2 = L.AbsLoss(imgs2_redu, lables2_redu)
-        else:
-            temp_loss = L.AbsLoss(imgs_redu, lables_redu)
-            temp_loss2 = L.AbsLoss(imgs2_redu, lables2_redu)
-            loss = L.Eltwise(loss, temp_loss, operation=P.Eltwise.SUM)
-            loss2 = L.Eltwise(loss2, temp_loss2, operation=P.Eltwise.SUM)
-
-    return loss, loss2
-'''
+    elif args.mode == 'sandbox':
+        sandbox()
+        denseUNet_solver(args)
+        solver = caffe.get_solver(args.solver_path)
+        solver.solve()
