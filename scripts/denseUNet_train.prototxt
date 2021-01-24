@@ -16,6 +16,11 @@ layer {
   }
 }
 layer {
+  name: "silence"
+  type: "Silence"
+  bottom: "ImageData1"
+}
+layer {
   name: "ImageData2"
   type: "ImageData"
   top: "ImageData2"

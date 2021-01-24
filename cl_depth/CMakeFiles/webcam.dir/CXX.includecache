@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/junhyeong/docker/Caffe_LF_Syn/cl_depth/main2.cpp
+ocl.h
+/home/junhyeong/docker/Caffe_LF_Syn/cl_depth/ocl.h
+opencv2/opencv.hpp
+-
+chrono
+-
+
+/home/junhyeong/docker/Caffe_LF_Syn/cl_depth/ocl.h
+CL/cl.hpp
+/home/junhyeong/docker/Caffe_LF_Syn/cl_depth/CL/cl.hpp
+iostream
+-
+algorithm
+-
+fstream
+-
+vector
+-
+

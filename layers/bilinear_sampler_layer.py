@@ -16,7 +16,7 @@ def warp_flow(img_in, flow):
             new_flow = new_flow
             new_flow[:,:,0] += np.arange(w)
             new_flow[:,:,1] += np.arange(h)[:,np.newaxis]
-            res[ch, :, :] = cv2.remap(img[:, :], new_flow, None, interpolation = cv2.INTER_LINEAR, borderMode = cv2.BORDER_WRAP)
+            res[ch, :, :] = cv2.remap(img[:, :], new_flow, None, interpolation = cv2.INTER_LINEAR, borderMode = cv2.BORDER_REPLICATE)
 
         return res
 
