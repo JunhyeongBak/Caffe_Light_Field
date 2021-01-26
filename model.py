@@ -100,12 +100,12 @@ def slice_warp_python(src, flow_h, flow_v, n_sai):
         if i < n_sai-1:
             flow_h_slice, flow_h = L.Slice(flow_h, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
             flow_v_slice, flow_v = L.Slice(flow_v, ntop=2, slice_param=dict(slice_dim=1, slice_point=[1]))
-            flow_hv_slice = L.Concat(*[flow_v_slice, flow_h_slice], concat_param={'axis': 1}) # 기존 warping layer랑 반대
+            flow_hv_slice = L.Concat(*[flow_h_slice, flow_v_slice], concat_param={'axis': 1}) # 기존 warping layer랑 반대
             predict_slice = L.Python(*[src, flow_hv_slice], module = 'warping_layer', layer = 'WarpingLayer', ntop = 1)
         else:
             flow_h_slice = flow_h
             flow_v_slice = flow_v
-            flow_hv_slice = L.Concat(*[flow_v_slice, flow_h_slice], concat_param={'axis': 1}) # 기존 warping layer랑 반대
+            flow_hv_slice = L.Concat(*[flow_h_slice, flow_v_slice], concat_param={'axis': 1}) # 기존 warping layer랑 반대
             predict_slice = L.Python(*[src, flow_hv_slice], module = 'warping_layer', layer = 'WarpingLayer', ntop = 1)
 
         if i == 0:
@@ -192,6 +192,11 @@ def org_loss(imgs):
     return row_mean1, row_mean2, row_mean3, row_mean4, row_mean5
 
 def denseUNet(input, batch_size):
+    def flow_layer(bottom=None, nout=1):    
+        conv = L.Convolution(bottom, num_output=nout, kernel_size=1, stride=1, dilation=1, pad=0,
+                                bias_term=False, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        return conv
+
     def conv_conv_group_layer(bottom=None, nout=1):
         conv = L.Convolution(bottom, num_output=nout, kernel_size=3, stride=1, dilation=1, pad=1,
                                 bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
@@ -212,8 +217,11 @@ def denseUNet(input, batch_size):
         conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         conv = L.Convolution(conv, num_output=nout, kernel_size=3, stride=1, dilation=6, pad=6,
                                 bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
+        conv = L.Convolution(conv, num_output=nout, kernel_size=3, stride=1, dilation=9, pad=9,
+                                bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
+        conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         elth = L.Eltwise(conv, bottom, operation=P.Eltwise.SUM)
-        elth = L.ReLU(elth, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         return elth   
 
     def conv_conv_downsample_group_layer(bottom=None, nout=1):
@@ -226,24 +234,26 @@ def denseUNet(input, batch_size):
                                 bias_term=True, weight_filler=dict(type='msra'), bias_filler=dict(type='msra'), engine=1)
         conv = L.ReLU(conv, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         pool = L.Pooling(conv, kernel_size=3, stride=2, pool=P.Pooling.MAX)
-        pool = L.ReLU(pool, relu_param=dict(negative_slope=0.2), in_place=True, engine=1)
         return conv, pool
 
     def upsample_concat_layer(bottom1=None, bottom2=None, nout=1):
         deconv = L.Deconvolution(bottom1, convolution_param=dict(num_output=nout, kernel_size=4, stride=2, pad=1))
-        deconv = L.ReLU(deconv, relu_param=dict(negative_slope=0.2), in_place=True)
-        #dum = L.DummyData(shape=dict(dim=[batch_size, nout, crop_size, crop_size]))
-        #deconv_crop = L.Crop(deconv, dum, crop_param=dict(axis=1, offset=[0, 0, 0]))
+
+        #deconv = L.BatchNorm(deconv, use_global_stats=True)
+        #deconv = L.Scale(deconv, bias_term=True)
+        #bottom2 = L.BatchNorm(bottom2, use_global_stats=True)
+        #bottom2 = L.Scale(bottom2, bias_term=True)
+
         conc = L.Concat(*[deconv, bottom2], concat_param={'axis': 1})
         return conc
 
-    conv1, poo1 = conv_conv_downsample_group_layer(input, 50)
-    conv2, poo2 = conv_conv_downsample_group_layer(poo1, 64)
-    conv3, poo3 = conv_conv_downsample_group_layer(poo2, 64)
-    conv4, poo4 = conv_conv_downsample_group_layer(poo3, 128)
-    conv5, poo5 = conv_conv_downsample_group_layer(poo4, 256)
+    conv1, pool1 = conv_conv_downsample_group_layer(input, 50)
+    conv2, pool2 = conv_conv_downsample_group_layer(pool1, 64)
+    conv3, pool3 = conv_conv_downsample_group_layer(pool2, 64)
+    conv4, pool4 = conv_conv_downsample_group_layer(pool3, 128)
+    conv5, pool5 = conv_conv_downsample_group_layer(pool4, 256)
     
-    feature = conv_conv_res_dense_layer(poo5, 512)
+    feature = conv_conv_res_dense_layer(pool5, 512)
 
     deconv1 = upsample_concat_layer(feature, conv5, 256)
     deconv1 = conv_conv_group_layer(deconv1, 256)
@@ -256,7 +266,9 @@ def denseUNet(input, batch_size):
     deconv5 = upsample_concat_layer(deconv4, conv1, 50)
     deconv5 = conv_conv_group_layer(deconv5, 50)
 
-    return deconv5
+    flow = flow_layer(deconv5, 50)
+
+    return flow
 
 def train_proto_gen(args):
     for i_sai in range(args.n_sai):

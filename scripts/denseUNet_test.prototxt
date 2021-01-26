@@ -120,16 +120,6 @@ layer {
   }
 }
 layer {
-  name: "ReLU3"
-  type: "ReLU"
-  bottom: "Pooling1"
-  top: "Pooling1"
-  relu_param {
-    negative_slope: 0.2
-    engine: CAFFE
-  }
-}
-layer {
   name: "Convolution4"
   type: "Convolution"
   bottom: "Pooling1"
@@ -151,7 +141,7 @@ layer {
   }
 }
 layer {
-  name: "ReLU4"
+  name: "ReLU3"
   type: "ReLU"
   bottom: "Convolution4"
   top: "Convolution4"
@@ -204,7 +194,7 @@ layer {
   }
 }
 layer {
-  name: "ReLU5"
+  name: "ReLU4"
   type: "ReLU"
   bottom: "Convolution6"
   top: "Convolution6"
@@ -222,16 +212,6 @@ layer {
     pool: MAX
     kernel_size: 3
     stride: 2
-  }
-}
-layer {
-  name: "ReLU6"
-  type: "ReLU"
-  bottom: "Pooling2"
-  top: "Pooling2"
-  relu_param {
-    negative_slope: 0.2
-    engine: CAFFE
   }
 }
 layer {
@@ -256,7 +236,7 @@ layer {
   }
 }
 layer {
-  name: "ReLU7"
+  name: "ReLU5"
   type: "ReLU"
   bottom: "Convolution7"
   top: "Convolution7"
@@ -309,7 +289,7 @@ layer {
   }
 }
 layer {
-  name: "ReLU8"
+  name: "ReLU6"
   type: "ReLU"
   bottom: "Convolution9"
   top: "Convolution9"
@@ -327,16 +307,6 @@ layer {
     pool: MAX
     kernel_size: 3
     stride: 2
-  }
-}
-layer {
-  name: "ReLU9"
-  type: "ReLU"
-  bottom: "Pooling3"
-  top: "Pooling3"
-  relu_param {
-    negative_slope: 0.2
-    engine: CAFFE
   }
 }
 layer {
@@ -361,7 +331,7 @@ layer {
   }
 }
 layer {
-  name: "ReLU10"
+  name: "ReLU7"
   type: "ReLU"
   bottom: "Convolution10"
   top: "Convolution10"
@@ -414,7 +384,7 @@ layer {
   }
 }
 layer {
-  name: "ReLU11"
+  name: "ReLU8"
   type: "ReLU"
   bottom: "Convolution12"
   top: "Convolution12"
@@ -432,16 +402,6 @@ layer {
     pool: MAX
     kernel_size: 3
     stride: 2
-  }
-}
-layer {
-  name: "ReLU12"
-  type: "ReLU"
-  bottom: "Pooling4"
-  top: "Pooling4"
-  relu_param {
-    negative_slope: 0.2
-    engine: CAFFE
   }
 }
 layer {
@@ -466,7 +426,7 @@ layer {
   }
 }
 layer {
-  name: "ReLU13"
+  name: "ReLU9"
   type: "ReLU"
   bottom: "Convolution13"
   top: "Convolution13"
@@ -519,7 +479,7 @@ layer {
   }
 }
 layer {
-  name: "ReLU14"
+  name: "ReLU10"
   type: "ReLU"
   bottom: "Convolution15"
   top: "Convolution15"
@@ -537,16 +497,6 @@ layer {
     pool: MAX
     kernel_size: 3
     stride: 2
-  }
-}
-layer {
-  name: "ReLU15"
-  type: "ReLU"
-  bottom: "Pooling5"
-  top: "Pooling5"
-  relu_param {
-    negative_slope: 0.2
-    engine: CAFFE
   }
 }
 layer {
@@ -571,7 +521,7 @@ layer {
   }
 }
 layer {
-  name: "ReLU16"
+  name: "ReLU11"
   type: "ReLU"
   bottom: "Convolution16"
   top: "Convolution16"
@@ -602,7 +552,7 @@ layer {
   }
 }
 layer {
-  name: "ReLU17"
+  name: "ReLU12"
   type: "ReLU"
   bottom: "Convolution17"
   top: "Convolution17"
@@ -633,23 +583,54 @@ layer {
   }
 }
 layer {
+  name: "ReLU13"
+  type: "ReLU"
+  bottom: "Convolution18"
+  top: "Convolution18"
+  relu_param {
+    negative_slope: 0.2
+    engine: CAFFE
+  }
+}
+layer {
+  name: "Convolution19"
+  type: "Convolution"
+  bottom: "Convolution18"
+  top: "Convolution19"
+  convolution_param {
+    num_output: 512
+    bias_term: true
+    pad: 9
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 9
+  }
+}
+layer {
+  name: "ReLU14"
+  type: "ReLU"
+  bottom: "Convolution19"
+  top: "Convolution19"
+  relu_param {
+    negative_slope: 0.2
+    engine: CAFFE
+  }
+}
+layer {
   name: "Eltwise1"
   type: "Eltwise"
-  bottom: "Convolution18"
+  bottom: "Convolution19"
   bottom: "Convolution16"
   top: "Eltwise1"
   eltwise_param {
     operation: SUM
-  }
-}
-layer {
-  name: "ReLU18"
-  type: "ReLU"
-  bottom: "Eltwise1"
-  top: "Eltwise1"
-  relu_param {
-    negative_slope: 0.2
-    engine: CAFFE
   }
 }
 layer {
@@ -665,15 +646,6 @@ layer {
   }
 }
 layer {
-  name: "ReLU19"
-  type: "ReLU"
-  bottom: "Deconvolution1"
-  top: "Deconvolution1"
-  relu_param {
-    negative_slope: 0.2
-  }
-}
-layer {
   name: "Concat1"
   type: "Concat"
   bottom: "Deconvolution1"
@@ -684,10 +656,10 @@ layer {
   }
 }
 layer {
-  name: "Convolution19"
+  name: "Convolution20"
   type: "Convolution"
   bottom: "Concat1"
-  top: "Convolution19"
+  top: "Convolution20"
   convolution_param {
     num_output: 256
     bias_term: true
@@ -705,20 +677,20 @@ layer {
   }
 }
 layer {
-  name: "ReLU20"
+  name: "ReLU15"
   type: "ReLU"
-  bottom: "Convolution19"
-  top: "Convolution19"
+  bottom: "Convolution20"
+  top: "Convolution20"
   relu_param {
     negative_slope: 0.2
     engine: CAFFE
   }
 }
 layer {
-  name: "Convolution20"
+  name: "Convolution21"
   type: "Convolution"
-  bottom: "Convolution19"
-  top: "Convolution20"
+  bottom: "Convolution20"
+  top: "Convolution21"
   convolution_param {
     num_output: 256
     bias_term: true
@@ -737,10 +709,10 @@ layer {
   }
 }
 layer {
-  name: "Convolution21"
+  name: "Convolution22"
   type: "Convolution"
-  bottom: "Convolution20"
-  top: "Convolution21"
+  bottom: "Convolution21"
+  top: "Convolution22"
   convolution_param {
     num_output: 256
     bias_term: true
@@ -758,10 +730,10 @@ layer {
   }
 }
 layer {
-  name: "ReLU21"
+  name: "ReLU16"
   type: "ReLU"
-  bottom: "Convolution21"
-  top: "Convolution21"
+  bottom: "Convolution22"
+  top: "Convolution22"
   relu_param {
     negative_slope: 0.2
     engine: CAFFE
@@ -770,22 +742,13 @@ layer {
 layer {
   name: "Deconvolution2"
   type: "Deconvolution"
-  bottom: "Convolution21"
+  bottom: "Convolution22"
   top: "Deconvolution2"
   convolution_param {
     num_output: 128
     pad: 1
     kernel_size: 4
     stride: 2
-  }
-}
-layer {
-  name: "ReLU22"
-  type: "ReLU"
-  bottom: "Deconvolution2"
-  top: "Deconvolution2"
-  relu_param {
-    negative_slope: 0.2
   }
 }
 layer {
@@ -799,10 +762,10 @@ layer {
   }
 }
 layer {
-  name: "Convolution22"
+  name: "Convolution23"
   type: "Convolution"
   bottom: "Concat2"
-  top: "Convolution22"
+  top: "Convolution23"
   convolution_param {
     num_output: 128
     bias_term: true
@@ -820,20 +783,20 @@ layer {
   }
 }
 layer {
-  name: "ReLU23"
+  name: "ReLU17"
   type: "ReLU"
-  bottom: "Convolution22"
-  top: "Convolution22"
+  bottom: "Convolution23"
+  top: "Convolution23"
   relu_param {
     negative_slope: 0.2
     engine: CAFFE
   }
 }
 layer {
-  name: "Convolution23"
+  name: "Convolution24"
   type: "Convolution"
-  bottom: "Convolution22"
-  top: "Convolution23"
+  bottom: "Convolution23"
+  top: "Convolution24"
   convolution_param {
     num_output: 128
     bias_term: true
@@ -852,10 +815,10 @@ layer {
   }
 }
 layer {
-  name: "Convolution24"
+  name: "Convolution25"
   type: "Convolution"
-  bottom: "Convolution23"
-  top: "Convolution24"
+  bottom: "Convolution24"
+  top: "Convolution25"
   convolution_param {
     num_output: 128
     bias_term: true
@@ -873,10 +836,10 @@ layer {
   }
 }
 layer {
-  name: "ReLU24"
+  name: "ReLU18"
   type: "ReLU"
-  bottom: "Convolution24"
-  top: "Convolution24"
+  bottom: "Convolution25"
+  top: "Convolution25"
   relu_param {
     negative_slope: 0.2
     engine: CAFFE
@@ -885,22 +848,13 @@ layer {
 layer {
   name: "Deconvolution3"
   type: "Deconvolution"
-  bottom: "Convolution24"
+  bottom: "Convolution25"
   top: "Deconvolution3"
   convolution_param {
     num_output: 64
     pad: 1
     kernel_size: 4
     stride: 2
-  }
-}
-layer {
-  name: "ReLU25"
-  type: "ReLU"
-  bottom: "Deconvolution3"
-  top: "Deconvolution3"
-  relu_param {
-    negative_slope: 0.2
   }
 }
 layer {
@@ -914,10 +868,10 @@ layer {
   }
 }
 layer {
-  name: "Convolution25"
+  name: "Convolution26"
   type: "Convolution"
   bottom: "Concat3"
-  top: "Convolution25"
+  top: "Convolution26"
   convolution_param {
     num_output: 64
     bias_term: true
@@ -935,20 +889,20 @@ layer {
   }
 }
 layer {
-  name: "ReLU26"
+  name: "ReLU19"
   type: "ReLU"
-  bottom: "Convolution25"
-  top: "Convolution25"
+  bottom: "Convolution26"
+  top: "Convolution26"
   relu_param {
     negative_slope: 0.2
     engine: CAFFE
   }
 }
 layer {
-  name: "Convolution26"
+  name: "Convolution27"
   type: "Convolution"
-  bottom: "Convolution25"
-  top: "Convolution26"
+  bottom: "Convolution26"
+  top: "Convolution27"
   convolution_param {
     num_output: 64
     bias_term: true
@@ -967,10 +921,10 @@ layer {
   }
 }
 layer {
-  name: "Convolution27"
+  name: "Convolution28"
   type: "Convolution"
-  bottom: "Convolution26"
-  top: "Convolution27"
+  bottom: "Convolution27"
+  top: "Convolution28"
   convolution_param {
     num_output: 64
     bias_term: true
@@ -988,10 +942,10 @@ layer {
   }
 }
 layer {
-  name: "ReLU27"
+  name: "ReLU20"
   type: "ReLU"
-  bottom: "Convolution27"
-  top: "Convolution27"
+  bottom: "Convolution28"
+  top: "Convolution28"
   relu_param {
     negative_slope: 0.2
     engine: CAFFE
@@ -1000,22 +954,13 @@ layer {
 layer {
   name: "Deconvolution4"
   type: "Deconvolution"
-  bottom: "Convolution27"
+  bottom: "Convolution28"
   top: "Deconvolution4"
   convolution_param {
     num_output: 64
     pad: 1
     kernel_size: 4
     stride: 2
-  }
-}
-layer {
-  name: "ReLU28"
-  type: "ReLU"
-  bottom: "Deconvolution4"
-  top: "Deconvolution4"
-  relu_param {
-    negative_slope: 0.2
   }
 }
 layer {
@@ -1029,10 +974,10 @@ layer {
   }
 }
 layer {
-  name: "Convolution28"
+  name: "Convolution29"
   type: "Convolution"
   bottom: "Concat4"
-  top: "Convolution28"
+  top: "Convolution29"
   convolution_param {
     num_output: 64
     bias_term: true
@@ -1050,20 +995,20 @@ layer {
   }
 }
 layer {
-  name: "ReLU29"
+  name: "ReLU21"
   type: "ReLU"
-  bottom: "Convolution28"
-  top: "Convolution28"
+  bottom: "Convolution29"
+  top: "Convolution29"
   relu_param {
     negative_slope: 0.2
     engine: CAFFE
   }
 }
 layer {
-  name: "Convolution29"
+  name: "Convolution30"
   type: "Convolution"
-  bottom: "Convolution28"
-  top: "Convolution29"
+  bottom: "Convolution29"
+  top: "Convolution30"
   convolution_param {
     num_output: 64
     bias_term: true
@@ -1082,10 +1027,10 @@ layer {
   }
 }
 layer {
-  name: "Convolution30"
+  name: "Convolution31"
   type: "Convolution"
-  bottom: "Convolution29"
-  top: "Convolution30"
+  bottom: "Convolution30"
+  top: "Convolution31"
   convolution_param {
     num_output: 64
     bias_term: true
@@ -1103,10 +1048,10 @@ layer {
   }
 }
 layer {
-  name: "ReLU30"
+  name: "ReLU22"
   type: "ReLU"
-  bottom: "Convolution30"
-  top: "Convolution30"
+  bottom: "Convolution31"
+  top: "Convolution31"
   relu_param {
     negative_slope: 0.2
     engine: CAFFE
@@ -1115,22 +1060,13 @@ layer {
 layer {
   name: "Deconvolution5"
   type: "Deconvolution"
-  bottom: "Convolution30"
+  bottom: "Convolution31"
   top: "Deconvolution5"
   convolution_param {
     num_output: 50
     pad: 1
     kernel_size: 4
     stride: 2
-  }
-}
-layer {
-  name: "ReLU31"
-  type: "ReLU"
-  bottom: "Deconvolution5"
-  top: "Deconvolution5"
-  relu_param {
-    negative_slope: 0.2
   }
 }
 layer {
@@ -1144,10 +1080,10 @@ layer {
   }
 }
 layer {
-  name: "Convolution31"
+  name: "Convolution32"
   type: "Convolution"
   bottom: "Concat5"
-  top: "Convolution31"
+  top: "Convolution32"
   convolution_param {
     num_output: 50
     bias_term: true
@@ -1165,20 +1101,20 @@ layer {
   }
 }
 layer {
-  name: "ReLU32"
+  name: "ReLU23"
   type: "ReLU"
-  bottom: "Convolution31"
-  top: "Convolution31"
+  bottom: "Convolution32"
+  top: "Convolution32"
   relu_param {
     negative_slope: 0.2
     engine: CAFFE
   }
 }
 layer {
-  name: "Convolution32"
+  name: "Convolution33"
   type: "Convolution"
-  bottom: "Convolution31"
-  top: "Convolution32"
+  bottom: "Convolution32"
+  top: "Convolution33"
   convolution_param {
     num_output: 50
     bias_term: true
@@ -1197,10 +1133,10 @@ layer {
   }
 }
 layer {
-  name: "Convolution33"
+  name: "Convolution34"
   type: "Convolution"
-  bottom: "Convolution32"
-  top: "Convolution33"
+  bottom: "Convolution33"
+  top: "Convolution34"
   convolution_param {
     num_output: 50
     bias_term: true
@@ -1218,19 +1154,40 @@ layer {
   }
 }
 layer {
-  name: "flow"
+  name: "ReLU24"
   type: "ReLU"
-  bottom: "Convolution33"
-  top: "Convolution33"
+  bottom: "Convolution34"
+  top: "Convolution34"
   relu_param {
     negative_slope: 0.2
     engine: CAFFE
   }
 }
 layer {
+  name: "flow"
+  type: "Convolution"
+  bottom: "Convolution34"
+  top: "flow"
+  convolution_param {
+    num_output: 50
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "msra"
+    }
+    engine: CAFFE
+    dilation: 1
+  }
+}
+layer {
   name: "flow_h"
   type: "Slice"
-  bottom: "Convolution33"
+  bottom: "flow"
   top: "flow_h"
   top: "flow_v"
   slice_param {
@@ -1241,7 +1198,7 @@ layer {
 layer {
   name: "Slice1"
   type: "Slice"
-  bottom: "flow_v"
+  bottom: "flow_h"
   top: "Slice1"
   top: "Slice2"
   slice_param {
@@ -1252,7 +1209,7 @@ layer {
 layer {
   name: "Slice3"
   type: "Slice"
-  bottom: "flow_h"
+  bottom: "flow_v"
   top: "Slice3"
   top: "Slice4"
   slice_param {

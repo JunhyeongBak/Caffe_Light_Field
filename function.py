@@ -141,33 +141,6 @@ def make_gif2(src, path, duration):
 
     imageio.mimsave(path, src_list, duration=duration)
 
-'''
-def make_epi(src, ang_size, epi_pt, path)
-    h, w, c, _ = src.shape
-
-    sai_mv = np.zeros((sai_h, sai_w, 3, 5, 5))
-    sai_epi_ver = np.zeros((sai_h, ang_w*ang_w, 3))
-    sai_epi_hor = np.zeros((ang_h*ang_h, sai_w, 3))
-    for ax in range(ang_w):
-        for ay in range(ang_h):
-            sai = sai_img_list[:, :, :, ang_h*ax+ay]
-            sai_mv[:, :, :, ay, ax] = sai
-            sai_epi_ver[:, ang_w*ax+ay, :] = sai_mv[:, ang_w//2, :, ay, ax]
-            sai_epi_hor[ang_h*ax+ay, :, :] = sai_mv[ang_h//2, :, :, ay, ax]
-    cv2.imwrite(pr_path+'/sai_epi_ver'+str(i_tot)+'.png', sai_epi_ver)
-    cv2.imwrite(pr_path+'/sai_epi_hor'+str(i_tot)+'.png', sai_epi_hor)
-
-    return epi_v, epi_h
-'''
-
-'''
-    if len(src.shape) == 2:
-        h, w = src.shape
-        c = 1
-    else:
-        h, w, c = src.shape
-'''
-
 def make_colorwheel():
     RY = 15
     YG = 6
@@ -271,22 +244,6 @@ def trans_order(imgSAIs):
             imgSAIs2[:, :, :, (i-4)//5+5*4] = imgSAIs[:, :, :, i]
     return imgSAIs2
 
-def blob_to_img(blob):
-    b, c, h, w = blob.shape
-
-    if b != 1:
-        raise Exception("!!! Batch should be 1 !!!")
-
-    if c == 3:
-        img = np.zeros((h, w, c))
-        for i in range(3):
-            img[:, :, i] = blob[0, i, :, :]
-    else:
-        img = np.zeros((h, w))
-        img = blob[0, 0, :, :] 
-
-    return img
-
 def change_order(imgs, batch_size):
     imgs_result = None
     for j in range(5):
@@ -299,31 +256,6 @@ def change_order(imgs, batch_size):
             else:
                 imgs_result = L.Concat(*[imgs_result, temp], concat_param={'axis': 1})
     return imgs_result
-
-def img_list_gen(path, tot_img, tot_sai, pick_mode):
-    for i_sai in range(tot_sai):
-        i_pick = index_picker_5x5(i_sai, pick_mode)
-        f = open(path+'/dataset_list{}.txt'.format(i_sai), 'w')
-        for i_tot in range(tot_img):
-            f.write(path+'/sai{}_{}.png 0\n'.format(i_tot, i_pick))
-        f.close()
-
-    '''
-    f = open(path+'/depthset_list.txt', 'w')
-    for i_tot in range(tot_img):
-        f.write(path+'/sai{}_dep.png 0\n'.format(i_tot))
-    f.close()
-    '''
-
-'''
-    #n.label_depth_org = image_data_depth(batch_size=args.batch_size, data_path=args.trainset_path)
-
-    #n.label_depth_1ch, n.label_depth_2ch, n.depth_trash = L.Slice(n.label_depth_org, ntop=3, slice_param=dict(slice_dim=1, slice_point=[1, 2]))
-    #n.label_depth_1ch = L.Power(n.label_depth_1ch, power=1.0, scale=256.0, shift=0.0)
-    #n.label_depth = L.Eltwise(n.label_depth_1ch, n.label_depth_2ch, operation=P.Eltwise.SUM)
-    #n.label_depth = L.Power(n.label_depth, power=1.0, scale=1/(256.0*256.0), shift=0.0)
-    #n.depth_trash = L.Silence(n.depth_trash, ntop=0)
-'''
 
 def blob_to_spatial(blob, n_sai):
     SIZE = 256
@@ -371,19 +303,183 @@ def blob_to_angular(blob, n_sai):
 
     return angular
 
-def blob_to_img(blob):
-    img = np.moveaxis(np.squeeze(blob, 0), 0, -1)
+# raise Exception('This is not a normal image !!!')
+
+def input_shifting(img, shift_val):
+    lf = np.zeros((256, 256, 25), np.float32)
+
+    for i in range(25):
+        tx, ty = shift_value_5x5(i, shift_val)
+        M = np.float32([[1, 0, tx], [0, 1, ty]])
+        lf[:, :, i] = cv2.warpAffine(img, M, (256, 256), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+
+    return lf
+
+def lf_to_blob(img):
+    h, w = img.shape[:2]
+    blob = np.zeros((5*5, 3, h//5, w//5))
+
+    for ax in range(5):
+        for ay in range(5):
+            blob[5*ax+ay, :, :, :] = np.moveaxis(img[ay::5, ax::5, :], -1, 0)
+
+    return blob
+
+def blob_to_lf(blob):
+    tensor = blob_to_tensor(blob)
+    b, h, w, c = tensor.shape
+    img = np.zeros((h*5, w*5, c))
+
+    for ax in range(5):
+        for ay in range(5):
+            img[ay::5, ax::5, :] = tensor[5*ax+ay, :, :, :]
+    if c == 1:
+        img = np.squeeze(img, -1)
 
     return img
 
-def img_to_blob(img):
-    dim = len(img.shape)
-
-    if dim == 3:
-        blob =  np.expand_dims(np.moveaxis(img, -1, 0), 0)
-    elif dim == 2:
-        blob =  np.expand_dims(np.expand_dims(img, 0), 0)
+def lf_load_5x5(path='./data_input/sai/sai0_{}.png', is_color=True):
+    if is_color == True:
+        color_mode = cv2.IMREAD_COLOR
+        lf_tensor = np.zeros((25, 256, 256, 3))
+    elif is_color == False:
+        color_mode = cv2.IMREAD_GRAYSCALE
+        lf_tensor = np.zeros((25, 256, 256, 1))
     else:
-        raise Exception('This is not a normal image !!!')
+        print('!!! Wrong is_color param !!!')
+        exit()
 
+    for i in range(25):
+        try:
+            img = cv2.imread(path.format(index_picker_5x5(i)), color_mode)
+            lf_tensor[i, :, :, :] = cv2.resize(img, dsize=(256, 256), interpolation=cv2.INTER_LINEAR)
+        except ValueError as e:
+            img = cv2.imread(path.format(index_picker_5x5(i)), color_mode)          
+            lf_tensor[i, :, :, 0] = cv2.resize(img, dsize=(256, 256), interpolation=cv2.INTER_LINEAR)
+            
+    return tensor_to_blob(lf_tensor)
+
+def lf_save_5x5(lf_blob, path='./data_output/sai/sai0_{}.png'):
+    lf_tensor = blob_to_tensor(lf_blob)
+
+    for i in range(lf_tensor.shape[0]):
+        try:
+            cv2.imwrite(path.format(i), lf_tensor[i, :, :, :])
+        except ValueError as e:
+            cv2.imwrite(path.format(i), lf_tensor[i, :, :, 0])
+
+def blob_to_image(blob):
+    tensor = blob_to_tensor(blob)
+    b, h, w, c = tensor.shape
+    if b != 1 and (c != 3 or c != 1):
+        print('!!! Wrong shape !!!')
+        exit()
+    
+    if c == 3:
+        img = np.squeeze(tensor, 0)
+    else:
+        img = np.squeeze(np.squeeze(tensor, 0), -1)
+
+    return img
+
+def image_to_blob(img):
+    if len(img.shape) == 3:
+        c = 3
+    elif len(img.shape) == 2:
+        c = 1
+    else:
+        print('!!! Wrong shape !!!')
+        exit()
+
+    if c == 3:
+        tensor = np.expand_dims(img, 0)
+    else:
+        tensor = np.expand_dims(np.expand_dims(img, 0), -1)
+    
+    return tensor_to_blob(tensor)
+
+def tensor_to_blob(tensor):
+    return np.moveaxis(tensor, -1, 1)
+
+def blob_to_tensor(blob):
+    return np.moveaxis(blob, 1, -1)
+
+def predict_to_blob(predict):
+    b, c, h, w = predict.shape
+
+    if c == 75:
+        blob = np.zeros((c//3, 3, h, w))
+        for ax in range(5):
+            for ay in range(5):
+                blob[5*ax+ay, :, :, :] = predict[:, 3*(5*ax+ay):3*(5*ax+ay)+3, :, :]
+    elif c == 25:
+        blob = np.zeros((c, 1, h, w))
+        for i in range(25):
+            blob[i, 0, :, :] = predict[:, i, :, :]
+    else:
+        print('!!! Wrong predict size !!!')
+        exit()
+        
     return blob
+
+def lf_flip_hor(blob):
+    dst_blob = np.zeros((blob.shape))
+    for ax in range(5):
+        for ay in range(5):
+            dst_blob[5*ax+ay, :, :, :] = blob[5*(4-ax)+ay, :, :, :]
+    return dst_blob
+
+def lf_flip_ver(blob):
+    dst_blob = np.zeros((blob.shape))
+    for ax in range(5):
+        for ay in range(5):
+            dst_blob[5*ax+ay, :, :, :] = blob[5*ax+(4-ay), :, :, :]
+    return dst_blob
+
+def lf_transpose(blob):
+    dst_blob = np.zeros((blob.shape))
+    for ax in range(5):
+        for ay in range(5):
+            dst_blob[5*ax+ay, :, :, :] = blob[5*ay+ax, :, :, :]
+    return dst_blob           
+
+def epi_slicing(blob, t=2, s=2, v=256//2, u=256//2):
+    '''
+    v = y coord of image
+    u = x coord of image
+    t = y coord of SAI gird
+    s = x coord of SAI gird
+    '''
+    
+    tensor = blob_to_tensor(blob)
+    b, h, w, c = tensor.shape
+
+    # Stack SAI
+    stack_ver = np.zeros((5, h, w, c))
+    stack_hor = np.zeros((5, h, w, c))
+    for i in range(5):
+        stack_ver[i, :, :, :] = tensor[i+(5*s), :, :, :]
+        stack_hor[i, :, :, :] = tensor[5*i+t, :, :, :]
+
+    # Extract EPI
+    epi_ver = np.zeros((h, 5, c))
+    epi_hor = np.zeros((5, w, c))
+    for i in range(5):
+        epi_ver[:, i, :] = stack_ver[i, :, u, :]
+        epi_hor[i, :, :] = stack_hor[i, v, :, :]
+
+    #cv2.imshow('test', np.uint8(epi_ver))
+    #cv2.waitKey()
+
+    return image_to_blob(epi_hor), image_to_blob(epi_ver)
+
+def view_center_change_5x5(blob, shift_val):
+    tensor = blob_to_tensor(blob)
+    for i in range(25):
+        tx, ty = shift_value_5x5(i, shift_val)
+        M = np.float32([[1, 0, tx], [0, 1, ty]])
+        try:
+            tensor[i, :, :, :] = cv2.warpAffine(tensor[i, :, :, :], M, (256, 256), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+        except ValueError as e:
+            tensor[i, :, :, 0] = cv2.warpAffine(tensor[i, :, :, 0], M, (256, 256), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    return tensor_to_blob(tensor)
