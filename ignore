@@ -7,8 +7,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list12.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list12.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -29,8 +29,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list0.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list0.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -46,8 +46,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list1.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list1.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -73,8 +73,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list2.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list2.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -100,8 +100,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list3.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list3.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -127,8 +127,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list4.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list4.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -154,8 +154,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list5.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list5.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -181,8 +181,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list6.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list6.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -208,8 +208,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list7.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list7.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -235,8 +235,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list8.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list8.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -262,8 +262,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list9.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list9.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -289,8 +289,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list10.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list10.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -316,8 +316,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list11.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list11.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -343,8 +343,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list12.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list12.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -370,8 +370,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list13.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list13.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -397,8 +397,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list14.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list14.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -424,8 +424,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list15.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list15.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -451,8 +451,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list16.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list16.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -478,8 +478,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list17.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list17.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -505,8 +505,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list18.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list18.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -532,8 +532,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list19.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list19.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -559,8 +559,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list20.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list20.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -586,8 +586,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list21.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list21.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -613,8 +613,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list22.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list22.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -640,8 +640,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list23.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list23.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -667,8 +667,8 @@ layer {
     scale: 0.00390625
   }
   image_data_param {
-    source: "./datas/face_dataset/face_train_5x5_f50_b1.25/dataset_list24.txt"
-    batch_size: 4
+    source: "./datas/face_dataset/face_test_5x5_f50_b1.25/dataset_list24.txt"
+    batch_size: 1
     shuffle: false
     new_height: 256
     new_width: 256
@@ -3050,218 +3050,66 @@ layer {
   }
 }
 layer {
-  name: "loss1"
-  type: "AbsLoss"
+  name: "trash"
+  type: "Python"
   bottom: "predict"
+  top: "trash"
+  python_param {
+    module: "visualization_layer"
+    layer: "VisualizationLayer"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'predict\', \'mult\': 256}"
+  }
+}
+layer {
+  name: "Python1"
+  type: "Python"
+  bottom: "flow_h"
+  top: "Python1"
+  python_param {
+    module: "visualization_layer"
+    layer: "VisualizationLayer"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'flow_h\', \'mult\': 20}"
+  }
+}
+layer {
+  name: "silence_flow_h"
+  type: "Silence"
+  bottom: "Python1"
+}
+layer {
+  name: "Python2"
+  type: "Python"
+  bottom: "flow_v"
+  top: "Python2"
+  python_param {
+    module: "visualization_layer"
+    layer: "VisualizationLayer"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'flow_v\', \'mult\': 20}"
+  }
+}
+layer {
+  name: "silence_flow_v"
+  type: "Silence"
+  bottom: "Python2"
+}
+layer {
+  name: "Python3"
+  type: "Python"
   bottom: "label"
-  top: "loss1"
-  loss_weight: 1
-}
-layer {
-  name: "pr_mean"
-  type: "Convolution"
-  bottom: "predict"
-  top: "pr_mean"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 1
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "constant"
-      value: 1
-    }
-    engine: CAFFE
-    dilation: 1
+  top: "Python3"
+  python_param {
+    module: "visualization_layer"
+    layer: "VisualizationLayer"
+    param_str: "{\'path\': \'./datas/face_dataset\', \'name\': \'label\', \'mult\': 256}"
   }
 }
 layer {
-  name: "gt_mean"
-  type: "Convolution"
-  bottom: "label"
-  top: "gt_mean"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 1
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "constant"
-      value: 1
-    }
-    engine: CAFFE
-    dilation: 1
-  }
+  name: "silence_label"
+  type: "Silence"
+  bottom: "Python3"
 }
 layer {
-  name: "Convolution35"
-  type: "Convolution"
-  bottom: "pr_mean"
-  top: "Convolution35"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 25
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "constant"
-      value: 1
-    }
-    engine: CAFFE
-    dilation: 1
-  }
-}
-layer {
-  name: "Eltwise2"
-  type: "Eltwise"
-  bottom: "predict"
-  bottom: "Convolution35"
-  top: "Eltwise2"
-  eltwise_param {
-    operation: PROD
-  }
-}
-layer {
-  name: "AbsVal1"
-  type: "AbsVal"
-  bottom: "Eltwise2"
-  top: "AbsVal1"
-}
-layer {
-  name: "pr_var"
-  type: "Convolution"
-  bottom: "AbsVal1"
-  top: "pr_var"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 1
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "constant"
-      value: 1
-    }
-    engine: CAFFE
-    dilation: 1
-  }
-}
-layer {
-  name: "Convolution36"
-  type: "Convolution"
-  bottom: "gt_mean"
-  top: "Convolution36"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 25
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "constant"
-      value: 1
-    }
-    engine: CAFFE
-    dilation: 1
-  }
-}
-layer {
-  name: "Eltwise3"
-  type: "Eltwise"
-  bottom: "label"
-  bottom: "Convolution36"
-  top: "Eltwise3"
-  eltwise_param {
-    operation: PROD
-  }
-}
-layer {
-  name: "AbsVal2"
-  type: "AbsVal"
-  bottom: "Eltwise3"
-  top: "AbsVal2"
-}
-layer {
-  name: "gt_var"
-  type: "Convolution"
-  bottom: "AbsVal2"
-  top: "gt_var"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 1
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "constant"
-      value: 1
-    }
-    engine: CAFFE
-    dilation: 1
-  }
-}
-layer {
-  name: "AbsLoss1"
-  type: "AbsLoss"
-  bottom: "pr_mean"
-  bottom: "gt_mean"
-  top: "AbsLoss1"
-}
-layer {
-  name: "loss2"
-  type: "Power"
-  bottom: "AbsLoss1"
-  top: "AbsLoss1"
-  loss_weight: 1
-  power_param {
-    power: 1.0
-    scale: 0.25
-    shift: 0.0
-  }
-}
-layer {
-  name: "AbsLoss2"
-  type: "AbsLoss"
-  bottom: "pr_var"
-  bottom: "gt_var"
-  top: "AbsLoss2"
-}
-layer {
-  name: "loss3"
-  type: "Power"
-  bottom: "AbsLoss2"
-  top: "AbsLoss2"
-  loss_weight: 1
-  power_param {
-    power: 1.0
-    scale: 0.025
-    shift: 0.0
-  }
+  name: "silence_predict"
+  type: "Silence"
+  bottom: "trash"
 }

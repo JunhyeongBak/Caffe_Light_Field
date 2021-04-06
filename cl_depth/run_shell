@@ -1,6 +1,0 @@
-#!/bin/bash
-
-echo "Run shell running!"
-./main
-
-exit 0

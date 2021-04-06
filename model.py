@@ -7,6 +7,8 @@ from caffe import layers as L
 from caffe import params as P
 import time
 from function import *
+from numpy import prod, sum
+from pprint import pprint
 
 def image_data_center(batch_size, data_path, center_id, color_mode):
     center, trash = L.ImageData(batch_size=batch_size,
@@ -191,6 +193,31 @@ def org_loss(imgs):
 
     return row_mean1, row_mean2, row_mean3, row_mean4, row_mean5
 
+def mv_loss(pr, gt, batch_size):
+    # Get mean
+    pr_mean = L.Convolution(pr, num_output=1, kernel_size=1, stride=1, dilation=1, pad=0,
+                                bias_term=False, weight_filler=dict(type='constant', value=1), param=dict(lr_mult=0, decay_mult=0), engine=1)
+    gt_mean = L.Convolution(gt, num_output=1, kernel_size=1, stride=1, dilation=1, pad=0,
+                                bias_term=False, weight_filler=dict(type='constant', value=1), param=dict(lr_mult=0, decay_mult=0), engine=1)
+
+    # Get var
+    pr_mean_broad = L.Convolution(pr_mean, num_output=25, kernel_size=1, stride=1, dilation=1, pad=0,
+                                bias_term=False, weight_filler=dict(type='constant', value=1), param=dict(lr_mult=0, decay_mult=0), engine=1)
+    gt_mean_broad = L.Convolution(gt_mean, num_output=25, kernel_size=1, stride=1, dilation=1, pad=0,
+                                bias_term=False, weight_filler=dict(type='constant', value=1), param=dict(lr_mult=0, decay_mult=0), engine=1)
+    #pr_mean_broad = L.Reshape(pr_mean, reshape_param={'shape':{'dim':[batch_size, 25, 256, 256]}})
+    #gt_mean_broad = L.Reshape(gt_mean, reshape_param={'shape':{'dim':[batch_size, 25, 256, 256]}})
+    pr_var_broad = L.Eltwise(pr, pr_mean_broad, operation=P.Eltwise.PROD)
+    gt_var_broad = L.Eltwise(gt, gt_mean_broad, operation=P.Eltwise.PROD)
+    pr_var_broad = L.AbsVal(pr_var_broad)
+    gt_var_broad = L.AbsVal(gt_var_broad)
+    pr_var = L.Convolution(pr_var_broad, num_output=1, kernel_size=1, stride=1, dilation=1, pad=0,
+                                bias_term=False, weight_filler=dict(type='constant', value=1), param=dict(lr_mult=0, decay_mult=0), engine=1)
+    gt_var = L.Convolution(gt_var_broad, num_output=1, kernel_size=1, stride=1, dilation=1, pad=0,
+                                bias_term=False, weight_filler=dict(type='constant', value=1), param=dict(lr_mult=0, decay_mult=0), engine=1)
+
+    return pr_mean, gt_mean, pr_var, gt_var
+
 def denseUNet(input, batch_size):
     def flow_layer(bottom=None, nout=1):    
         conv = L.Convolution(bottom, num_output=nout, kernel_size=1, stride=1, dilation=1, pad=0,
@@ -290,6 +317,12 @@ def train_proto_gen(args):
 
     n.loss1 = L.AbsLoss(n.predict, n.label, loss_weight=1)
 
+    n.pr_mean, n.gt_mean, n.pr_var, n.gt_var = mv_loss(n.predict, n.label, args.batch_size)
+    n.loss2 = L.AbsLoss(n.pr_mean, n.gt_mean)
+    n.loss2 = L.Power(n.loss2, power=1.0, scale=0.25, shift=0.0, in_place=True, loss_weight=1)
+    n.loss3 = L.AbsLoss(n.pr_var, n.gt_var)
+    n.loss3 = L.Power(n.loss3, power=1.0, scale=0.025, shift=0.0, in_place=True, loss_weight=1)
+
     with open(args.train_path, 'w') as f:
         f.write(str(n.to_proto()))    
 
@@ -311,12 +344,12 @@ def test_proto_gen(args):
         n.input = L.Input(input_param=dict(shape=dict(dim=[1, 1, 256, 256])))
         n.input_color = L.Input(input_param=dict(shape=dict(dim=[1, 3, 256, 256])))
 
-    n.flow = denseUNet(n.input, 1)   
+    n.flow = denseUNet(n.input, 1)
+
     n.flow_h, n.flow_v = L.Slice(n.flow, ntop=2, slice_param=dict(slice_dim=1, slice_point=[args.n_sai]))
 
     if args.mode == 'train':
         n.predict = slice_warp2(n.input, n.flow_h, n.flow_v, args.n_sai)
-
         n.trash = L.Python(n.flow_h, module='visualization_layer', layer='VisualizationLayer', ntop=1,
                         param_str=str(dict(path='./datas/face_dataset', name='flow_h', mult=20)))
         n.silence_flow_h = L.Silence(n.trash, ntop=0)
@@ -370,3 +403,10 @@ def solver_proto_gen(args):
 
     with open(args.solver_path, 'w') as f:
         f.write(str(s))
+
+def print_net_parameters (deploy_file):
+    print("Net: " + deploy_file)
+    net = caffe.Net(deploy_file, caffe.TEST)
+    print("Layer-wise parameters: ")
+    pprint([(k, v[0].data.shape) for k, v in net.params.items()])
+    print("Total number of parameters: " + str(sum([prod(v[0].data.shape) for k, v in net.params.items()])))

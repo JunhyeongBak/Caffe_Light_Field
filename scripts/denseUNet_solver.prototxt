@@ -4,7 +4,7 @@ test_iter: 1
 test_interval: 20
 base_lr: 0.0005
 display: 1
-max_iter: 46000000
+max_iter: 60000000
 lr_policy: "step"
 gamma: 0.75
 power: 0.75

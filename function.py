@@ -1,7 +1,9 @@
+import os
 import numpy as np
 import cv2
 import imageio
 import sys
+import math
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -483,3 +485,62 @@ def view_center_change_5x5(blob, shift_val):
         except ValueError as e:
             tensor[i, :, :, 0] = cv2.warpAffine(tensor[i, :, :, 0], M, (256, 256), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
     return tensor_to_blob(tensor)
+
+def psnr(img1, img2):
+    img1 = np.float64(img1)
+    img2 = np.float64(img2)
+    mse = np.mean( (img1 - img2) ** 2 )
+    if mse == 0:
+        return 100.
+    return 10 * math.log10(255. * 255. / mse)
+
+def blob_to_grid(blob):
+    tensor = blob_to_tensor(blob)
+    c = tensor.shape[-1]
+    grid_img = np.zeros((256*5, 256*5, c))
+
+    for ax in range(5):
+        for ay in range(5):
+            grid_img[256*ay:256*ay+256, 256*ax:256*ax+256, :] = tensor[5*ax+ay, :, :, :]
+            
+    if c == 1:
+        grid_img = np.squeeze(grid_img, -1)
+
+    return grid_img
+
+def data_preparation():
+    n_tot = 600
+    n_sai = 25
+    directory = './datas/face_dataset/face_train_5x5_f50_b2.5'
+    ext_src = '.png'
+    ext_dst = '.jpg'
+
+    for i_tot in range(n_tot):
+        # Make seperated directory
+        directory_new = os.path.join(directory, 'img{}'.format(i_tot))
+        if not os.path.exists(directory_new):
+            os.makedirs(directory_new)
+
+        # Read and save image at new directory
+        for i_sai in range(n_sai):
+            i_pick = index_picker_5x5(i_sai, pick_mode='9x9')
+            filename_src = 'sai{}_{}'.format(i_tot, i_pick)
+            filename_dst = 'sai{}'.format(i_sai)
+            path_src = os.path.join(directory, filename_src + ext_src)
+            path_dst = os.path.join(directory_new, filename_dst + ext_dst)
+            print(path_src, path_dst)
+            img = cv2.imread(path_src, cv2.IMREAD_COLOR)
+            cv2.imwrite(path_dst, img)
+            os.remove(path_src)
+
+def name_erase():
+    n_tot = 600
+    n_sai = 25
+    directory = './datas/face_dataset/face_train_5x5_f50_b2.5'
+    
+    for i_tot in range(n_tot):
+        for i_sai in range(n_sai):
+            name_src = os.path.join(directory, 'img{}'.format(i_tot), 'sai{}_{}.jpg'.format(i_tot, i_sai))
+            name_dst = os.path.join(directory, 'img{}'.format(i_tot), 'sai{}.jpg'.format(i_sai))
+            print(name_src, name_dst)
+            os.rename(name_src, name_dst)
